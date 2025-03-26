@@ -36,7 +36,7 @@ class Catequistas(db.Model):
     # (1:N - One-to-Many) UM catequista pode ter VÁRIOS crismandos
     crismandos = db.relationship('Crismandos', backref='cat', lazy=True)
 
-    # (1:1 - One-to-One)
+    # (1:1 - One-to-One) UM login para apenas UM catequista
     login = db.relationship('Usuarios', uselist=False, backref='usuario')
 
 
@@ -68,12 +68,13 @@ class Frequencias(db.Model):
 
     id_freq = db.Column(db.Integer, primary_key=True)
     data_frequencia = db.Column(db.Date, nullable=False)
-    status_frequencia = db.Column(
-        db.Enum('presente', 'falta', 'justificada'), default='falta')
+    status_frequencia = db.Column(db.Enum('presente', 'falta', 'justificada'), default='falta')
     observacao = db.Column(db.Text)
 
     # Chave Estrangeira
-    fk_id_crismando = db.Column(db.Integer, db.ForeignKey('crismandos.id'), nullable=False)
+    fk_id_crismando = db.Column(db.Integer, 
+                                db.ForeignKey('crismandos.id'), 
+                                nullable=False)
 
 
 
@@ -85,13 +86,16 @@ class Usuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
 
     # Chave Estrangeira
-    fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'), nullable=False)
+    fk_id_catequista = db.Column(db.Integer,
+                                 db.ForeignKey('catequistas.id_catequista'),
+                                 nullable=False)
 
 
 # Rota de começo
 @app.route("/", methods=["GET"])
 def index():
-    lista_crismandos = Crismandos.query.all()
+    # lista_crismandos = Crismandos.query.all()
+    lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
     return render_template('index.html', lista_crismandos = lista_crismandos)
 
 

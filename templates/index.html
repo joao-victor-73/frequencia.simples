@@ -2,19 +2,23 @@
 
 {% block conteudo %}
     <h1>Lista de Presença</h1>
-    <table border="1">
+    <table class="table table-striped table-hover">
         <tr>
+            <th>Id</th>
             <th>Nome</th>
-            <th>Nome da Mãe</th>
-            <th>Nome do Pai</th>
-            <th>Presença</th>
+            <th>Endereco</th>
+            <th>Data de Nascimento</th>
+            <th>Status do Crismando</th>
+            <th>Catequista/Grupo</th>
         </tr>
-        {% for crismando in lista_crismandos %}
+        {% for crismando, catequista in lista_crismandos %}
         <tr>
+            <td>{{ crismando.id }}</td>
             <td>{{ crismando.nome }}</td>
-            <td>{{ crismando.nome_mae }}</td>
-            <td>{{ crismando.nome_pai }}</td>
-            <td>{% if crismando.presente %}✅ Presente{% else %}❌ Ausente{% endif %}</td>
+            <td>{{ crismando.endereco }}</td>
+            <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
+            <td>{{ crismando.status_crismando|title }}</td>
+            <td>{{ catequista.grupo }}</td>
         </tr>
         {% endfor %}
     </table>
