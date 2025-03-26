@@ -1,0 +1,24 @@
+frequencia.simples/
+│── app.py                 # Arquivo principal do Flask
+│── config.py              # Configuração do banco de dados
+│── models.py              # Modelos do banco de dados
+│── routes.py              # Rotas do sistema
+│── database.db            # Arquivo SQLite (será gerado automaticamente)
+│── requirements.txt       # Dependências do projeto
+│── static/                # Arquivos estáticos (CSS, JS, imagens)
+│── templates/             # Arquivos HTML (para o front-end futuramente)
+└── migrations/            # Pasta para gerenciamento do banco (caso use Flask-Migrate)
+
+
+                                
+                                INFORMAÇÕES DE CADA BIBLIOTECA
+
+flask_sqlalchemy: ORM para interação com o banco de dados.
+
+flask_cors: Permite requisições entre origens diferentes (necessário para comunicação com o front-end).
+
+flask_migrate: Gerenciamento de migrações de banco de dados.
+
+flask_bcrypt: Hashing de senhas para segurança.
+
+flask_jwt_extended: Autenticação por tokens JWT

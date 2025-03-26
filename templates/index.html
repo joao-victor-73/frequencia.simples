@@ -1,5 +1,23 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
+    <h1>Lista de Presença</h1>
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>Nome da Mãe</th>
+            <th>Nome do Pai</th>
+            <th>Presença</th>
+        </tr>
+        {% for crismando in lista_crismandos %}
+        <tr>
+            <td>{{ crismando.nome }}</td>
+            <td>{{ crismando.nome_mae }}</td>
+            <td>{{ crismando.nome_pai }}</td>
+            <td>{% if crismando.presente %}✅ Presente{% else %}❌ Ausente{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
 
 {% endblock %}
