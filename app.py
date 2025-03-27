@@ -130,6 +130,10 @@ def index():
     if filtrar_eucaristia is not None:
         query = query.filter(Crismandos.eucaristia == ('sim' if filtrar_eucaristia == '1' else 'nao'))
 
+
+    # Ordenação alfabética dos resultados
+    query = query.order_by(Crismandos.nome)
+    
     # Executamos a consulta e pegamos os resultados
     lista_crismandos = query.all()
 
