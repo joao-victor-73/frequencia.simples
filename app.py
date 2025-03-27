@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import os
 import dotenv
 from flask_sqlalchemy import SQLAlchemy
@@ -31,7 +31,8 @@ class Catequistas(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
     grupo = db.Column(db.String(100), default='Nao Especificado')
-    nivel = db.Column(db.Enum('coordenador', 'catequista'), nullable=False, default='catequista')
+    nivel = db.Column(db.Enum('coordenador', 'catequista'),
+                      nullable=False, default='catequista')
 
     # (1:N - One-to-Many) UM catequista pode ter VÁRIOS crismandos
     crismandos = db.relationship('Crismandos', backref='cat', lazy=True)
@@ -40,27 +41,29 @@ class Catequistas(db.Model):
     login = db.relationship('Usuarios', uselist=False, backref='usuario')
 
 
-
 class Crismandos(db.Model):
     __tablename__ = 'crismandos'
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     nome_mae = db.Column(db.String(100), nullable=False)
-    nome_pai = db.Column(db.String(100), nullable=False, default='Nao mencionado')
+    nome_pai = db.Column(db.String(100), nullable=False,
+                         default='Nao mencionado')
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200), nullable=False)
     tel1 = db.Column(db.String(15), nullable=False)
     tel2 = db.Column(db.String(15))
     batismo = db.Column(db.Enum('sim', 'nao'), default='nao')
     eucaristia = db.Column(db.Enum('sim', 'nao'), default='nao')
-    status_crismando = db.Column(db.Enum('ativo', 'desistente'), default='ativo')
+    status_crismando = db.Column(
+        db.Enum('ativo', 'desistente'), default='ativo')
 
     # Chave Estrangeira (ForeignKey)
-    fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'))
+    fk_id_catequista = db.Column(
+        db.Integer, db.ForeignKey('catequistas.id_catequista'))
 
     # (1:N) UM crismando pode ter VÁRIAS frequências
-    frequencias = db.relationship('Frequencias', backref='freq')
+    frequencias = db.relationship('Frequencias', backref='cris')
 
 
 class Frequencias(db.Model):
@@ -68,14 +71,14 @@ class Frequencias(db.Model):
 
     id_freq = db.Column(db.Integer, primary_key=True)
     data_frequencia = db.Column(db.Date, nullable=False)
-    status_frequencia = db.Column(db.Enum('presente', 'falta', 'justificada'), default='falta')
+    status_frequencia = db.Column(
+        db.Enum('presente', 'falta', 'justificada'), default='falta')
     observacao = db.Column(db.Text)
 
     # Chave Estrangeira
-    fk_id_crismando = db.Column(db.Integer, 
-                                db.ForeignKey('crismandos.id'), 
+    fk_id_crismando = db.Column(db.Integer,
+                                db.ForeignKey('crismandos.id'),
                                 nullable=False)
-
 
 
 class Usuarios(db.Model):
@@ -95,8 +98,21 @@ class Usuarios(db.Model):
 @app.route("/", methods=["GET"])
 def index():
     # lista_crismandos = Crismandos.query.all()
-    lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
-    return render_template('index.html', lista_crismandos = lista_crismandos)
+    # lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
+    
+    termo_procura = request.args.get('pesquisa', '').strip()
+
+    query = db.session.query(Crismandos, Catequistas).join(Catequistas)
+
+    if termo_procura:
+        query = query.filter(Crismandos.nome.ilike(f"%{termo_procura}%"))
+
+    lista_crismandos = query.all()
+
+    return render_template('index.html', lista_crismandos=lista_crismandos, termo_procura=termo_procura)
+
+    
+    return render_template('index.html', lista_crismandos=lista_crismandos)
 
 
 # Rota para registrar presença
@@ -105,6 +121,8 @@ def registrar_presenca():
     pass
 
 # Rota para consultar frequência
+
+
 @app.route("/frequencia", methods=["GET"])
 def listar_frequencia():
     pass
