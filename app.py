@@ -35,7 +35,7 @@ class Catequistas(db.Model):
                       nullable=False, default='catequista')
 
     # (1:N - One-to-Many) UM catequista pode ter VÁRIOS crismandos
-    crismandos = db.relationship('Crismandos', backref='cat', lazy=True)
+    crismandos = db.relationship('Crismandos', backref='catequista', lazy=True)
 
     # (1:1 - One-to-One) UM login para apenas UM catequista
     login = db.relationship('Usuarios', uselist=False, backref='usuario')
@@ -64,7 +64,7 @@ class Crismandos(db.Model):
         db.Integer, db.ForeignKey('catequistas.id_catequista'))
 
     # (1:N) UM crismando pode ter VÁRIAS frequências
-    frequencias = db.relationship('Frequencias', backref='cris')
+    frequencias = db.relationship('Frequencias', backref='crismando')
 
 
 class Frequencias(db.Model):
@@ -103,11 +103,12 @@ def index():
 
     # Obter os valores de busca da URL que vem da pagina index.html
     search_term = request.args.get('busca', '').strip()
-    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
+    status_filter = request.args.get(
+        'buscar_status_crismando', '').strip()  # obtém o status selecionado
 
     # Pega o valor se o checkbox foi marcado
     filtrar_batizado = request.args.get('batismo')
-    
+
     # Pega o valor se o checkbox foi marcado
     filtrar_eucaristia = request.args.get('eucaristia')
 
@@ -124,26 +125,42 @@ def index():
 
     # Filtro por batismo (1 = Sim | 0 - Não)
     if filtrar_batizado is not None:
-        query = query.filter(Crismandos.batismo == ('sim' if filtrar_batizado == '1' else 'nao'))
+        query = query.filter(Crismandos.batismo == (
+            'sim' if filtrar_batizado == '1' else 'nao'))
 
     # Filtro por eucaristia (1 = Sim | 0 - Não)
     if filtrar_eucaristia is not None:
-        query = query.filter(Crismandos.eucaristia == ('sim' if filtrar_eucaristia == '1' else 'nao'))
-
+        query = query.filter(Crismandos.eucaristia == (
+            'sim' if filtrar_eucaristia == '1' else 'nao'))
 
     # Ordenação alfabética dos resultados
     query = query.order_by(Crismandos.nome)
-    
+
     # Executamos a consulta e pegamos os resultados
     lista_crismandos = query.all()
 
     return render_template('index.html',
                            lista_crismandos=lista_crismandos,
                            search_term=search_term,
-                           status_crismando=request.args.get('buscar_status_crismando', ''), # Garantindo a persistência dos filtros de Batismo e Eucaristia
+                           # Garantindo a persistência dos filtros de Batismo e Eucaristia
+                           status_crismando=request.args.get(
+                               'buscar_status_crismando', ''),
                            status_filter=status_filter,
                            filtrar_batizado=filtrar_batizado,
                            filtrar_eucaristia=filtrar_eucaristia)
+
+
+# Rota para editar informações dos crismandos
+@app.route("/editar_informacoes/<int:id_crismando>", methods=['POST', 'GET'])
+def editar_infor(id_crismando):
+
+    # Obtendo os dados associados ao id do crismando
+    crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
+
+    if not crismando:
+        return "Crismando não encontrado", 404
+
+    return render_template('infor_crismandos.html', crismando=crismando)
 
 
 # Rota para registrar presença
