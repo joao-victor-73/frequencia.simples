@@ -1,34 +1,79 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-    <h1>Lista de Presença</h1>
+    <div>
+        <h1>Lista de Presença</h1>
+    </div>
 
-    
+    <!-- FILTRO para a busca -->
+     <div>
+         <form method="GET" action="{{ url_for('index') }}" class="mb-3">
+            <div class="row">
+                <div class="col-md-3">
+                    <!-- Buscar pelo nome -->
+                    <label> Nome: </label>
+                    <input type="text" name="busca" class="form-control" placeholder="Buscar crismando pelo nome..." value="{{ request.args.get('busca', '') }}">
+                </div>
 
-    <form method="GET" action="{{ url_for('index') }}" class="mb-3">
-        <input type="text" name="pesquisa" class="form-control" placeholder="Buscar crismando pelo nome..." value="{{ request.args.get('pesquisa', '') }}">
-        <button type="submit" class="btn btn-primary mt-2">Buscar</button>
-    </form>    
 
-    <table class="table table-striped table-hover">
-        <tr>
-            <th>Id</th>
-            <th>Nome</th>
-            <th>Endereco</th>
-            <th>Data de Nascimento</th>
-            <th>Status do Crismando</th>
-            <th>Catequista/Grupo</th>
-        </tr>
-        {% for crismando, catequista in lista_crismandos %}
-        <tr>
-            <td>{{ crismando.id }}</td>
-            <td>{{ crismando.nome }}</td>
-            <td>{{ crismando.endereco }}</td>
-            <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
-            <td>{{ crismando.status_crismando|title }}</td>
-            <td>{{ catequista.grupo }}</td>
-        </tr>
-        {% endfor %}
+                <!-- Buscar pelo status do crismando -->
+                <div class="col-md-3">
+                    <label> Status: </label>
+                    <select name="buscar_status_crismando" class="form-control">
+                        <option value="" {% if request.args.get('buscar_status_crismando', '') == '' %} selected {% endif %}> Nenhum </option>
+                        <option value="ativo" {% if request.args.get('buscar_status_crismando', '') == 'ativo' %} selected {% endif %}> Ativo </option>
+                        <option value="desistente" {% if request.args.get('buscar_status_crismando', '') == 'desistente' %} selected {% endif %}> Desistente </option>
+                    </select>
+                </div>
+
+                <!-- Buscar pelos sacramentos -->
+                <div class="col-md-3">
+                    <label> Recebeu o batismo? </label>
+                    <label><input type="radio" name="batismo" value="1" {% if request.args.get('batismo') == '1' %} checked {% endif %}> Sim </label>
+                    <label><input type="radio" name="batismo" value="0" {% if request.args.get('batismo') == '0' %} checked {% endif %}> Não </label>
+                    
+                    <label> Recebeu a eucaristia? </label>
+                    <label><input type="radio" name="eucaristia" value="1" {% if request.args.get('eucaristia') == '1' %} checked {% endif %}> Sim </label>
+                    <label><input type="radio" name="eucaristia" value="0" {% if request.args.get('eucaristia') == '0' %} checked {% endif %}> Não </label>
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary"> Limpar Filtros </a>
+                </div>
+            </div>
+         </form>
+    </div>
+
+    <!-- Lista completa dos nomes -->
+    <table class="table table-striped table-responsive table-bordered">
+        <thead class="thead-default">
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Endereco</th>
+                <th>Data de Nascimento</th>
+                <th>Status do Crismando</th>
+                <th>Batizado?</th>
+                <th>Eucaristia?</th>
+                <th>Catequista/Grupo</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for crismando, catequista in lista_crismandos %}
+            <tr>
+                <td>{{ crismando.id }}</td>
+                <td>{{ crismando.nome }}</td>
+                <td>{{ crismando.endereco }}</td>
+                <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
+                <td>{{ crismando.status_crismando|title }}</td>
+                <td>{{ crismando.batismo|title }}</td>
+                <td>{{ crismando.eucaristia|title }}</td>
+                <td>{{ catequista.grupo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
 

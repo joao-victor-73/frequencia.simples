@@ -101,16 +101,45 @@ def index():
     # lista_crismandos = Crismandos.query.all()
     # lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
 
-    termo_procura = request.args.get('pesquisa', '').strip()
+    # Obter os valores de busca da URL que vem da pagina index.html
+    search_term = request.args.get('busca', '').strip()
+    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
 
+    # Pega o valor se o checkbox foi marcado
+    filtrar_batizado = request.args.get('batismo')
+    
+    # Pega o valor se o checkbox foi marcado
+    filtrar_eucaristia = request.args.get('eucaristia')
+
+    # Join entre as tabelas Crismandos e Catequistas
     query = db.session.query(Crismandos, Catequistas).join(Catequistas)
 
-    if termo_procura:
-        query = query.filter(Crismandos.nome.ilike(f"%{termo_procura}%"))
+    # Se o usuário digitou um nome, aplicamos um filtro de nome:
+    if search_term:
+        query = query.filter(Crismandos.nome.ilike(f"%{search_term}%"))
 
+    # Se o usuário escolheu um filtro, aplicamos o filtro de status:
+    if status_filter:
+        query = query.filter(Crismandos.status_crismando == status_filter)
+
+    # Filtro por batismo (1 = Sim | 0 - Não)
+    if filtrar_batizado is not None:
+        query = query.filter(Crismandos.batismo == ('sim' if filtrar_batizado == '1' else 'nao'))
+
+    # Filtro por eucaristia (1 = Sim | 0 - Não)
+    if filtrar_eucaristia is not None:
+        query = query.filter(Crismandos.eucaristia == ('sim' if filtrar_eucaristia == '1' else 'nao'))
+
+    # Executamos a consulta e pegamos os resultados
     lista_crismandos = query.all()
 
-    return render_template('index.html', lista_crismandos=lista_crismandos, termo_procura=termo_procura)
+    return render_template('index.html',
+                           lista_crismandos=lista_crismandos,
+                           search_term=search_term,
+                           status_crismando=request.args.get('buscar_status_crismando', ''), # Garantindo a persistência dos filtros de Batismo e Eucaristia
+                           status_filter=status_filter,
+                           filtrar_batizado=filtrar_batizado,
+                           filtrar_eucaristia=filtrar_eucaristia)
 
 
 # Rota para registrar presença
