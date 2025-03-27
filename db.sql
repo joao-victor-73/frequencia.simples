@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS crismandos (
     data_nascimento DATE NOT NULL,
     endereco VARCHAR(200) NOT NULL,
     cidade VARCHAR(100),
-    tel1 VARCHAR(15) NOT NULL,
-    tel2 VARCHAR(15),
+    tel1 VARCHAR(20) NOT NULL,
+    tel2 VARCHAR(20),
     batismo ENUM('sim', 'nao') DEFAULT 'nao',
     eucaristia ENUM('sim', 'nao') DEFAULT 'nao',
     status_crismando ENUM('ativo', 'desistente') DEFAULT 'ativo',
@@ -41,8 +41,16 @@ CREATE TABLE IF NOT EXISTS crismandos (
     ON UPDATE CASCADE
 );
 
-
 -- UM crismando pode ter VARIAS frequencias (1:N)
+
+
+-- ALTER TABLE crismandos
+-- CHANGE tel1 tel1 VARCHAR(20);
+
+-- ALTER TABLE crismandos
+-- CHANGE tel2 tel2 VARCHAR(20);
+
+
 
 CREATE TABLE IF NOT EXISTS frequencias (
     id_freq INT PRIMARY KEY AUTO_INCREMENT,

@@ -3,6 +3,8 @@
 {% block conteudo %}
     <h1>Lista de Presença</h1>
 
+    
+
     <form method="GET" action="{{ url_for('index') }}" class="mb-3">
         <input type="text" name="pesquisa" class="form-control" placeholder="Buscar crismando pelo nome..." value="{{ request.args.get('pesquisa', '') }}">
         <button type="submit" class="btn btn-primary mt-2">Buscar</button>
