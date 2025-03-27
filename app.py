@@ -51,6 +51,7 @@ class Crismandos(db.Model):
                          default='Nao mencionado')
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200), nullable=False)
+    cidade = db.Column(db.String(100))
     tel1 = db.Column(db.String(15), nullable=False)
     tel2 = db.Column(db.String(15))
     batismo = db.Column(db.Enum('sim', 'nao'), default='nao')
@@ -110,9 +111,6 @@ def index():
     lista_crismandos = query.all()
 
     return render_template('index.html', lista_crismandos=lista_crismandos, termo_procura=termo_procura)
-
-    
-    return render_template('index.html', lista_crismandos=lista_crismandos)
 
 
 # Rota para registrar presença

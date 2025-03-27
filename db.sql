@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS crismandos (
     nome_pai VARCHAR(100) DEFAULT 'Não mencionado',
     data_nascimento DATE NOT NULL,
     endereco VARCHAR(200) NOT NULL,
+    cidade VARCHAR(100),
     tel1 VARCHAR(15) NOT NULL,
     tel2 VARCHAR(15),
     batismo ENUM('sim', 'nao') DEFAULT 'nao',
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS crismandos (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
+
 
 -- UM crismando pode ter VARIAS frequencias (1:N)
 
