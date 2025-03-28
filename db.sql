@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS frequencias (
     id_freq INT PRIMARY KEY AUTO_INCREMENT,
     fk_id_crismando INT NOT NULL,
     data_frequencia DATE NOT NULL,
-    status_frequencia ENUM('presente', 'falta', 'justificada') DEFAULT 'falta',
+    status_frequencia ENUM('presente', 'falta', 'justificada') DEFAULT 'presente',
     observacao TEXT NULL,
 
     CONSTRAINT fk_crismando_frequencia

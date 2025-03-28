@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 import dotenv
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
 
 
 # Configuração do Banco de Dados (Essas configs vem do arquivo .env)
@@ -73,7 +75,7 @@ class Frequencias(db.Model):
     id_freq = db.Column(db.Integer, primary_key=True)
     data_frequencia = db.Column(db.Date, nullable=False)
     status_frequencia = db.Column(
-        db.Enum('presente', 'falta', 'justificada'), default='falta')
+        db.Enum('presente', 'falta', 'justificada'), default='presente')
     observacao = db.Column(db.Text)
 
     # Chave Estrangeira
@@ -184,10 +186,9 @@ def atualizar_infor():
     atualiza_crismando.batismo = request.form['batismo']
     atualiza_crismando.eucaristia = request.form['eucaristia']
 
-    
     # Atualiza o catequista responsável (pega o id da mesma maneira que o do crismando)
-    atualiza_crismando.fk_id_catequista = request.form['catequista_responsavel']  # Atualiza a FK do catequista
-
+    # Atualiza a FK do catequista
+    atualiza_crismando.fk_id_catequista = request.form['catequista_responsavel']
 
     try:
         db.session.add(atualiza_crismando)
@@ -198,18 +199,46 @@ def atualizar_infor():
 
     return redirect(url_for('index'))
 
+
 # Rota para registrar presença
+@app.route("/registrar_freq", methods=["POST", "GET"])
+def registrar_frequencia():
+    if request.method == 'POST':
+        data_frequencia = request.form['data_frequencia']
 
+        for crismando_id, status in request.form.items():
 
-@app.route("/registrar_presenca", methods=["POST"])
-def registrar_presenca():
-    pass
+            if crismando_id != 'data_frequencia':
+                crismando = Crismandos.query.get(crismando_id)
+
+                if crismando:
+                    nova_frequencia = Frequencias(
+                        fk_id_crismando=crismando.id,
+                        data_frequencia=data_frequencia,
+                        status_frequencia=status
+                    )
+                    db.session.add(nova_frequencia)
+
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('frequencia.html', crismandos=Crismandos.query.all())
 
 
 # Rota para consultar frequência
 @app.route("/frequencia", methods=["GET"])
 def listar_frequencia():
-    pass
+    # crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
+    lista_crismandos = db.session.query(Crismandos)
+
+    return render_template('frequencia.html', lista_crismandos=lista_crismandos)
+
+
+@app.route("/ver_frequencias")
+def ver_frequencias():
+    frequencias = Frequencias.query.all()
+    return render_template('visualizar_frequencias.html', frequencias=frequencias)
+
 
 
 if __name__ == "__main__":
