@@ -200,6 +200,31 @@ def atualizar_infor():
     return redirect(url_for('index'))
 
 
+# Rota para registrar presença
+@app.route("/registrar_freq", methods=["POST", "GET"])
+def registrar_frequencia():
+    if request.method == 'POST':
+        data_frequencia = request.form['data_frequencia']
+
+        for crismando_id, status in request.form.items():
+
+            if crismando_id != 'data_frequencia':
+                crismando = Crismandos.query.get(crismando_id)
+
+                if crismando:
+                    nova_frequencia = Frequencias(
+                        fk_id_crismando=crismando.id,
+                        data_frequencia=data_frequencia,
+                        status_frequencia=status
+                    )
+                    db.session.add(nova_frequencia)
+
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('frequencia.html', crismandos=Crismandos.query.all())
+
+
 # Rota para consultar frequência
 @app.route("/frequencia", methods=["GET"])
 def listar_frequencia():
@@ -209,10 +234,10 @@ def listar_frequencia():
     return render_template('frequencia.html', lista_crismandos=lista_crismandos)
 
 
-# Rota para consultar frequência
-@app.route("/registrar_frequencia", methods=["GET"])
-def registrar_frequencia():
-    pass
+@app.route("/ver_frequencias")
+def ver_frequencias():
+    frequencias = Frequencias.query.all()
+    return render_template('visualizar_frequencias.html', frequencias=frequencias)
 
 
 
