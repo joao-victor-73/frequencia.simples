@@ -74,13 +74,25 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label for="catequista" class="form-label">Catequista responsável: </label>
-                    <input type="text" name="nome_catequista" class="form-control" value="{{ crismando.catequista.nome}}">
+                    <label for="catequista_responsavel" class="form-label">Catequista Responsável: </label>
+                    <select name="catequista_responsavel" class="form-select">
+                        {% for catequista in lista_catequistas %}
+                            <option value="{{ catequista.id_catequista }}" {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
+                                {{ catequista.nome }}
+                            </option>   
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="grupo" class="form-label">Cidade</label>
-                    <input type="text" name="grupo" class="form-control" value="{{ crismando.catequista.grupo }}">
+                    <label for="grupo" class="form-label">Grupo: </label>
+                    <select name="grupo" class="form-select">
+                        {% for catequista in lista_catequistas %}
+                            <option value="{{ catequista.id_catequista }}" {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
+                                {{ catequista.grupo }}
+                            </option>   
+                        {% endfor %}
+                    </select>
                 </div>
 
 

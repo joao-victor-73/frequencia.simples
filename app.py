@@ -156,11 +156,12 @@ def editar_infor(id_crismando):
 
     # Obtendo os dados associados ao id do crismando
     crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
+    lista_catequistas = db.session.query(Catequistas)
 
     if not crismando:
         return "Crismando não encontrado", 404
 
-    return render_template('infor_crismandos.html', crismando=crismando)
+    return render_template('infor_crismandos.html', crismando=crismando, lista_catequistas=lista_catequistas)
 
 
 # Rota para registrar presença
