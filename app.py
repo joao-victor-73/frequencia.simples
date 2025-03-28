@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import os
 import dotenv
 from flask_sqlalchemy import SQLAlchemy
@@ -164,14 +164,49 @@ def editar_infor(id_crismando):
     return render_template('infor_crismandos.html', crismando=crismando, lista_catequistas=lista_catequistas)
 
 
+# Rota para salvar alterações nas informações dos crismandos
+@app.route("/atualizar_informacoes", methods=['POST', ])
+def atualizar_infor():
+
+    # Pega o id do crismando. (esse id vem de um input hidden la no template 'infor_crismandos')
+    atualiza_crismando = Crismandos.query.filter_by(
+        id=request.form['id_crismando']).first()
+
+    atualiza_crismando.nome = request.form['nome_crismando']
+    atualiza_crismando.data_nascimento = request.form['data_nascimento']
+    atualiza_crismando.tel1 = request.form['telefone1']
+    atualiza_crismando.tel2 = request.form['telefone2']
+    atualiza_crismando.nome_mae = request.form['nome_mae']
+    atualiza_crismando.nome_pai = request.form['nome_pai']
+    atualiza_crismando.endereco = request.form['endereco']
+    atualiza_crismando.cidade = request.form['cidade']
+    atualiza_crismando.status_crismando = request.form['status_crismando']
+    atualiza_crismando.batismo = request.form['batismo']
+    atualiza_crismando.eucaristia = request.form['eucaristia']
+
+    
+    # Atualiza o catequista responsável (pega o id da mesma maneira que o do crismando)
+    atualiza_crismando.fk_id_catequista = request.form['catequista_responsavel']  # Atualiza a FK do catequista
+
+
+    try:
+        db.session.add(atualiza_crismando)
+        db.session.commit()
+    except Exception as e:
+        print("Erro ao salvar no banco de dados: ", str(e))
+        db.session.rollback()
+
+    return redirect(url_for('index'))
+
 # Rota para registrar presença
+
+
 @app.route("/registrar_presenca", methods=["POST"])
 def registrar_presenca():
     pass
 
+
 # Rota para consultar frequência
-
-
 @app.route("/frequencia", methods=["GET"])
 def listar_frequencia():
     pass

@@ -1,106 +1,136 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
+    <!-- Importar SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <div class="cards-container mt-5">
         <div class="card">
             <div class="card-header">
                 <h2>Detalhes de {{ crismando.nome }}</h2>
             </div>
-        <div class="card-body">
-            <form class="row g-3">
-                <div class="col-md-6">
-                <label for="nome" class="form-label">Nome</label>
-                <input type="text" name="nome_crismando" class="form-control" value="{{ crismando.nome }}">
-                </div>
+            <div class="card-body">
+                <form class="row g-3" id="formAtualizacao" action="{{ url_for('atualizar_infor') }}" method="POST" >
+                    <input type="hidden" name="id_crismando" value="{{ crismando.id }}">
+                    <input type="hidden" name="id_catequista" value="{{ crismando.fk_id_catequista }}">
 
-                <div class="col-md-6">
-                    <label for="date" class="form-label"> Data de Nascimento </label>
-                    <input type="date" name="data_nascimento" class="form-control" value="{{ crismando.data_nascimento }}">
-                </div>
+                    <div class="col-md-6">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" name="nome_crismando" class="form-control" value="{{ crismando.nome }}">
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="contato1" class="form-label">Número para contato 1: </label>
-                    <input type="text" name="telefone1" class="form-control" value="{{ crismando.tel1 }}">
-                </div>
-    
-                <div class="col-md-6">
-                    <label for="contato2" class="form-label">Número para contato 2: </label>
-                    <input type="text" name="telefone2" class="form-control" value="{{ crismando.tel2 }}">
-                </div>
-    
+                    <div class="col-md-6">
+                        <label for="date" class="form-label"> Data de Nascimento </label>
+                        <input type="date" name="data_nascimento" class="form-control" value="{{ crismando.data_nascimento }}">
+                    </div>
 
-                <div class="col-12">
-                    <label for="nome_mae" class="form-label">Nome da Mãe</label>
-                    <input type="text" name="nome_mae" class="form-control" value="{{ crismando.nome_mae }}">
-                </div>
-                
-                <div class="col-12">
-                    <label for="nome_pai" class="form-label">Nome do Pai</label>
-                    <input type="text" name="nome_pai" class="form-control" value="{{ crismando.nome_pai }}">
-                </div>
+                    <div class="col-md-6">
+                        <label for="contato1" class="form-label">Número para contato 1: </label>
+                        <input type="text" name="telefone1" class="form-control" value="{{ crismando.tel1 }}">
+                    </div>
+        
+                    <div class="col-md-6">
+                        <label for="contato2" class="form-label">Número para contato 2: </label>
+                        <input type="text" name="telefone2" class="form-control" value="{{ crismando.tel2 }}">
+                    </div>
+        
 
-                <div class="col-md-6">
-                    <label for="Address" class="form-label">Endereço</label>
-                    <input type="text" name="endereco" class="form-control" value="{{ crismando.endereco}}">
-                </div>
+                    <div class="col-12">
+                        <label for="nome_mae" class="form-label">Nome da Mãe</label>
+                        <input type="text" name="nome_mae" class="form-control" value="{{ crismando.nome_mae }}">
+                    </div>
+                    
+                    <div class="col-12">
+                        <label for="nome_pai" class="form-label">Nome do Pai</label>
+                        <input type="text" name="nome_pai" class="form-control" value="{{ crismando.nome_pai }}">
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="city" class="form-label">Cidade</label>
-                    <input type="text" name="cidade" class="form-control" value="{{ crismando.cidade }}">
-                </div>
+                    <div class="col-md-6">
+                        <label for="Address" class="form-label">Endereço</label>
+                        <input type="text" name="endereco" class="form-control" value="{{ crismando.endereco}}">
+                    </div>
 
-                <div class="col-md-4">
-                    <label> Status: </label>
-                    <select name="status_crismando" class="form-select">
-                        <option value="ativo" {% if crismando.status_crismando == 'ativo' %} selected {% endif %}> Ativo </option>
-                        <option value="desistente" {% if crismando.status_crismando == 'desistente' %} selected {% endif %}> Desistente </option>
-                    </select>
-                </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Cidade</label>
+                        <input type="text" name="cidade" class="form-control" value="{{ crismando.cidade }}">
+                    </div>
 
-                <div class="col-md-4">
-                    <label> Recebeu o batismo? </label>
-                    <select name="status_crismando" class="form-select">
-                        <option value="sim" {% if crismando.batismo == 'sim' %} selected {% endif %}> Sim </option>
-                        <option value="nao" {% if crismando.batismo == 'nao' %} selected {% endif %}> Não </option>
-                    </select>
-                </div>
+                    <div class="col-md-4">
+                        <label> Status: </label>
+                        <select name="status_crismando" class="form-select">
+                            <option value="ativo" {% if crismando.status_crismando == 'ativo' %} selected {% endif %}> Ativo </option>
+                            <option value="desistente" {% if crismando.status_crismando == 'desistente' %} selected {% endif %}> Desistente </option>
+                        </select>
+                    </div>
 
-                <div class="col-md-4">
-                    <label> Recebeu a 1º Eucaristia? </label>
-                    <select name="status_crismando" class="form-select">
-                        <option value="sim" {% if crismando.eucaristia == 'sim' %} selected {% endif %}> Sim </option>
-                        <option value="nao" {% if crismando.eucaristia == 'nao' %} selected {% endif %}> Não </option>
-                    </select>
-                </div>
+                    <div class="col-md-4">
+                        <label> Recebeu o batismo? </label>
+                        <select name="batismo" class="form-select">
+                            <option value="sim" {% if crismando.batismo == 'sim' %} selected {% endif %}> Sim </option>
+                            <option value="nao" {% if crismando.batismo == 'nao' %} selected {% endif %}> Não </option>
+                        </select>
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="catequista_responsavel" class="form-label">Catequista Responsável: </label>
-                    <select name="catequista_responsavel" class="form-select">
-                        {% for catequista in lista_catequistas %}
-                            <option value="{{ catequista.id_catequista }}" {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
-                                {{ catequista.nome }}
-                            </option>   
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="col-md-4">
+                        <label> Recebeu a 1º Eucaristia? </label>
+                        <select name="eucaristia" class="form-select">
+                            <option value="sim" {% if crismando.eucaristia == 'sim' %} selected {% endif %}> Sim </option>
+                            <option value="nao" {% if crismando.eucaristia == 'nao' %} selected {% endif %}> Não </option>
+                        </select>
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="grupo" class="form-label">Grupo: </label>
-                    <select name="grupo" class="form-select">
-                        {% for catequista in lista_catequistas %}
-                            <option value="{{ catequista.id_catequista }}" {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
-                                {{ catequista.grupo }}
-                            </option>   
-                        {% endfor %}
-                    </select>
-                </div>
+                    <div class="col-md-6">
+                        <label for="catequista_responsavel" class="form-label">Catequista Responsável: </label>
+                        <select name="catequista_responsavel"  id="catequista_responsavel" class="form-select">
+                            {% for catequista in lista_catequistas %}
+                                <option value="{{ catequista.id_catequista }}"
+                                    data-grupo="{{ catequista.grupo }}"
+                                    {% if catequista.id_catequista == crismando.fk_id_catequista %} 
+                                        selected 
+                                    {% endif %}>
+                                    {{ catequista.nome }}
+                                </option>   
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="grupo" class="form-label">Grupo: </label>
+                        <input type="text" name="grupo" id="grupo" class="form-control" value="{{ crismando.catequista.grupo }}" readonly>
+                    </div>
 
 
-                <div class="col-12">
-                    <button type="submit" class="btn btn-success">Salvar</button>
-                    <a href="{{ url_for('index') }}" class="btn btn-danger">Voltar</a>
-                </div>
-            </form>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-danger">Voltar</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById("catequista_responsavel").addEventListener("change", function() {
+            let selectedCatequista = this.options[this.selectedIndex];
+            let grupo = selectedCatequista.getAttribute("data-grupo");
+            document.getElementById("grupo").value = grupo;
+        });
+
+        document.getElementById("formAtualizacao").addEventListener("submit", function(event) {
+            event.preventDefault(); // Evita o envio automático do formulário
+        
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Você deseja salvar as alterações?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sim, salvar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit(); // Envia o formulário se o usuário confirmar
+                }
+            });
+        });
+    </script>
 {% endblock %}
