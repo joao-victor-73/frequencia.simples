@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+
+    <div class="mb-6">
+        <h2>Registro de Frequência</h2>
+        <h3> Grupo: </h3>
+        <!-- Resolver problema de nome do grupo depois que for resolvido a questão de que
+         cada login terá seu acesso ao grupo determinado. por enquanto não irá aparecer nome de grupo nenhum -->
+    </div>
+
+    <form action="{{ url_for('registrar_frequencia') }}" method="POST">
+        <div class="mb-3">
+            <label class="form-label">Data:</label>
+            <input type="date" id="data_chamada" name="data_chamada" class="form-control" required>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nome do Crismando</th>
+                    <th>Presente ou Faltou?</th>
+                    <th>Observação a falta justificada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crismando in lista_crismandos %}
+                <tr>
+                    <td>{{ crismando.nome }}</td>
+
+                    <td>
+                        <select name="escolher_status[]" class="form-select" aria-label="Default select example">
+                            <option value="presente" selected>Presente</option>
+                            <option value="falta">Faltou</option>
+                            <option value="justificada">Justificou</option>
+                        </select>
+                    </td>
+
+                    <td class="text-center">
+                        <input type="checkbox" name="presenca[]" value="{{ crismando.id }}">
+                        <input type="hidden" name="crismando_id[]" value="{{ crismando.id }}">
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox" name="falta[]" value="{{ crismando.id }}">
+                        <input type="hidden" name="crismando_id[]" value="{{ crismando.id }}">
+                    </td>
+                    <td> 
+                        <div class="input-group">
+                            <textarea name="observacao" class="form-control" aria-label="With textarea"></textarea>
+                        </div>    
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Salvar Frequência</button>
+    </form>
+</div>
+{% endblock %}

@@ -3,59 +3,57 @@
 {% block conteudo %}
 <div class="container mt-5">
 
-    <div class="mb-6">
-        <h2>Registro de Frequência</h2>
-        <h3> Grupo: </h3>
+    <div class="mb-4">
+        <h2 class="text-primary">Registro de Frequência</h2>
+        <h4 class="text-muted">Grupo: <span class="fw-bold"> Ainda não definido </span> </h4>
         <!-- Resolver problema de nome do grupo depois que for resolvido a questão de que
          cada login terá seu acesso ao grupo determinado. por enquanto não irá aparecer nome de grupo nenhum -->
     </div>
 
     <form action="{{ url_for('registrar_frequencia') }}" method="POST">
         <div class="mb-3">
-            <label class="form-label">Data:</label>
-            <input type="date" id="data_chamada" name="data_chamada" class="form-control" required>
+            <label class="form-label fw-bold">Data da Chamada:</label>
+            <input type="date" id="data_chamada" name="data_chamada" class="form-control w-25" required>
         </div>
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Nome do Crismando</th>
-                    <th>Presente ou Faltou?</th>
-                    <th>Observação a falta justificada</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for crismando in lista_crismandos %}
-                <tr>
-                    <td>{{ crismando.nome }}</td>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Nome do Crismando</th>
+                        <th>Faltou?</th>
+                        <th>Observação a falta justificada</th>
+                    </tr>
+                </thead>
 
-                    <td>
-                        <select name="escolher_status[]" class="form-select" aria-label="Default select example">
-                            <option value="presente" selected>Presente</option>
-                            <option value="falta">Faltou</option>
-                            <option value="justificada">Justificou</option>
-                        </select>
-                    </td>
+                <tbody>
+                    {% for crismando in lista_crismandos %}
+                    <tr>
+                        <td class="align-middle fw-semibold">{{ crismando.nome }}</td>
 
-                    <td class="text-center">
-                        <input type="checkbox" name="presenca[]" value="{{ crismando.id }}">
-                        <input type="hidden" name="crismando_id[]" value="{{ crismando.id }}">
-                    </td>
-                    <td class="text-center">
-                        <input type="checkbox" name="falta[]" value="{{ crismando.id }}">
-                        <input type="hidden" name="crismando_id[]" value="{{ crismando.id }}">
-                    </td>
-                    <td> 
-                        <div class="input-group">
-                            <textarea name="observacao" class="form-control" aria-label="With textarea"></textarea>
-                        </div>    
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input" type="checkbox" name="status_frequencia_{{ crismando.id }}">
+                                <label class="form-check-label"> Sim </label>
+                            </div>
+                        </td>
+                           
+                        <td class="align-middle"> 
+                            <div class="input-group">
+                                <textarea name="observacao_{{ crismando.id }}" class="form-control" rows="2"></textarea>
+                            </div>    
+                        </td>
 
-        <button type="submit" class="btn btn-success">Salvar Frequência</button>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-success px-4">Salvar Frequência</button>
+        </div>
+
     </form>
 </div>
 {% endblock %}

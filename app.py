@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import dotenv
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
 
 
 # Configuração do Banco de Dados (Essas configs vem do arquivo .env)
@@ -17,11 +16,17 @@ database = os.environ['MYSQL_DATABASE']
 # Instanciando a aplicação e o SQLAlchemy
 app = Flask(__name__)
 
+
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{user}:{password}@{host}/{database}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 print("Banco de dados Conectado!")
 
 db = SQLAlchemy(app)
+
+app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
+
+
+
 
 
 # Classes / Models para as TABELAS
@@ -210,10 +215,70 @@ def listar_frequencia():
 
 
 # Rota para consultar frequência
-@app.route("/registrar_frequencia", methods=["GET"])
+@app.route("/registrar_frequencia", methods=["POST"])
 def registrar_frequencia():
-    pass
+    """
+    Como funciona a lógica do registro da frequencia para salvar no banco de dados:
+    -> Se o checkbox for marcado, considera-se "faltou".
 
+    -> Se não for marcado, considera-se "presente".
+
+    -> Se houver um texto na observação, a falta é justificada.
+    """
+
+    data_chamada = request.form.get('data_chamada')
+
+    if not data_chamada:
+        flash("A data é Obrigatória!", "danger")
+        return redirect(url_for('frequencia'))
+
+    # Formatando a data para inserir no banco de dados:
+    data_chamada = datetime.strptime(data_chamada, "%Y-%m-%d").date()
+
+    # Pegando todos os registros da tabela 'crismandos'
+    registros_crismandos = Crismandos.query.all()
+
+    for crismando in registros_crismandos:
+        # Se marcado, retorna 'on'
+        faltou = request.form.get(f'faltou_{crismando.id}')
+        observacao = request.form.get(f'observacao_{crismando.id}', '').strip()
+
+        status = "Presente"
+        if faltou:
+            status = "Justificado" if observacao else "Faltou"
+
+        # Verifica se já existe um registro para a mesma data e crismando
+        frequencia_existente = Frequencias.query.filter_by(
+            fk_id_crismando=crismando.id, data_frequencia=data_chamada).first()
+
+        if frequencia_existente:
+            frequencia_existente.status_frequencia = status
+            frequencia_existente.observacao = observacao
+        else:
+            nova_frequencia = Frequencias(
+                fk_id_crismando=crismando.id,
+                data_frequencia=data_chamada,
+                status_frequencia=status,
+                observacao=observacao
+            )
+            db.session.add(nova_frequencia)
+
+    db.session.commit()
+    flash("Frequência salva com sucesso!", "success")
+
+    return redirect(url_for('frequencia'))
+
+@app.route('/historico_frequencia')
+def historico_frequencia():
+    # Buscar todos os registros de frequência com JOIN na tabela Crismandos
+    registros = db.session.query(
+        Crismandos.nome,
+        Frequencias.data_frequencia,
+        Frequencias.status_frequencia,
+        Frequencias.observacao
+    ).join(Frequencias).order_by(Frequencias.data_frequencia.desc()).all()
+
+    return render_template('historico_frequencias.html', registros=registros)
 
 
 if __name__ == "__main__":
