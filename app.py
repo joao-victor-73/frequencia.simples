@@ -26,9 +26,6 @@ db = SQLAlchemy(app)
 app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
 
 
-
-
-
 # Classes / Models para as TABELAS
 
 class Catequistas(db.Model):
@@ -226,35 +223,45 @@ def registrar_frequencia():
     -> Se houver um texto na observação, a falta é justificada.
     """
 
+    # Pegando a data do formulário:
     data_chamada = request.form.get('data_chamada')
 
     if not data_chamada:
         flash("A data é Obrigatória!", "danger")
         return redirect(url_for('frequencia'))
 
-    # Formatando a data para inserir no banco de dados:
+    # Converte a string "YYYY-MM-DD" vinda do formulário para um objeto de data do Python (datetime.date).
     data_chamada = datetime.strptime(data_chamada, "%Y-%m-%d").date()
 
     # Pegando todos os registros da tabela 'crismandos'
     registros_crismandos = Crismandos.query.all()
 
+    # Percorre cada crismando para registrar a frequência individualmente.
     for crismando in registros_crismandos:
-        # Se marcado, retorna 'on'
+        # Recuperando dados do formulário
+        # Se o checkbox for marcado, retorna 'on'
         faltou = request.form.get(f'faltou_{crismando.id}')
         observacao = request.form.get(f'observacao_{crismando.id}', '').strip()
+        # "obsevação" Recupera o texto digitado no campo de observação. Se estiver vazio, retorna "".
 
-        status = "Presente"
-        if faltou:
-            status = "Justificado" if observacao else "Faltou"
+        # Definição do status de frequência
+        if observacao:  
+            status = "justificada"
+        elif faltou == "faltou":  
+            status = "falta"
+        else:
+            status = "presente"
 
         # Verifica se já existe um registro para a mesma data e crismando
         frequencia_existente = Frequencias.query.filter_by(
             fk_id_crismando=crismando.id, data_frequencia=data_chamada).first()
 
+        # Se o registro já existir, atualiza os valores do banco para o novo status e observação.
         if frequencia_existente:
             frequencia_existente.status_frequencia = status
             frequencia_existente.observacao = observacao
         else:
+            # Se o registro não existir, ele irá criar um novo objeto Frequencias e adicionar ao banco.
             nova_frequencia = Frequencias(
                 fk_id_crismando=crismando.id,
                 data_frequencia=data_chamada,
@@ -266,7 +273,8 @@ def registrar_frequencia():
     db.session.commit()
     flash("Frequência salva com sucesso!", "success")
 
-    return redirect(url_for('frequencia'))
+    return redirect(url_for('index'))
+
 
 @app.route('/historico_frequencia')
 def historico_frequencia():

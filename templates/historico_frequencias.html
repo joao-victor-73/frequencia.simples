@@ -17,9 +17,9 @@
             <tbody>
                 {% for registro in registros %}
                 <tr>
-                    <td>{{ registro[0] }}</td>  <!-- Nome do Crismando -->
                     <td>{{ registro[1].strftime('%d/%m/%Y') }}</td>  <!-- Data da frequência -->
-                    <td>{{ 'Presente' if registro[2] else 'Faltou' }}</td>  <!-- Status -->
+                    <td>{{ registro[0] }}</td>  <!-- Nome do Crismando -->
+                    <td>{{ registro[2] if registro[2] else 'Sem Status' }}</td>  <!-- Status -->
                     <td>{{ registro[3] if registro[3] else 'Sem observações' }}</td>  <!-- Observação -->
                 </tr>
                 {% endfor %}
