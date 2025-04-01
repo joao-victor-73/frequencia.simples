@@ -17,23 +17,28 @@
                 </thead>
                 <tbody>
                     {% for registro in registros %}
-                    <tr>
-                        <td class="fw-semibold">{{ registro.crismando.nome }}</td>
-                        <td class="text-center">
-                            {% if registro.status_frequencia == 'presente' %}
-                                ✅ Presente
-                            {% elif registro.status_frequencia == 'falta' %}
-                                ❌ Faltou
-                            {% elif registro.status_frequencia == 'justificada' %}
-                                ⚠️ Falta Justificada
-                            {% endif %}
-                        </td>
-                        <td>{{ registro.observacao or '' }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted">Nenhum registro encontrado.</td>
-                    </tr>
+                        <tr>
+                            <td class="fw-semibold">{{ registro.crismando.nome }}</td>
+                            <td class="text-center">
+                                {% if registro.status_frequencia == 'presente' %}
+                                    ✅ Presente
+
+                                {% elif registro.status_frequencia == 'falta' %}
+                                    ❌ Faltou
+                                
+                                {% elif registro.status_frequencia == 'justificada' %}
+                                    ⚠️ Falta Justificada
+                                
+                                {% endif %}
+                            </td>
+                            <td>{{ registro.observacao or '' }}</td>
+                        </tr>
+                        {% else %}
+
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Nenhum registro encontrado.</td>
+                        </tr>
+                    
                     {% endfor %}
                 </tbody>
             </table>

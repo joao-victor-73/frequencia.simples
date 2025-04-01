@@ -249,6 +249,8 @@ def salvar_frequencia():
             status = 'presente'
             if request.form.get(f'faltou_{crismando.id}'):
                 status = 'falta'
+            elif request.form.get(f'observacao_{crismando.id}'):
+                status = 'justificada'
 
             observacao = request.form.get(f'observacao_{crismando.id}', None)
             nova_frequencia = Frequencias(
@@ -273,7 +275,7 @@ def listar_frequencias():
     return render_template('historico_frequencias.html', registros=registros_de_frequencias)
 
 
-@app.route('/frequencia/<int:id>', methods=['GET'])
+@app.route('/listar_frequencias/<int:id>', methods=['GET'])
 def detalhes_frequencia(id):
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
