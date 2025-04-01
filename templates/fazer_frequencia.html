@@ -2,47 +2,53 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-
-    <div class="mb-4">
-        <h2 class="text-primary">Registro de Frequência</h2>
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📝 Registro de Frequência</h2>
     </div>
-    
-    <form action="{{ url_for('salvar_frequencia') }}" method="POST">
-        <div class="mb-3">
-            <label class="form-label fw-bold">Título:</label>
-            <input type="text" name="titulo_encontro" class="form-control w-25" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Data da Chamada:</label>
-            <input type="date" name="data_chamada" class="form-control w-25" required>
-        </div>
-    
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Nome do Crismando</th>
-                    <th>Faltou?</th>
-                    <th>Observação</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for crismando in lista_crismandos %}
-                <tr>
-                    <td>{{ crismando.nome }}</td>
-                    <td class="text-center">
-                        <input type="checkbox" name="faltou_{{ crismando.id }}" value="faltou">
-                    </td>
-                    <td>
-                        <textarea name="observacao_{{ crismando.id }}" class="form-control"></textarea>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <div class="text-end">
-            <button type="submit" class="btn btn-success">Salvar</button>
-        </div>
-    </form>
-    
+
+    <div class="card shadow-sm p-4">
+        <form action="{{ url_for('salvar_frequencia') }}" method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📌 Título:</label>
+                    <input type="text" name="titulo_encontro" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📅 Data da Chamada:</label>
+                    <input type="date" name="data_chamada" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>👤 Nome do Crismando</th>
+                            <th class="text-center">📌 Faltou?</th>
+                            <th>📝 Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crismando in lista_crismandos %}
+                        <tr>
+                            <td class="fw-semibold">{{ crismando.nome }}</td>
+                            <td class="text-center">
+                                <input type="checkbox" name="faltou_{{ crismando.id }}" value="faltou">
+                            </td>
+                            <td>
+                                <textarea name="observacao_{{ crismando.id }}" class="form-control"></textarea>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success">💾 Salvar</button>
+                <a href="{{ url_for('listar_frequencias') }}" class="btn btn-secondary ms-2">⬅️ Voltar</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

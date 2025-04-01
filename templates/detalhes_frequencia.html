@@ -1,18 +1,26 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-    <div class="container mt-4">
-        <h2 class="text-primary">Detalhes da Frequência</h2>
-        <h4 class="text-muted">Título: <span class="fw-bold">{{ frequencia.titulo_encontro }}</span></h4>
-        <h5 class="text-muted">Data da Chamada: <span class="fw-bold">{{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</span></h5>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📋 Detalhes da Frequência</h2>
+    </div>
 
-        <div class="table-responsive mt-3">
-            <table class="table table-bordered table-striped">
-                <thead class="table-light text-center">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="text-muted">📌 Título: <span class="fw-bold">{{ frequencia.titulo_encontro }}</span></h4>
+            <h5 class="text-muted">📅 Data: <span class="fw-bold">{{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</span></h5>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark text-center">
                     <tr>
-                        <th>Nome do Crismando</th>
-                        <th>Status</th>
-                        <th>Observação</th>
+                        <th>👤 Nome do Crismando</th>
+                        <th>📌 Status</th>
+                        <th>📝 Observação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,31 +29,29 @@
                             <td class="fw-semibold">{{ registro.crismando.nome }}</td>
                             <td class="text-center">
                                 {% if registro.status_frequencia == 'presente' %}
-                                    ✅ Presente
-
+                                    <span class="badge bg-success">✅ Presente</span>
                                 {% elif registro.status_frequencia == 'falta' %}
-                                    ❌ Faltou
-                                
+                                    <span class="badge bg-danger">❌ Faltou</span>
                                 {% elif registro.status_frequencia == 'justificada' %}
-                                    ⚠️ Falta Justificada
-                                
+                                    <span class="badge bg-warning text-dark">⚠️ Falta Justificada</span>
                                 {% endif %}
                             </td>
-                            <td>{{ registro.observacao or '' }}</td>
+                            <td>{{ registro.observacao or '—' }}</td>
                         </tr>
-                        {% else %}
-
+                    {% else %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted">Nenhum registro encontrado.</td>
+                            <td colspan="3" class="text-center text-muted py-3">
+                                🚫 Nenhum registro encontrado.
+                            </td>
                         </tr>
-                    
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <a href="{{ url_for('listar_frequencias') }}" class="btn btn-secondary">Voltar</a>
     </div>
 
-
+    <div class="text-center mt-3">
+        <a href="{{ url_for('listar_frequencias') }}" class="btn btn-secondary">⬅️ Voltar</a>
+    </div>
+</div>
 {% endblock %}
