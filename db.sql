@@ -52,20 +52,37 @@ CREATE TABLE IF NOT EXISTS crismandos (
 
 
 
+CREATE TABLE IF NOT EXISTS infor_frequencias (
+	id_infor_freq INT PRIMARY KEY AUTO_INCREMENT,
+    titulo_encontro VARCHAR(250) NOT NULL,
+    data_chamada DATE NOT NULL,
+    fk_id_freq INT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS frequencias (
     id_freq INT PRIMARY KEY AUTO_INCREMENT,
     fk_id_crismando INT NOT NULL,
-    data_frequencia DATE NOT NULL,
+    fk_id_infor_freq INT,
     status_frequencia ENUM('presente', 'falta', 'justificada') DEFAULT 'presente',
     observacao TEXT NULL,
 
     CONSTRAINT fk_crismando_frequencia
     FOREIGN KEY (fk_id_crismando) REFERENCES crismandos(id)
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    
+    CONSTRAINT fk_frequencia_inforfrequencia
+    FOREIGN KEY (fk_id_infor_freq) REFERENCES infor_frequencias(id_infor_freq)
+    ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 
 
+ALTER TABLE infor_frequencias
+ADD CONSTRAINT fk_infor_freq_freq
+FOREIGN KEY (fk_id_freq) REFERENCES frequencias(id_freq)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- ALTER TABLE frequencias
 -- RENAME COLUMN status TO status_frequencia;

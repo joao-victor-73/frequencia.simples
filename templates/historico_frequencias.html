@@ -2,29 +2,29 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <h2>Histórico de Frequência</h2>
-    
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Nome do Crismando</th>
-                    <th>Status</th>
-                    <th>Observação</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for registro in registros %}
-                <tr>
-                    <td>{{ registro[1].strftime('%d/%m/%Y') }}</td>  <!-- Data da frequência -->
-                    <td>{{ registro[0] }}</td>  <!-- Nome do Crismando -->
-                    <td>{{ registro[2] if registro[2] else 'Sem Status' }}</td>  <!-- Status -->
-                    <td>{{ registro[3] if registro[3] else 'Sem observações' }}</td>  <!-- Observação -->
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="mb-4">
+        <h2 class="text-primary">Chamadas Registradas</h2>
     </div>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.titulo_encontro }}</td>
+                <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-info btn-sm">Ver Detalhes</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

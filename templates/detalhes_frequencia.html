@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+    <div class="container mt-4">
+        <h2 class="text-primary">Detalhes da Frequência</h2>
+        <h4 class="text-muted">Título: <span class="fw-bold">{{ frequencia.titulo_encontro }}</span></h4>
+        <h5 class="text-muted">Data da Chamada: <span class="fw-bold">{{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</span></h5>
+
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Nome do Crismando</th>
+                        <th>Status</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td class="fw-semibold">{{ registro.crismando.nome }}</td>
+                        <td class="text-center">
+                            {% if registro.status_frequencia == 'presente' %}
+                                ✅ Presente
+                            {% elif registro.status_frequencia == 'falta' %}
+                                ❌ Faltou
+                            {% elif registro.status_frequencia == 'justificada' %}
+                                ⚠️ Falta Justificada
+                            {% endif %}
+                        </td>
+                        <td>{{ registro.observacao or '' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Nenhum registro encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{{ url_for('listar_frequencias') }}" class="btn btn-secondary">Voltar</a>
+    </div>
+
+
+{% endblock %}

@@ -79,16 +79,20 @@ class Crismandos(db.Model):
 class InforFrequencias(db.Model):
     __tablename__ = 'infor_frequencias'
 
-    id_infor_freq = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
+
+    # Relacionamento com Frequencias
+    frequencias = db.relationship(
+        'Frequencias', backref='infor_frequencia', cascade="all, delete-orphan", lazy=True)
 
 
 # 📌 Frequências dos Crismandos
 class Frequencias(db.Model):
     __tablename__ = 'frequencias'
 
-    id_freq = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     status_frequencia = db.Column(
         db.Enum('presente', 'falta', 'justificada'), default='presente')
     observacao = db.Column(db.Text)
@@ -97,7 +101,7 @@ class Frequencias(db.Model):
     fk_id_crismando = db.Column(db.Integer, db.ForeignKey(
         'crismandos.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     fk_id_infor_freq = db.Column(db.Integer, db.ForeignKey(
-        'infor_frequencias.id_infor_freq', ondelete='CASCADE', onupdate='CASCADE'))
+        'infor_frequencias.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 
 
 # 📌 Usuários (Login)
@@ -161,8 +165,7 @@ def index():
                            lista_crismandos=lista_crismandos,
                            search_term=search_term,
                            # Garantindo a persistência dos filtros de Batismo e Eucaristia
-                           status_crismando=request.args.get(
-                               'buscar_status_crismando', ''),
+                           status_crismando=request.args.get('buscar_status_crismando', ''),
                            status_filter=status_filter,
                            filtrar_batizado=filtrar_batizado,
                            filtrar_eucaristia=filtrar_eucaristia)
@@ -216,74 +219,83 @@ def atualizar_infor():
     return redirect(url_for('index'))
 
 
-# Rota para exibir o formulário de frequência
-@app.route("/fazer_frequencia", methods=["GET"])
-def fazer_frequencia():
+# Rota para consultar frequência
+@app.route("/frequencia", methods=["GET"])
+def listar_frequencia():
     # crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
-    lista_crismandos = Crismandos.query.filter_by(
-        status_crismando='ativo').all()
+    lista_crismandos = db.session.query(Crismandos)
 
     return render_template('frequencia.html', lista_crismandos=lista_crismandos)
 
 
-# Rota para salvar a frequência no banco
-@app.route("/salvar_frequencia", methods=["GET", "POST"])
-def salvar_frequencia():
-    if request.method == 'POST':
-        titulo = request.form.get('titulo_encontro')
-        data_chamada = request.form.get('data_chamada')
+# Rota para consultar frequência
+@app.route("/registrar_frequencia", methods=["POST"])
+def registrar_frequencia():
 
-        # Criar registro em InforFrequencias
-        nova_info_freq = InforFrequencias(titulo_encontro=titulo,
-                                          data_chamada=datetime.strptime(data_chamada, '%Y-%m-%d'))
-        db.session.add(nova_info_freq)
-        db.session.commit()
+    # Pegando a data do formulário:
+    data_chamada = request.form.get('data_chamada')
 
-        id_infor_freq = nova_info_freq.id_infor_freq
+    if not data_chamada:
+        flash("A data é Obrigatória!", "danger")
+        return redirect(url_for('frequencia'))
 
-        # Salvar a frequência dos crismandos
-        lista_crismandos = Crismandos.query.filter_by(
-            status_crismando='ativo').all()
+    # Converte a string "YYYY-MM-DD" vinda do formulário para um objeto de data do Python (datetime.date).
+    data_chamada = datetime.strptime(data_chamada, "%Y-%m-%d").date()
 
-        for crismando in lista_crismandos:
-            status = 'presente'
-            if request.form.get(f'faltou_{crismando.id}'):
-                status = 'falta'
+    # Pegando todos os registros da tabela 'crismandos'
+    registros_crismandos = Crismandos.query.all()
 
-            observacao = request.form.get(f'observacao_{crismando.id}', None)
+    # Percorre cada crismando para registrar a frequência individualmente.
+    for crismando in registros_crismandos:
+        # Recuperando dados do formulário
+        # Se o checkbox for marcado, retorna 'on'
+        faltou = request.form.get(f'faltou_{crismando.id}')
+        observacao = request.form.get(f'observacao_{crismando.id}', '').strip()
+        # "obsevação" Recupera o texto digitado no campo de observação. Se estiver vazio, retorna "".
+
+        # Definição do status de frequência
+        if observacao:
+            status = "justificada"
+        elif faltou == "faltou":
+            status = "falta"
+        else:
+            status = "presente"
+
+        # Verifica se já existe um registro para a mesma data e crismando
+        frequencia_existente = Frequencias.query.filter_by(
+            fk_id_crismando=crismando.id, data_frequencia=data_chamada).first()
+
+        # Se o registro já existir, atualiza os valores do banco para o novo status e observação.
+        if frequencia_existente:
+            frequencia_existente.status_frequencia = status
+            frequencia_existente.observacao = observacao
+        else:
+            # Se o registro não existir, ele irá criar um novo objeto Frequencias e adicionar ao banco.
             nova_frequencia = Frequencias(
-                status_frequencia=status,
-                observacao=observacao,
                 fk_id_crismando=crismando.id,
-                fk_id_infor_freq=id_infor_freq
+                data_frequencia=data_chamada,
+                status_frequencia=status,
+                observacao=observacao
             )
             db.session.add(nova_frequencia)
 
-        db.session.commit()
-        flash("Frequencias registradas com sucesso!", "success")
+    db.session.commit()
+    flash("Frequência salva com sucesso!", "success")
 
-        return redirect(url_for('listar_frequencias'))
-
-
-# Rota para listar frequências registradas
-@app.route('/listar_frequencias')
-def listar_frequencias():
-    registros_de_frequencias = InforFrequencias.query.order_by(
-        InforFrequencias.data_chamada.desc()).all()
-    return render_template('historico_frequencias.html', registros=registros_de_frequencias)
+    return redirect(url_for('index'))
 
 
-@app.route('/frequencia/<int:id>', methods=['GET'])
-def detalhes_frequencia(id):
-    frequencia = InforFrequencias.query.get(id)
-    if not frequencia:
-        return "Frequência não encontrada", 404
+@app.route('/historico_frequencia')
+def historico_frequencia():
+    # Buscar todos os registros de frequência com JOIN na tabela Crismandos
+    registros = db.session.query(
+        Crismandos.nome,
+        Frequencias.data_frequencia,
+        Frequencias.status_frequencia,
+        Frequencias.observacao
+    ).join(Frequencias).order_by(Frequencias.data_frequencia.desc()).all()
 
-    # Buscar todas as frequências associadas a essa chamada específica
-    registros = Frequencias.query.filter_by(fk_id_infor_freq=id).all()
-
-    return render_template('detalhes_frequencia.html', frequencia=frequencia, registros=registros)
-
+    return render_template('historico_frequencias.html', registros=registros)
 
 
 if __name__ == "__main__":

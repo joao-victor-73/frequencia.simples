@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <h2>Histórico de Frequência</h2>
+
+    <form method="GET" action="{{url_for('historico_frequencia') }}" class="mb-3">
+
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Buscar pelo nome -->
+                <label> Nome: </label>
+                <input type="text" name="busca" class="form-control" placeholder="Buscar crismando pelo nome..." value="{{ request.args.get('busca', '') }}">
+            </div>
+        
+        <div class="col-md-3">
+            <!-- Buscar pela data da frequência -->
+            <label>Data da frequência:</label>
+            <input type="date" name="data_frequencia_busca" value="{{ registros[1].strftime('%d/%m/%Y') }}">
+        </div>
+
+    </form>
+    
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Nome do Crismando</th>
+                    <th>Status</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in registros %}
+                <tr>
+                    <td>{{ registro[1].strftime('%d/%m/%Y') }}</td>  <!-- Data da frequência -->
+                    <td>{{ registro[0] }}</td>  <!-- Nome do Crismando -->
+                    <td>{{ registro[2] if registro[2] else 'Sem Status' }}</td>  <!-- Status -->
+                    <td>{{ registro[3] if registro[3] else 'Sem observações' }}</td>  <!-- Observação -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
