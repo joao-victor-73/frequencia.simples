@@ -3,8 +3,25 @@
 {% block conteudo %}
 <div class="container mt-5">
     <div class="mb-4">
-        <h2 class="text-primary">Chamadas Registradas</h2>
+        <h2 class="text-primary">Frequencias Registradas</h2>
     </div>
+
+    <!-- FORMULARIO PARA REQUISITAR OS DADOS PARA FILTRAGEM E PESQUISA-->
+    <form method="GET" action="{{ url_for('listar_frequencias') }}" class="mb-3">
+        <label for="data_filtro">Filtrar por data:</label>
+        <input type="date" id="data_filtro" name="data_filtro" class="form-control d-inline w-auto">
+
+        <!-- Buscar pelo nome do encontro -->
+        <label> Titulo do encontro: </label>
+        <input type="text" name="busca_titulo" class="form-control d-inline w-25" placeholder="Buscar pelo titulo" value="{{ request.args.get('busca_titulo', '') }}">
+
+
+        <div class="mb-3 d-inline">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <a href="{{ url_for('listar_frequencias') }}" class="btn btn-secondary"> Limpar Filtros </a>
+        </div>        
+
+    </form>
     
     <table class="table table-bordered">
         <thead>
@@ -14,6 +31,7 @@
                 <th>Ações</th>
             </tr>
         </thead>
+        
         <tbody>
             {% for registro in registros %}
             <tr>

@@ -223,7 +223,7 @@ def fazer_frequencia():
     lista_crismandos = Crismandos.query.filter_by(
         status_crismando='ativo').all()
 
-    return render_template('frequencia.html', lista_crismandos=lista_crismandos)
+    return render_template('fazer_frequencia.html', lista_crismandos=lista_crismandos)
 
 
 # Rota para salvar a frequência no banco
@@ -270,9 +270,29 @@ def salvar_frequencia():
 # Rota para listar frequências registradas
 @app.route('/listar_frequencias')
 def listar_frequencias():
-    registros_de_frequencias = InforFrequencias.query.order_by(
-        InforFrequencias.data_chamada.desc()).all()
-    return render_template('historico_frequencias.html', registros=registros_de_frequencias)
+    data_filtro = request.args.get('data_filtro')  # Obtém a data do formulário
+    titulo_filtro = request.args.get('busca_titulo') # Obtém o titulo do formulário
+
+    query = InforFrequencias.query.order_by(InforFrequencias.data_chamada.desc())
+
+    if data_filtro: # Verifica se o usuário digitou algo no campo de data
+        try:
+            data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
+            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+        except ValueError:
+            flash("Formato de data inválido!", "danger")
+
+    if titulo_filtro: # Verifica se o usuário digitou algo no campo de título
+        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        # .ilike(f"%{---}") -> Utilizado para onde for texto
+
+
+    registros_de_frequencias = query.all() # Executa a consulta filtrada
+
+    return render_template('historico_frequencias.html', 
+                           registros=registros_de_frequencias, 
+                           data_filtro=data_filtro, 
+                           titulo_filtro=titulo_filtro)
 
 
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
@@ -285,7 +305,6 @@ def detalhes_frequencia(id):
     registros = Frequencias.query.filter_by(fk_id_infor_freq=id).all()
 
     return render_template('detalhes_frequencia.html', frequencia=frequencia, registros=registros)
-
 
 
 if __name__ == "__main__":
