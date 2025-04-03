@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import dotenv
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 
@@ -12,6 +14,7 @@ host = os.environ['MYSQL_HOST']
 user = os.environ['MYSQL_USER']
 password = os.environ['MYSQL_PASSWORD']
 database = os.environ['MYSQL_DATABASE']
+secret_key = os.environ['SECRET_KEY']
 
 # Instanciando a aplicação e o SQLAlchemy
 app = Flask(__name__)
@@ -23,7 +26,12 @@ print("Banco de dados Conectado!")
 
 db = SQLAlchemy(app)
 
-app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
+app.config['SECRET_KEY'] = secret_key
+app.secret_key = secret_key  # Necessário para sessões do login
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
 
 # Classes / Models para as TABELAS
 
@@ -36,6 +44,7 @@ class Catequistas(db.Model):
     id_catequista = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
+    endereco = db.Column(db.String(200))
     grupo = db.Column(db.String(100), default='Nao Especificado')
     nivel = db.Column(db.Enum('coordenador', 'catequista'),
                       nullable=False, default='catequista')
@@ -101,16 +110,80 @@ class Frequencias(db.Model):
 
 
 # 📌 Usuários (Login)
-class Usuarios(db.Model):
+class Usuarios(db.Model, UserMixin):
     __tablename__ = 'usuarios'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=False)
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+
+    def set_password(self, senha):
+        self.senha_hash = generate_password_hash(senha)
+
+    def check_password(self, senha):
+        return check_password_hash(self.senha_hash, senha)
+    
+    def get_id(self):
+        return str(self.id_usuario)  # Flask-Login precisa desse método
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuarios.query.get(int(user_id))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        senha = request.form['senha']
+
+        usuario = Usuarios.query.filter_by(email=email).first()
+        if usuario and usuario.check_password(senha):
+            login_user(usuario)
+            return redirect(url_for('index'))
+        else:
+            flash('Email ou senha incorretos!', 'danger')
+
+    return render_template('login.html')
+
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        email = request.form['email']
+        senha = request.form['senha']
+        id_catequista = request.form['fk_id_catequista']
+
+        if Usuarios.query.filter_by(email=email).first():
+            flash('Email já cadastrado!', 'warning')
+        elif Usuarios.query.filter_by(fk_id_catequista=id_catequista).first():
+            flash('Este catequista já possui um usuário!', 'warning')
+        else:
+            novo_usuario = Usuarios(
+                email=email, fk_id_catequista=id_catequista)
+
+            novo_usuario.set_password(senha)
+            db.session.add(novo_usuario)
+            db.session.commit()
+
+            flash('Usuário cadastrado com sucesso!', 'success')
+            return redirect(url_for('login'))
+
+    catequistas = Catequistas.query.with_entities(
+        Catequistas.id_catequista, Catequistas.nome).all()
+    return render_template('register.html', catequistas=catequistas)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 # Rota de começo
@@ -271,27 +344,30 @@ def salvar_frequencia():
 @app.route('/listar_frequencias')
 def listar_frequencias():
     data_filtro = request.args.get('data_filtro')  # Obtém a data do formulário
-    titulo_filtro = request.args.get('busca_titulo') # Obtém o titulo do formulário
+    # Obtém o titulo do formulário
+    titulo_filtro = request.args.get('busca_titulo')
 
-    query = InforFrequencias.query.order_by(InforFrequencias.data_chamada.desc())
+    query = InforFrequencias.query.order_by(
+        InforFrequencias.data_chamada.desc())
 
-    if data_filtro: # Verifica se o usuário digitou algo no campo de data
+    if data_filtro:  # Verifica se o usuário digitou algo no campo de data
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(
+                InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
-    if titulo_filtro: # Verifica se o usuário digitou algo no campo de título
-        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+    if titulo_filtro:  # Verifica se o usuário digitou algo no campo de título
+        query = query.filter(
+            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
         # .ilike(f"%{---}") -> Utilizado para onde for texto
 
+    registros_de_frequencias = query.all()  # Executa a consulta filtrada
 
-    registros_de_frequencias = query.all() # Executa a consulta filtrada
-
-    return render_template('historico_frequencias.html', 
-                           registros=registros_de_frequencias, 
-                           data_filtro=data_filtro, 
+    return render_template('historico_frequencias.html',
+                           registros=registros_de_frequencias,
+                           data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro)
 
 

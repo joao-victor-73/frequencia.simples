@@ -10,11 +10,13 @@ USE crisma;
 CREATE TABLE IF NOT EXISTS catequistas (
 	id_catequista INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
+    endereco VARCHAR(200),
     data_nascimento DATE NOT NULL,
     grupo VARCHAR(100) DEFAULT "Nao Especificado",
     nivel ENUM('coordenador', 'catequista') DEFAULT 'catequista',
     status_informacao BOOLEAN DEFAULT 1
 );
+
 
 -- ALTER TABLE catequistas
 -- ADD COLUMN status_informacao BOOLEAN DEFAULT 1;
