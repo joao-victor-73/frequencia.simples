@@ -10,16 +10,30 @@
     </div>
         
     <!-- FORMULÁRIO DE FILTRAGEM -->
-    <div class="card shadow-sm p-3 mb-4">
-        <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-3">
+    <div class="card shadow-sm p-3 mb-6">
+        <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-6">
+
+            <!-- Filtro por grupo (somente para coordenador) -->
+            {% if nivel_usuario == 'coordenador' %}
+                <div class="col-md-3">
+                    <label for="grupo_filtro" class="form-label fw-bold">Grupo:</label>
+                    <select name="grupo_filtro" class="form-select">
+                        <option value="">Todos os grupos</option>
+                        {% for grupo in grupos_disponiveis %}
+                            <option value="{{ grupo[0] }}" {% if grupo_filtro == grupo[0] %}selected{% endif %}>{{ grupo[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            
             <!-- Campo de Data -->
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="data_filtro" class="form-label fw-semibold">📅 Filtrar por Data:</label>
                 <input type="date" id="data_filtro" name="data_filtro" class="form-control" value="{{ request.args.get('data_filtro', '') }}">
             </div>
 
             <!-- Campo de Título -->
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <label for="busca_titulo" class="form-label fw-semibold">🔍 Buscar pelo Título:</label>
                 <input type="text" id="busca_titulo" name="busca_titulo" class="form-control" placeholder="Digite o título do encontro" value="{{ request.args.get('busca_titulo', '') }}">
             </div>
@@ -50,7 +64,7 @@
                         <td class="fw-semibold">{{ registro.titulo_encontro }}</td>
                         <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
                         <td class="text-center">
-                            <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-info btn-sm">
+                            <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq, origem=request.path) }}" class="btn btn-info btn-sm">
                                 🔎 Ver Detalhes
                             </a>
                         </td>

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="alert alert-info" role="alert">
+        <div class="text-center mb-3">
+            <h2 class="text-info">📊 Frequências de Todos os Grupos</h2>
+            <p class="lead">Somente visualização – registros de todos os grupos</p>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO DE FILTRAGEM -->
+    <div class="card shadow-sm p-3 mb-4">
+        <form method="GET" action="{{ url_for('geral_frequencias') }}" class="row g-3">
+
+            <!-- Filtro por grupo -->
+            <div class="col-md-3">
+                <label for="grupo_filtro" class="form-label fw-bold">Grupo:</label>
+                <select name="grupo_filtro" class="form-select">
+                    <option value="">Todos os grupos</option>
+                    {% for grupo in grupos_disponiveis %}
+                        <option value="{{ grupo[0] }}" {% if grupo_filtro == grupo[0] %}selected{% endif %}>
+                            {{ grupo[0] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Filtro por data -->
+            <div class="col-md-3">
+                <label for="data_filtro" class="form-label fw-bold">📅 Data:</label>
+                <input type="date" name="data_filtro" class="form-control" value="{{ data_filtro or '' }}">
+            </div>
+
+            <!-- Filtro por título -->
+            <div class="col-md-3">
+                <label for="busca_titulo" class="form-label fw-bold">🔍 Título:</label>
+                <input type="text" name="busca_titulo" class="form-control" placeholder="Digite o título do encontro" value="{{ titulo_filtro or '' }}">
+            </div>
+
+            <!-- Botões -->
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrar 🔍</button>
+                <a href="{{ url_for('geral_frequencias') }}" class="btn btn-outline-secondary ms-2 w-100">Limpar ❌</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABELA DE REGISTROS -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>📌 Título</th>
+                        <th>📆 Data</th>
+                        <th>👥 Grupo</th>
+                        <th class="text-center">⚙️ Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                        <tr>
+                            <td>{{ registro.titulo_encontro }}</td>
+                            <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ registro.catequista.grupo }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-info btn-sm">
+                                    🔎 Ver Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">
+                                🚫 Nenhum registro encontrado.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

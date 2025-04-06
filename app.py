@@ -6,7 +6,6 @@ import os
 import dotenv
 from datetime import datetime
 from functools import wraps
-from sqlalchemy.orm import joinedload
 
 
 # Configuração do Banco de Dados (Essas configs vem do arquivo .env)
@@ -105,6 +104,8 @@ class InforFrequencias(db.Model):
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    
+    catequista = db.relationship('Catequistas', backref='infor_frequencias', foreign_keys=[fk_id_catequista])
 
 
 # 📌 Frequências dos Crismandos
@@ -425,48 +426,104 @@ def salvar_frequencia():
 def listar_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
+    grupo_filtro = request.args.get('grupo_filtro') 
 
     grupo_usuario = current_user.catequista.grupo
     nivel_usuario = current_user.catequista.nivel
 
-    # Base da consulta
+    # Base da consulta SEM filtro por catequista ainda
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
-        .filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)
 
-    query = query.filter(Catequistas.grupo == grupo_usuario)
+    if nivel_usuario == 'coordenador':
+        # Coordenador pode filtrar por grupo (ou ver todos)
+        if grupo_filtro:
+            query = query.filter(Catequistas.grupo == grupo_filtro)
 
-    # Filtro de data
+        grupos_disponiveis = db.session.query(Catequistas.grupo).distinct().all()
+
+    else:
+        # Catequista comum: restringe à sua autoria
+        query = query.filter(Catequistas.grupo == grupo_usuario)
+        query = query.filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
+        grupos_disponiveis = []
+
+    # Filtro por data
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(
-                InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
     # Filtro por título
     if titulo_filtro:
-        query = query.filter(
-            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
-    # Ordena por data
-    registros_de_frequencias = query.order_by(
-        InforFrequencias.data_chamada.desc()).all()
+    registros_de_frequencias = query.order_by(InforFrequencias.data_chamada.desc()).all()
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
                            data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro,
-                           grupo_catequista=grupo_usuario)
+                           grupo_filtro=grupo_filtro,
+                           grupos_disponiveis=grupos_disponiveis,
+                           grupo_catequista=grupo_usuario,
+                           nivel_usuario=nivel_usuario)
+
+
+
+@app.route('/geral_frequencias', methods=['GET'])
+@login_required
+@coordenador_required
+def geral_frequencias():
+    if current_user.catequista.nivel != 'coordenador':
+        flash("Acesso restrito!", "danger")
+        return redirect(url_for('listar_frequencias'))
+
+    grupo_filtro = request.args.get('grupo_filtro')
+    data_filtro = request.args.get('data_filtro')
+    titulo_filtro = request.args.get('busca_titulo')
+
+    query = db.session.query(InforFrequencias).distinct()\
+        .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
+        .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)
+
+    if grupo_filtro:
+        query = query.filter(Catequistas.grupo == grupo_filtro)
+
+    if data_filtro:
+        try:
+            data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
+            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+        except ValueError:
+            flash("Formato de data inválido!", "danger")
+
+    if titulo_filtro:
+        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+
+    registros = query.order_by(InforFrequencias.data_chamada.desc()).all()
+    grupos_disponiveis = db.session.query(Catequistas.grupo).distinct().all()
+
+    return render_template('frequencias_gerais.html',
+                           registros=registros,
+                           grupos_disponiveis=grupos_disponiveis,
+                           grupo_filtro=grupo_filtro,
+                           data_filtro=data_filtro,
+                           titulo_filtro=titulo_filtro)
+
+
 
 
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
 @login_required
 def detalhes_frequencia(id):
     grupo_usuario = current_user.catequista.grupo
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('listar_frequencias')  # Padrão: listar_frequencias
+
 
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
@@ -493,7 +550,8 @@ def detalhes_frequencia(id):
     return render_template('detalhes_frequencia.html',
                            frequencia=frequencia,
                            registros=registros,
-                           grupo_catequista=grupo_usuario)
+                           grupo_catequista=grupo_usuario,
+                           origem_url_voltar=origem_url_voltar)
 
 
 if __name__ == "__main__":
