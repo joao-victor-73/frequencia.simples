@@ -29,11 +29,11 @@
                             <td class="fw-semibold">{{ registro.crismando.nome }}</td>
                             <td class="text-center">
                                 {% if registro.status_frequencia == 'presente' %}
-                                    <span class="badge bg-success">✅ Presente</span>
+                                    <span class="badge bg-success "><i class="bi bi-check-circle-fill"></i> Presente</span>
                                 {% elif registro.status_frequencia == 'falta' %}
-                                    <span class="badge bg-danger">❌ Faltou</span>
+                                    <span class="badge bg-danger text-dark"><i class="bi bi-x-circle-fill"></i> Faltou</span>
                                 {% elif registro.status_frequencia == 'justificada' %}
-                                    <span class="badge bg-warning text-dark">⚠️ Falta Justificada</span>
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill"></i> Falta Justificada</span>
                                 {% endif %}
                             </td>
                             <td>{{ registro.observacao or '—' }}</td>
