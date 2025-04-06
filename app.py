@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import dotenv
 from datetime import datetime
+from functools import wraps
+from sqlalchemy.orm import joinedload
 
 
 # Configuração do Banco de Dados (Essas configs vem do arquivo .env)
@@ -15,6 +17,8 @@ user = os.environ['MYSQL_USER']
 password = os.environ['MYSQL_PASSWORD']
 database = os.environ['MYSQL_DATABASE']
 secret_key = os.environ['SECRET_KEY']
+
+time_logout = os.environ['REMEMBER_COOKIE_DURATION']
 
 # Instanciando a aplicação e o SQLAlchemy
 app = Flask(__name__)
@@ -30,7 +34,14 @@ app.config['SECRET_KEY'] = secret_key
 app.secret_key = secret_key  # Necessário para sessões do login
 
 login_manager = LoginManager(app)
+login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.login_message = 'Por favor, faça login para continuar.'
+login_manager.login_message_category = 'warning'
+
+
+# Serve para utilzar um tempo de expiração de sessão do login
+app.config['REMEMBER_COOKIE_DURATION'] = time_logout
 
 
 # Classes / Models para as TABELAS
@@ -92,6 +103,9 @@ class InforFrequencias(db.Model):
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
 
+    fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
+        'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+
 
 # 📌 Frequências dos Crismandos
 class Frequencias(db.Model):
@@ -125,15 +139,36 @@ class Usuarios(db.Model, UserMixin):
         self.senha_hash = generate_password_hash(senha)
 
     def check_password(self, senha):
+        # Dentro da função check_password_hash, ele verifica se a senha_hash e a senha normal
+        # são iguais ao decodificar, e retorna um BOOL (True para dizer que são iguais e
+        # False se forem diferentes).
         return check_password_hash(self.senha_hash, senha)
-    
+
     def get_id(self):
-        return str(self.id_usuario)  # Flask-Login precisa desse método
+        # Flask-Login precisa desse método, dizendo qual que é o ID desse modelo.
+        return str(self.id_usuario)
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return Usuarios.query.get(int(user_id))
+
+
+# decorator personalizado para que apenas "Coordenadores" acessem algumas páginas/templates
+def coordenador_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash("Você precisa estar logado para acessar esta página.", "warning")
+            return redirect(url_for("login"))
+
+        if current_user.catequista.nivel != 'coordenador':
+            flash("Você não tem permissão para acessar esta página.", "danger")
+            return redirect(url_for("index"))
+
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -145,6 +180,8 @@ def login():
         usuario = Usuarios.query.filter_by(email=email).first()
         if usuario and usuario.check_password(senha):
             login_user(usuario)
+            flash("Login realizado com sucesso", "success")
+
             return redirect(url_for('index'))
         else:
             flash('Email ou senha incorretos!', 'danger')
@@ -152,15 +189,20 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/registro', methods=['GET', 'POST'])
+@app.route('/registrar_catequista', methods=['GET', 'POST'])
+@login_required
+@coordenador_required
 def registro():
     if request.method == 'POST':
         email = request.form['email']
         senha = request.form['senha']
         id_catequista = request.form['fk_id_catequista']
 
+        # Lógica para verificar se o e-mail está cadastrado.
         if Usuarios.query.filter_by(email=email).first():
             flash('Email já cadastrado!', 'warning')
+
+        # Lógica para verificar se o catequista ja possui cadastro.
         elif Usuarios.query.filter_by(fk_id_catequista=id_catequista).first():
             flash('Este catequista já possui um usuário!', 'warning')
         else:
@@ -186,8 +228,15 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/perfil')
+@login_required
+def perfil():
+    return render_template('perfil.html')
+
+
 # Rota de começo
 @app.route("/", methods=["GET"])
+@login_required
 def index():
     # lista_crismandos = Crismandos.query.all()
     # lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
@@ -243,6 +292,7 @@ def index():
 
 # Rota para editar informações dos crismandos
 @app.route("/editar_informacoes/<int:id_crismando>", methods=['POST', 'GET'])
+@login_required
 def editar_infor(id_crismando):
 
     # Obtendo os dados associados ao id do crismando
@@ -257,6 +307,7 @@ def editar_infor(id_crismando):
 
 # Rota para salvar alterações nas informações dos crismandos
 @app.route("/atualizar_informacoes", methods=['POST', ])
+@login_required
 def atualizar_infor():
 
     # Pega o id do crismando. (esse id vem de um input hidden la no template 'infor_crismandos')
@@ -289,34 +340,62 @@ def atualizar_infor():
     return redirect(url_for('index'))
 
 
+@app.route("/lista_geral_crismandos", methods=["GET", "POST"])
+@login_required
+@coordenador_required
+def geral_crismandos():
+    pass
+
+
+@app.route("/lista_geral_catequistas", methods=["GET", "POST"])
+@login_required
+@coordenador_required
+def geral_catequistas():
+    pass
+
+
 # Rota para exibir o formulário de frequência
 @app.route("/fazer_frequencia", methods=["GET"])
+@login_required
 def fazer_frequencia():
     # crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
-    lista_crismandos = Crismandos.query.filter_by(
-        status_crismando='ativo').all()
+    # lista_crismandos = Crismandos.query.filter_by(status_crismando='ativo').all()
+
+    grupo_do_catequista = current_user.catequista.grupo
+    # Vai pegar o usuário logado e trazer a informação de qual grupo ele é responsável
+
+    # Filtra os crismandos com o mesmo grupo
+    lista_crismandos = db.session.query(Crismandos).join(Catequistas).filter(
+        Catequistas.grupo == grupo_do_catequista).order_by(Crismandos.nome).all()
 
     return render_template('fazer_frequencia.html', lista_crismandos=lista_crismandos)
 
 
 # Rota para salvar a frequência no banco
 @app.route("/salvar_frequencia", methods=["GET", "POST"])
+@login_required
 def salvar_frequencia():
     if request.method == 'POST':
+        grupo_catequista = current_user.catequista.grupo
+
         titulo = request.form.get('titulo_encontro')
         data_chamada = request.form.get('data_chamada')
 
         # Criar registro em InforFrequencias
         nova_info_freq = InforFrequencias(titulo_encontro=titulo,
-                                          data_chamada=datetime.strptime(data_chamada, '%Y-%m-%d'))
+                                          data_chamada=datetime.strptime(
+                                              data_chamada, '%Y-%m-%d'),
+                                          fk_id_catequista=current_user.catequista.id_catequista
+                                          )
         db.session.add(nova_info_freq)
         db.session.commit()
 
         id_infor_freq = nova_info_freq.id_infor_freq
 
-        # Salvar a frequência dos crismandos
-        lista_crismandos = Crismandos.query.filter_by(
-            status_crismando='ativo').all()
+        lista_crismandos = db.session.query(Crismandos)\
+            .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
+            .filter(Crismandos.status_crismando == 'ativo')\
+            .filter(Catequistas.grupo == grupo_catequista).all()
 
         for crismando in lista_crismandos:
             status = 'presente'
@@ -342,15 +421,25 @@ def salvar_frequencia():
 
 # Rota para listar frequências registradas
 @app.route('/listar_frequencias')
+@login_required
 def listar_frequencias():
-    data_filtro = request.args.get('data_filtro')  # Obtém a data do formulário
-    # Obtém o titulo do formulário
+    data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
-    query = InforFrequencias.query.order_by(
-        InforFrequencias.data_chamada.desc())
+    grupo_usuario = current_user.catequista.grupo
+    nivel_usuario = current_user.catequista.nivel
 
-    if data_filtro:  # Verifica se o usuário digitou algo no campo de data
+    # Base da consulta
+    query = db.session.query(InforFrequencias).distinct()\
+        .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
+        .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
+        .filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
+
+    query = query.filter(Catequistas.grupo == grupo_usuario)
+
+    # Filtro de data
+    if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
             query = query.filter(
@@ -358,29 +447,53 @@ def listar_frequencias():
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
-    if titulo_filtro:  # Verifica se o usuário digitou algo no campo de título
+    # Filtro por título
+    if titulo_filtro:
         query = query.filter(
             InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
-        # .ilike(f"%{---}") -> Utilizado para onde for texto
 
-    registros_de_frequencias = query.all()  # Executa a consulta filtrada
+    # Ordena por data
+    registros_de_frequencias = query.order_by(
+        InforFrequencias.data_chamada.desc()).all()
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
                            data_filtro=data_filtro,
-                           titulo_filtro=titulo_filtro)
+                           titulo_filtro=titulo_filtro,
+                           grupo_catequista=grupo_usuario)
 
 
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
+@login_required
 def detalhes_frequencia(id):
+    grupo_usuario = current_user.catequista.grupo
+
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
         return "Frequência não encontrada", 404
 
-    # Buscar todas as frequências associadas a essa chamada específica
-    registros = Frequencias.query.filter_by(fk_id_infor_freq=id).all()
+    # Verifica se há algum crismando desse grupo vinculado a essa frequência
+    autorizada = db.session.query(Frequencias)\
+        .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
+        .filter(Frequencias.fk_id_infor_freq == id)\
+        .filter(Catequistas.grupo == grupo_usuario).first()
 
-    return render_template('detalhes_frequencia.html', frequencia=frequencia, registros=registros)
+    if not autorizada:
+        flash("Você não tem permissão para acessar essa chamada.", "danger")
+        return redirect(url_for('listar_frequencias'))
+
+    # Buscar todos os registros dessa chamada, mas apenas do grupo do usuário
+    registros = db.session.query(Frequencias)\
+        .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
+        .filter(Frequencias.fk_id_infor_freq == id)\
+        .filter(Catequistas.grupo == grupo_usuario).all()
+
+    return render_template('detalhes_frequencia.html',
+                           frequencia=frequencia,
+                           registros=registros,
+                           grupo_catequista=grupo_usuario)
 
 
 if __name__ == "__main__":

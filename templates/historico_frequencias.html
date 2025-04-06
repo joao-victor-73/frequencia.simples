@@ -2,10 +2,13 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <div class="mb-4 text-center">
-        <h2 class="text-primary fw-bold">📋 Frequências Registradas</h2>
+    <div class="alert alert-primary" role="alert">
+        <div class="mb-4 text-center">
+            <h2 class="text-primary">📋 Frequências Registradas</h2>
+            <h3> <strong>📌 Exibindo chamadas do grupo:</strong> {{ grupo_catequista }} </h3>
+        </div>
     </div>
-
+        
     <!-- FORMULÁRIO DE FILTRAGEM -->
     <div class="card shadow-sm p-3 mb-4">
         <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-3">

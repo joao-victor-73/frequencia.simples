@@ -72,21 +72,24 @@
             </tr>
         </thead>
         <tbody>
+
             {% for crismando, catequista in lista_crismandos %}
-            <tr>
-                <td>{{ crismando.nome }}</td>
-                <td>{{ crismando.endereco }}</td>
-                <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
-                <td>{{ crismando.status_crismando|title }}</td>
-                <td>{{ crismando.batismo|title }}</td>
-                <td>{{ crismando.eucaristia|title }}</td>
-                <td>{{ catequista.grupo }}</td>
-                <td>
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modal_{{ crismando.id }}">
-                        Ver Detalhes
-                    </button>
-                </td>
-            </tr>
+                {% if current_user.catequista.grupo == catequista.grupo %}
+                    <tr>
+                        <td>{{ crismando.nome }}</td>
+                        <td>{{ crismando.endereco }}</td>
+                        <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
+                        <td>{{ crismando.status_crismando|title }}</td>
+                        <td>{{ crismando.batismo|title }}</td>
+                        <td>{{ crismando.eucaristia|title }}</td>
+                        <td>{{ catequista.grupo }}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modal_{{ crismando.id }}">
+                                Ver Detalhes
+                            </button>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
