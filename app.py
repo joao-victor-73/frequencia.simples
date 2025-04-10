@@ -366,8 +366,10 @@ def fazer_frequencia():
     # Vai pegar o usuário logado e trazer a informação de qual grupo ele é responsável
 
     # Filtra os crismandos com o mesmo grupo
-    lista_crismandos = db.session.query(Crismandos).join(Catequistas).filter(
-        Catequistas.grupo == grupo_do_catequista).order_by(Crismandos.nome).all()
+    lista_crismandos = db.session.query(Crismandos).join(Catequistas)\
+        .filter(Catequistas.grupo == grupo_do_catequista)\
+        .filter(Crismandos.status_crismando == 'ativo')\
+        .order_by(Crismandos.nome).all()
 
     return render_template('fazer_frequencia.html', lista_crismandos=lista_crismandos)
 
@@ -400,12 +402,13 @@ def salvar_frequencia():
 
         for crismando in lista_crismandos:
             status = 'presente'
-            if request.form.get(f'faltou_{crismando.id}'):
-                status = 'falta'
-            elif request.form.get(f'observacao_{crismando.id}'):
-                status = 'justificada'
-
             observacao = request.form.get(f'observacao_{crismando.id}', None)
+
+            if observacao:
+                status = 'justificada'
+            elif request.form.get(f'faltou_{crismando.id}'):
+                status = 'falta'
+
             nova_frequencia = Frequencias(
                 status_frequencia=status,
                 observacao=observacao,
@@ -426,29 +429,22 @@ def salvar_frequencia():
 def listar_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
-    grupo_filtro = request.args.get('grupo_filtro') 
 
     grupo_usuario = current_user.catequista.grupo
-    nivel_usuario = current_user.catequista.nivel
+    id_catequista = current_user.catequista.id_catequista
+
 
     # Base da consulta SEM filtro por catequista ainda
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)
+        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
+        .filter(Catequistas.grupo == grupo_usuario)\
+        .filter(InforFrequencias.fk_id_catequista == id_catequista)
 
-    if nivel_usuario == 'coordenador':
-        # Coordenador pode filtrar por grupo (ou ver todos)
-        if grupo_filtro:
-            query = query.filter(Catequistas.grupo == grupo_filtro)
-
-        grupos_disponiveis = db.session.query(Catequistas.grupo).distinct().all()
-
-    else:
-        # Catequista comum: restringe à sua autoria
-        query = query.filter(Catequistas.grupo == grupo_usuario)
-        query = query.filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
-        grupos_disponiveis = []
+    # Catequista comum: restringe à sua autoria
+    query = query.filter(Catequistas.grupo == grupo_usuario)
+    query = query.filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
 
     # Filtro por data
     if data_filtro:
@@ -468,11 +464,7 @@ def listar_frequencias():
                            registros=registros_de_frequencias,
                            data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro,
-                           grupo_filtro=grupo_filtro,
-                           grupos_disponiveis=grupos_disponiveis,
-                           grupo_catequista=grupo_usuario,
-                           nivel_usuario=nivel_usuario)
-
+                           grupo_catequista=grupo_usuario)
 
 
 @app.route('/geral_frequencias', methods=['GET'])
@@ -487,10 +479,9 @@ def geral_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
-    query = db.session.query(InforFrequencias).distinct()\
-        .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
-        .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)
+    query = db.session.query(InforFrequencias).distinct().join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
+
+    # query = db.session.query(InforFrequencias).join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
 
     if grupo_filtro:
         query = query.filter(Catequistas.grupo == grupo_filtro)

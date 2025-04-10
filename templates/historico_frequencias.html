@@ -12,19 +12,6 @@
     <!-- FORMULÁRIO DE FILTRAGEM -->
     <div class="card shadow-sm p-3 mb-6">
         <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-6">
-
-            <!-- Filtro por grupo (somente para coordenador) -->
-            {% if nivel_usuario == 'coordenador' %}
-                <div class="col-md-3">
-                    <label for="grupo_filtro" class="form-label fw-bold">Grupo:</label>
-                    <select name="grupo_filtro" class="form-select">
-                        <option value="">Todos os grupos</option>
-                        {% for grupo in grupos_disponiveis %}
-                            <option value="{{ grupo[0] }}" {% if grupo_filtro == grupo[0] %}selected{% endif %}>{{ grupo[0] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% endif %}
             
             <!-- Campo de Data -->
             <div class="col-md-3">

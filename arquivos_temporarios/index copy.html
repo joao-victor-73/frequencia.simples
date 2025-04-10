@@ -62,6 +62,8 @@
         <thead class="table-light text-center">
             <tr>
                 <th>Nome</th>
+                <th>Endereço</th>
+                <th>Data de Nascimento</th>
                 <th>Status</th>
                 <th>Batizado?</th>
                 <th>Eucaristia?</th>
@@ -75,6 +77,8 @@
                 {% if current_user.catequista.grupo == catequista.grupo %}
                     <tr>
                         <td>{{ crismando.nome }}</td>
+                        <td>{{ crismando.endereco }}</td>
+                        <td>{{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</td>
                         <td>{{ crismando.status_crismando|title }}</td>
                         <td>{{ crismando.batismo|title }}</td>
                         <td>{{ crismando.eucaristia|title }}</td>
