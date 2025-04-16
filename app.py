@@ -104,8 +104,9 @@ class InforFrequencias(db.Model):
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    
-    catequista = db.relationship('Catequistas', backref='infor_frequencias', foreign_keys=[fk_id_catequista])
+
+    catequista = db.relationship(
+        'Catequistas', backref='infor_frequencias', foreign_keys=[fk_id_catequista])
 
 
 # 📌 Frequências dos Crismandos
@@ -233,6 +234,11 @@ def logout():
 @login_required
 def perfil():
     return render_template('perfil.html')
+
+
+@app.route("/inicio", methods=["GET"])
+def inicio():
+    return render_template('inicio.html')
 
 
 # Rota de começo
@@ -433,7 +439,6 @@ def listar_frequencias():
     grupo_usuario = current_user.catequista.grupo
     id_catequista = current_user.catequista.id_catequista
 
-
     # Base da consulta SEM filtro por catequista ainda
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
@@ -444,21 +449,25 @@ def listar_frequencias():
 
     # Catequista comum: restringe à sua autoria
     query = query.filter(Catequistas.grupo == grupo_usuario)
-    query = query.filter(InforFrequencias.fk_id_catequista == current_user.catequista.id_catequista)
+    query = query.filter(InforFrequencias.fk_id_catequista ==
+                         current_user.catequista.id_catequista)
 
     # Filtro por data
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(
+                InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
     # Filtro por título
     if titulo_filtro:
-        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(
+            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
-    registros_de_frequencias = query.order_by(InforFrequencias.data_chamada.desc()).all()
+    registros_de_frequencias = query.order_by(
+        InforFrequencias.data_chamada.desc()).all()
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
@@ -479,7 +488,8 @@ def geral_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
-    query = db.session.query(InforFrequencias).distinct().join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
+    query = db.session.query(InforFrequencias).distinct().join(
+        Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
 
     # query = db.session.query(InforFrequencias).join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
 
@@ -489,12 +499,14 @@ def geral_frequencias():
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(
+                InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
     if titulo_filtro:
-        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(
+            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
     registros = query.order_by(InforFrequencias.data_chamada.desc()).all()
     grupos_disponiveis = db.session.query(Catequistas.grupo).distinct().all()
@@ -507,14 +519,12 @@ def geral_frequencias():
                            titulo_filtro=titulo_filtro)
 
 
-
-
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
 @login_required
 def detalhes_frequencia(id):
     grupo_usuario = current_user.catequista.grupo
-    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('listar_frequencias')  # Padrão: listar_frequencias
-
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'listar_frequencias')  # Padrão: listar_frequencias
 
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:

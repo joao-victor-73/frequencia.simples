@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+    <!-- Estilo customizado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Estilo próprio da página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio_styles.css') }}" />
+
+
+</head>
+<body id="page-top" style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa; padding-top: 80px;">
+    
+    <!-- PARTE DO NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('inicio') }}">
+                <img src="{{ url_for('static', filename='image/logo_snsc.jpg') }}" alt="Avatar" class="rounded-circle me-2" width="60" height="60">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Itens do menu (alinhados à esquerda) -->
+                <ul class="navbar-nav me-auto"> 
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('inicio') }}">Início</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#santuario">O Santuario</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pastoral">A Pastoral</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contato">Contatos</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <!-- PARTE DE LOGAR NO SISTEMA -->
+            <!-- Header-->
+            <header class="bg-primary bg-gradient text-white">
+                <div class="container px-4 text-center">
+                    <h1 class="fw-bolder">Welcome to Scrolling Nav</h1>
+                    <p class="lead">A functional Bootstrap 5 boilerplate for one page scrolling websites</p>
+                    <a class="btn btn-lg btn-light" href="{{ url_for('login') }}">Faça seu login!</a>
+                </div>
+            </header>
+            
+        <!-- PARTE QUE FALA SOBRE O SANTUÁRIO -->
+            <section id="santuario" class="py-5 border-top" style="background-color:rgb(221, 221, 221);">
+                <div class="container px-4">
+                    <div class="row gx-4 justify-content-center">
+                        <div class="col-lg-8">
+                            <h2>Santuário Nossa Senhora da Conceição </h2>
+                            <p class="lead">This is a great place to talk about your webpage. This template is purposefully unstyled so you can use it as a boilerplate or starting point for you own landing page designs! This template features:</p>
+                            <ul>
+                                <li>Clickable nav links that smooth scroll to page sections</li>
+                                <li>Responsive behavior when clicking nav links perfect for a one page website</li>
+                                <li>Bootstrap's scrollspy feature which highlights which section of the page you're on in the navbar</li>
+                                <li>Minimal custom CSS so you are free to explore your own unique design options</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- IMAGEM OU CARROSSEL DE IMAGENS -->
+
+
+            <!-- PARTE QUE FALA SOBRE A PASTORAL -->
+            <section class="bg-light py-5 border-top" id="pastoral" style="background-color: #f1f1f1;">
+                <div class="container px-4">
+                    <div class="row gx-4 justify-content-center">
+                        <div class="col-lg-8">
+                            <h2>Pastoral da Crisma</h2>
+                            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut optio velit inventore, expedita quo laboriosam possimus ea consequatur vitae, doloribus consequuntur ex. Nemo assumenda laborum vel, labore ut velit dignissimos.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO SOBRE OS CONTATOS DO SANTUARIO -->
+            <section id="contato" class="py-5 border-top" style="background-color: #e9ecef">
+                <div class="container px-4">
+                    <div class="row gx-4 justify-content-center">
+                        <div class="col-lg-8">
+                            <h2>Contact us</h2>
+                            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero odio fugiat voluptatem dolor, provident officiis, id iusto! Obcaecati incidunt, qui nihil beatae magnam et repudiandae ipsa exercitationem, in, quo totam.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RODAPÉ -->
+            <footer class="py-5 bg-dark">
+                <div class="container px-4"><p class="m-0 text-center text-white">Copyright &copy; Santuario N. Sra. da Conceição 2025</p></div>
+            </footer>
+
+
+            <!-- Bootstrap core JS-->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Core theme JS-->
+            <script src="js/scripts.js"></script>
+
+
+
+
+
+    
+
+
+    
+</body>
+</html>
