@@ -58,6 +58,7 @@ class Catequistas(db.Model):
     grupo = db.Column(db.String(100), default='Nao Especificado')
     nivel = db.Column(db.Enum('coordenador', 'catequista'),
                       nullable=False, default='catequista')
+    tel1 = db.Column(db.Integer)
 
     # Relacionamentos
     crismandos = db.relationship(
@@ -223,6 +224,14 @@ def registro():
     return render_template('register.html', catequistas=catequistas)
 
 
+@app.route('/registrar_novo_catequista', methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def register_new_cat():
+    grupos_catequistas = Catequistas.query.with_entities(Catequistas.id_catequista, Catequistas.grupo).all()
+    return render_template('registrar_novo_catequista.html', grupos_catequistas=grupos_catequistas)
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -236,13 +245,13 @@ def perfil():
     return render_template('perfil.html')
 
 
-@app.route("/inicio", methods=["GET"])
+@app.route("/", methods=["GET"])
 def inicio():
     return render_template('inicio.html')
 
 
 # Rota de começo
-@app.route("/", methods=["GET"])
+@app.route("/inicio", methods=["GET"])
 @login_required
 def index():
     # lista_crismandos = Crismandos.query.all()

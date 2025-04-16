@@ -50,7 +50,8 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
                             <!-- Dessa maneira, apenas os coordenadores poderão acessar esse menu -->
                             {% if current_user.catequista.nivel == 'coordenador' %}
-                                <li><a class="dropdown-item" href="{{ url_for('registro') }}">Registrar Catequista</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('registro') }}">Registrar novo usuário</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('register_new_cat') }}">Registrar novo Catequista</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('geral_catequistas') }}">Lista Geral de Catequistas</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('geral_crismandos') }}">Lista Geral de Crismandos</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('geral_frequencias') }}">Lista Geral de Frequências</a></li>
