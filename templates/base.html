@@ -41,27 +41,36 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('fazer_frequencia') }}">Registrar Frequência</a>
                     </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
 
+                    <!-- Dropdown -->
+                    {% if current_user.catequista.nivel == 'coordenador' %}
+                    <!-- Dessa maneira, apenas os coordenadores poderão acessar esse menu -->
+                    
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
+                                Menu de Registros
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('registro') }}">Registrar novo usuário</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('register_new_cat') }}">Registrar novo Catequista</a></li>                                
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            
                         <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
-                            Menu
+                            Menu de Listas
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-                            <!-- Dessa maneira, apenas os coordenadores poderão acessar esse menu -->
-                            {% if current_user.catequista.nivel == 'coordenador' %}
-                                <li><a class="dropdown-item" href="{{ url_for('registro') }}">Registrar novo usuário</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('register_new_cat') }}">Registrar novo Catequista</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('geral_catequistas') }}">Lista Geral de Catequistas</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('geral_crismandos') }}">Lista Geral de Crismandos</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('geral_frequencias') }}">Lista Geral de Frequências</a></li>
-                            {% endif %}
-
-                            <li><a class="dropdown-item" href="/ajuda">Ajuda</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
+                                <li><a class="dropdown-item" href="{{ url_for('geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+                    
                 <ul class="navbar-nav">
                     <!-- Avatar e Logout (alinhado à direita) -->
                     <ul class="navbar-nav ms-auto">
