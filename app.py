@@ -58,7 +58,7 @@ class Catequistas(db.Model):
     grupo = db.Column(db.String(100), default='Nao Especificado')
     nivel = db.Column(db.Enum('coordenador', 'catequista'),
                       nullable=False, default='catequista')
-    tel1 = db.Column(db.Integer)
+    tel1 = db.Column(db.String(20))
 
     # Relacionamentos
     crismandos = db.relationship(
@@ -228,7 +228,39 @@ def registro():
 @login_required
 @coordenador_required
 def register_new_cat():
+    if request.method == 'POST':
+        nome = request.form['nome'].strip().title()
+        data_nascimento = request.form['data_nascimento']
+        tel1 = request.form['tel1']
+        endereco = request.form['endereco']
+        grupo = request.form['selecionar_grupo']
+
+        # Verificar se já existe um catequista com o mesmo nome
+        if Catequistas.query.filter_by(nome=nome).first():
+            flash(f"O catequista '{nome}' já está cadastrado!", "warning")
+            return redirect(url_for("cadastrar_catequista"))
+        
+        else:
+            novo_catequista = Catequistas(
+                nome=nome,
+                data_nascimento=data_nascimento,
+                tel1=tel1,
+                endereco=endereco,
+                grupo=grupo
+            )
+
+            try:
+                db.session.add(novo_catequista)
+                db.session.commit()
+                flash("Cadastro realizado com sucesso", "success")
+
+            except Exception as e:
+                print("Erro ao salvar no banco de dados: ", str(e))
+                db.session.rollback()
+
+
     grupos_catequistas = Catequistas.query.with_entities(Catequistas.id_catequista, Catequistas.grupo).all()
+
     return render_template('registrar_novo_catequista.html', grupos_catequistas=grupos_catequistas)
 
 

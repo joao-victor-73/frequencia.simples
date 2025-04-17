@@ -45,7 +45,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Grupo</label>
-                    <select name="fk_id_catequista" class="form-select">
+                    <select name="selecionar_grupo" class="form-select">
                             <option> Nenhum </option>
                         {% for grupo in grupos_catequistas %}
                             <option value="{{ grupo.id_catequista }}">{{ grupo.grupo }}</option>
