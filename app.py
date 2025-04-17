@@ -239,7 +239,7 @@ def register_new_cat():
         if Catequistas.query.filter_by(nome=nome).first():
             flash(f"O catequista '{nome}' já está cadastrado!", "warning")
             return redirect(url_for("cadastrar_catequista"))
-        
+
         else:
             novo_catequista = Catequistas(
                 nome=nome,
@@ -258,8 +258,8 @@ def register_new_cat():
                 print("Erro ao salvar no banco de dados: ", str(e))
                 db.session.rollback()
 
-
-    grupos_catequistas = Catequistas.query.with_entities(Catequistas.id_catequista, Catequistas.grupo).all()
+    grupos_catequistas = Catequistas.query.with_entities(
+        Catequistas.id_catequista, Catequistas.grupo).all()
 
     return render_template('registrar_novo_catequista.html', grupos_catequistas=grupos_catequistas)
 
@@ -399,7 +399,12 @@ def geral_crismandos():
 @login_required
 @coordenador_required
 def geral_catequistas():
-    pass
+    todos_os_catequistas = Catequistas.query.all()
+
+    # for catequista in todos_os_catequistas:
+        # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
+    
+    return render_template('lista_geral_catequistas.html', todos_os_catequistas=todos_os_catequistas)
 
 
 # Rota para exibir o formulário de frequência

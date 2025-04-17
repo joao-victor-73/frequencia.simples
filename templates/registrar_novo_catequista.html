@@ -53,10 +53,15 @@
                     </select>
                 </div>
 
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-3">
                     <button type="submit" class="btn btn-primary">Cadastrar</button>
                     <a href="{{ url_for('index') }}" class="btn btn-danger">Voltar</a>
                 </div>
+                
+                <div class="d-flex justify-content-center mb-3">
+                    <a href="{{ url_for('geral_catequistas') }}" class="btn btn-info">Visualizar lista</a>
+                </div>
+
             </form>
         </div>
     </div>

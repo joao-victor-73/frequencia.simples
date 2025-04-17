@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+    <!-- Lista completa dos nomes -->
+    <table class="table table-striped table-responsive table-bordered mt-3">
+        <thead class="table-light text-center">
+            <tr>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Endereço</th>
+                <th>Nº Contato</th>
+                <th>Grupo</th>
+                <th>Nivel</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for catequista in todos_os_catequistas %}
+                <tr>
+                    <td>{{ catequista.nome }}</td>
+                    <td>{{ catequista.data_nascimento.strftime('%d-%m-%Y') if catequista.data_nascimento else 'N/A' }}</td>
+                    <td>{{ catequista.endereco|title }}</td>
+                    <td>{{ catequista.tel1 }}</td>
+                    <td>{{ catequista.grupo }}</td>
+                    <td>{{ catequista.nivel }}</td>
+                    <td> --- </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}
