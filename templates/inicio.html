@@ -1,138 +1,200 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inicio</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap 5 -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-    <!-- Ícones -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+        <!-- Ícones -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 
-    <!-- Estilo customizado -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <!-- Estilo customizado -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Estilo próprio da página -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio_styles.css') }}" />
+        <!-- Estilo próprio da página -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio_styles.css') }}" />
 
 
-</head>
-<body id="page-top" style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa; padding-top: 80px;">
+    </head>
     
-    <!-- PARTE DO NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 fixed-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('inicio') }}">
-                <img src="{{ url_for('static', filename='image/logo_snsc.jpg') }}" alt="Avatar" class="rounded-circle me-2" width="60" height="60">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Itens do menu (alinhados à esquerda) -->
-                <ul class="navbar-nav me-auto"> 
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('inicio') }}">Início</a>
-                    </li>
+    <body id="page-top" style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa; padding-top: 80px;">
+        
+        <!-- PARTE DO NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 fixed-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" href="{{ url_for('inicio') }}">
+                    <img src="{{ url_for('static', filename='image/logo_snsc_2.jpg') }}" alt="Avatar" class="rounded-circle me-2" width="60" height="60">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Itens do menu (alinhados à esquerda) -->
+                    <ul class="navbar-nav me-auto"> 
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('inicio') }}">Início</a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="#santuario">O Santuario</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#santuario">O Santuario</a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="#pastoral">A Pastoral</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#pastoral">A Pastoral</a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contato">Contatos</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contato">Contatos</a>
+                        </li>
 
-                </ul>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+
+        <header class="bg-primary bg-gradient text-white">
+            <!-- PARTE DE CABEÇALHO -->
+            <div class="parent">
+                <div class="div1 text-center">
+                    <div class="container px-4 text-center">
+                        <h1 class="fw-bolder">Welcome to Scrolling Nav</h1>
+                        <p class="lead">A functional Bootstrap 5 boilerplate for one page scrolling websites</p>
+                    </div>
+
+                </div>
+                
+                <!-- PARTE PARA LOGAR NO SISTEMA -->
+                <div class="div4 text-center">
+                    <div class="container px-4">
+                        <a class="btn btn-lg btn-light" href="{{ url_for('login') }}">Faça seu login!</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+                
+        <!-- PARTE QUE FALA SOBRE O SANTUÁRIO -->
+        <div id="santuario" class="santuario py-5 border-top" style="background-color:rgb(221, 221, 221);">
+            <div class="container px-4">
+                <div class="row gx-4 align-items-center">
+                    <!-- Coluna do texto -->
+                    <div class="col-md-6">
+                        <h2>Santuário Nossa Senhora da Conceição</h2>
+                        <p class="lead">
+                            Este é um ótimo lugar para falar sobre o seu site. 
+                            Este modelo é intencionalmente sem estilo para que você possa usá-lo como base para seus próprios designs!
+                        </p>
+                        <ul>
+                            <li>Links de navegação clicáveis com rolagem suave até as seções da página</li>
+                            <li>Comportamento responsivo ao clicar nos links</li>
+                            <li>Recurso scrollspy do Bootstrap que destaca a seção atual no menu</li>
+                            <li>CSS personalizado mínimo para você explorar seu próprio estilo</li>
+                        </ul>
+                    </div>
+
+                    <!-- Coluna da imagem -->
+                    <div class="col-md-6 text-center">
+                        <img src="{{ url_for('static', filename='image/santuario_tumb.jpg') }}" class="img-fluid rounded border border-primary" alt="Santuário">
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
 
 
-
-    <!-- PARTE DE LOGAR NO SISTEMA -->
-            <!-- Header-->
-            <header class="bg-primary bg-gradient text-white">
-                <div class="container px-4 text-center">
-                    <h1 class="fw-bolder">Welcome to Scrolling Nav</h1>
-                    <p class="lead">A functional Bootstrap 5 boilerplate for one page scrolling websites</p>
-                    <a class="btn btn-lg btn-light" href="{{ url_for('login') }}">Faça seu login!</a>
-                </div>
-            </header>
-            
-        <!-- PARTE QUE FALA SOBRE O SANTUÁRIO -->
-            <section id="santuario" class="py-5 border-top" style="background-color:rgb(221, 221, 221);">
-                <div class="container px-4">
-                    <div class="row gx-4 justify-content-center">
-                        <div class="col-lg-8">
-                            <h2>Santuário Nossa Senhora da Conceição </h2>
-                            <p class="lead">This is a great place to talk about your webpage. This template is purposefully unstyled so you can use it as a boilerplate or starting point for you own landing page designs! This template features:</p>
-                            <ul>
-                                <li>Clickable nav links that smooth scroll to page sections</li>
-                                <li>Responsive behavior when clicking nav links perfect for a one page website</li>
-                                <li>Bootstrap's scrollspy feature which highlights which section of the page you're on in the navbar</li>
-                                <li>Minimal custom CSS so you are free to explore your own unique design options</li>
-                            </ul>
+        <!-- IMAGEM OU CARROSSEL DE IMAGENS -->
+        <section class="bg-light py-5 border-top" id="carrosel">
+            <div class="container px-4">
+                <div id="carouselSantuario" class="carousel slide" data-bs-ride="carousel">
+                    
+                    <!-- Indicadores (os pontinhos embaixo) -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselSantuario" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselSantuario" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselSantuario" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#carouselSantuario" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#carouselSantuario" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+        
+                    <!-- Slides -->
+                    <div class="carousel-inner rounded shadow-sm">
+                        <div class="carousel-item active">
+                            <img src="{{ url_for('static', filename='image/carrossel1.jpg') }}" class="d-block w-100 img-fluid" alt="Imagem 1">
                         </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='image/carrossel2.jpg') }}" class="d-block w-100 img-fluid" alt="Imagem 2">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='image/carrossel3.jpg') }}" class="d-block w-100 img-fluid" alt="Imagem 3">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='image/carrossel4.jpg') }}" class="d-block w-100 img-fluid" alt="Imagem 4">
+                        </div>
+
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='image/carrossel5.jpg') }}" class="d-block w-100 img-fluid" alt="Imagem 5">
+                        </div>
+
+                    </div>
+        
+                    <!-- Controles -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselSantuario" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselSantuario" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+          
+        
+        <!-- PARTE QUE FALA SOBRE A PASTORAL -->
+        <section id="contato" class="py-5 border-top" style="background-color: #e9ecef">
+            <div class="container px-4">
+                <div class="row gx-4 justify-content-center">
+                    <div class="col-lg-8">
+                        <h2>Pastoral da Crisma</h2>
+                        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut optio velit inventore, expedita quo laboriosam possimus ea consequatur vitae, doloribus consequuntur ex. Nemo assumenda laborum vel, labore ut velit dignissimos.</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- IMAGEM OU CARROSSEL DE IMAGENS -->
-
-
-            <!-- PARTE QUE FALA SOBRE A PASTORAL -->
-            <section class="bg-light py-5 border-top" id="pastoral" style="background-color: #f1f1f1;">
-                <div class="container px-4">
-                    <div class="row gx-4 justify-content-center">
-                        <div class="col-lg-8">
-                            <h2>Pastoral da Crisma</h2>
-                            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut optio velit inventore, expedita quo laboriosam possimus ea consequatur vitae, doloribus consequuntur ex. Nemo assumenda laborum vel, labore ut velit dignissimos.</p>
-                        </div>
+            </div>
+        </section>
+        
+        <!-- SEÇÃO SOBRE OS CONTATOS DO SANTUARIO -->
+        <section id="santuario" class="py-5 border-top" style="background-color:rgb(221, 221, 221);">
+            <div class="container px-4">
+                <div class="row gx-4 justify-content-center">
+                    <div class="col-lg-8">
+                        <h2>Contact us</h2>
+                        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero odio fugiat voluptatem dolor, provident officiis, id iusto! Obcaecati incidunt, qui nihil beatae magnam et repudiandae ipsa exercitationem, in, quo totam.</p>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- SEÇÃO SOBRE OS CONTATOS DO SANTUARIO -->
-            <section id="contato" class="py-5 border-top" style="background-color: #e9ecef">
-                <div class="container px-4">
-                    <div class="row gx-4 justify-content-center">
-                        <div class="col-lg-8">
-                            <h2>Contact us</h2>
-                            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero odio fugiat voluptatem dolor, provident officiis, id iusto! Obcaecati incidunt, qui nihil beatae magnam et repudiandae ipsa exercitationem, in, quo totam.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RODAPÉ -->
-            <footer class="py-5 bg-dark">
-                <div class="container px-4"><p class="m-0 text-center text-white">Copyright &copy; Santuario N. Sra. da Conceição 2025</p></div>
-            </footer>
+        <!-- RODAPÉ -->
+        <footer class="py-5 bg-dark">
+            <div class="container px-4"><p class="m-0 text-center text-white">Copyright &copy; Santuario N. Sra. da Conceição 2025</p></div>
+        </footer>
 
 
-            <!-- Bootstrap core JS-->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-            <!-- Core theme JS-->
-            <script src="js/scripts.js"></script>
-
-
-
-
-
-    
-
-
-    
-</body>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>    
+    </body>
 </html>
