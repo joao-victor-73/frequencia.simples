@@ -119,7 +119,7 @@
                     <p><strong>Data de Nascimento:</strong> {{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</p>
                     <p><strong>Endereço:</strong> {{ crismando.endereco }}</p>
                     <p><strong>Telefone 1:</strong> {{ crismando.tel1 }}</p>
-                    <p><strong>Telefone 2:</strong> {{ crismando.tel2 }}</p>
+                    <p><strong>Telefone 2:</strong> {% if crismando.tel2 == 'None' or crismando.tel2 == '' %} Sem Contato {% endif %}  {{crismando.tel2}}</p>
                     <p><strong>Status:</strong> {{ crismando.status_crismando|title }}</p>
                     <p><strong>Batizado:</strong> {{ crismando.batismo|title }}</p>
                     <p><strong>Eucaristia:</strong> {{ crismando.eucaristia|title }}</p>

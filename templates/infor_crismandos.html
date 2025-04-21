@@ -32,7 +32,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Número para contato 2</label>
-                    <input type="text" name="telefone2" class="form-control rounded-3" value="{{ crismando.tel2 }}">
+                    <input type="text" name="telefone2" class="form-control rounded-3" {% if crismando.tel2 == 'None' or crismando.tel2 == '' %} value='Sem Contato' {% endif %}  value="{{crismando.tel2}}"  >
                 </div>
 
                 <div class="col-12">
