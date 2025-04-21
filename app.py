@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy as sa
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import dotenv
@@ -92,7 +93,7 @@ class Crismandos(db.Model):
 
     # Relacionamento com Frequencias
     frequencias = db.relationship(
-        'Frequencias', backref='crismando', cascade="all, delete-orphan")
+        'Frequencias', backref='crismando', cascade="all, delete-orphan", lazy='dynamic')
 
 
 # 📌 Informações sobre Chamadas
@@ -300,8 +301,29 @@ def index():
     # Pega o valor se o checkbox foi marcado
     filtrar_eucaristia = request.args.get('eucaristia')
 
+    # Subquery para contar presenças, faltas e justificadas
+    subquery_frequencias = db.session.query(
+        Frequencias.fk_id_crismando,
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'presente', 1))).label(
+            'total_presencas'),
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'falta', 1))).label(
+            'total_faltas'),
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'justificada', 1))).label(
+            'total_justificadas')
+    ).group_by(Frequencias.fk_id_crismando).subquery()
+
+    # Join com Catequistas e Frequências
+    query = db.session.query(
+        Crismandos,
+        Catequistas,
+        subquery_frequencias.c.total_presencas,
+        subquery_frequencias.c.total_faltas,
+        subquery_frequencias.c.total_justificadas
+    ).join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
+           ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+
     # Join entre as tabelas Crismandos e Catequistas
-    query = db.session.query(Crismandos, Catequistas).join(Catequistas)
+    # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
 
     # Se o usuário digitou um nome, aplicamos um filtro de nome:
     if search_term:
@@ -331,8 +353,7 @@ def index():
                            lista_crismandos=lista_crismandos,
                            search_term=search_term,
                            # Garantindo a persistência dos filtros de Batismo e Eucaristia
-                           status_crismando=request.args.get(
-                               'buscar_status_crismando', ''),
+                           status_crismando=status_filter,
                            status_filter=status_filter,
                            filtrar_batizado=filtrar_batizado,
                            filtrar_eucaristia=filtrar_eucaristia)
@@ -402,8 +423,8 @@ def geral_catequistas():
     todos_os_catequistas = Catequistas.query.all()
 
     # for catequista in todos_os_catequistas:
-        # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
-    
+    # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
+
     return render_template('lista_geral_catequistas.html', todos_os_catequistas=todos_os_catequistas)
 
 

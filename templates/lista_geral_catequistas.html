@@ -20,7 +20,7 @@
             {% for catequista in todos_os_catequistas %}
                 <tr>
                     <td>{{ catequista.nome }}</td>
-                    <td>{{ catequista.data_nascimento.strftime('%d-%m-%Y') if catequista.data_nascimento else 'N/A' }}</td>
+                    <td>{{ catequista.data_nascimento.strftime('%d/%m/%Y') if catequista.data_nascimento else 'N/A' }}</td>
                     <td>{{ catequista.endereco|title }}</td>
                     <td>{{ catequista.tel1 }}</td>
                     <td>{{ catequista.grupo }}</td>

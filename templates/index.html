@@ -63,6 +63,9 @@
             <tr>
                 <th>Nome</th>
                 <th>Status</th>
+                <th>Presenças</th>
+                <th>Faltas</th>
+                <th>Faltas Justificadas</th>
                 <th>Batizado?</th>
                 <th>Eucaristia?</th>
                 <th>Grupo</th>
@@ -71,11 +74,21 @@
         </thead>
         <tbody>
 
-            {% for crismando, catequista in lista_crismandos %}
+            {% for crismando, catequista, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
                 {% if current_user.catequista.grupo == catequista.grupo %}
-                    <tr>
+                    {% set linha_classe = '' %}
+                    {% if total_faltas and total_faltas >= 7 %}
+                        {% set linha_classe = 'table-danger' %}
+                    {% elif total_faltas and total_faltas >= 5 %}
+                        {% set linha_classe = 'table-warning' %}
+                    {% endif %}
+
+                    <tr class="{{ linha_classe }}">
                         <td>{{ crismando.nome }}</td>
                         <td>{{ crismando.status_crismando|title }}</td>
+                        <td>{{ total_presencas or 0 }}</td>
+                        <td>{{ total_faltas or 0 }}</td>
+                        <td>{{ total_justificadas or 0 }}</td>
                         <td>{{ crismando.batismo|title }}</td>
                         <td>{{ crismando.eucaristia|title }}</td>
                         <td>{{ catequista.grupo }}</td>
@@ -91,7 +104,7 @@
     </table>
 
     <!-- Modal (pop-up) -->
-    {% for crismando, catequista in lista_crismandos %}
+    {% for crismando, catequista, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
     <div class="modal fade" id="modal_{{ crismando.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
