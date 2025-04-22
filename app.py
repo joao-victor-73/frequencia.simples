@@ -348,8 +348,8 @@ def index():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
-    ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
-    ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+           ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
+                  ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -456,17 +456,13 @@ def geral_crismandos():
 @coordenador_required
 def geral_catequistas():
     todos_os_catequistas = Catequistas.query.join(
-    Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
+        Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
 
     # for catequista in todos_os_catequistas:
     # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
 
-    # Todos os grupos disponíveis para o dropdown
-    todos_grupos = Grupos.query.all()
-
-    return render_template('lista_geral_catequistas.html', 
-                           todos_os_catequistas=todos_os_catequistas, 
-                           todos_grupos=todos_grupos)
+    return render_template('lista_geral_catequistas.html',
+                           todos_os_catequistas=todos_os_catequistas)
 
 
 @app.route("/editar_infor_catequista/<int:id_catequista>", methods=['POST', 'GET'])
@@ -480,10 +476,13 @@ def editar_infor_catequista(id_catequista):
         Catequistas.id_catequista == id_catequista
     ).first()
 
+    # Todos os grupos disponíveis para o dropdown
+    todos_grupos = Grupos.query.all()
+
     if not catequista:
         return "Catequista não encontrado", 404
 
-    return render_template('editar_infor_cateq.html', catequista=catequista)
+    return render_template('editar_infor_cateq.html', catequista=catequista, todos_grupos=todos_grupos)
 
 
 @app.route("/salvar_infor_catequista", methods=['POST', 'GET'])
@@ -497,7 +496,7 @@ def salvar_infor_catequista():
     atualizar_catequista.nome = request.form['nome_catequista']
     atualizar_catequista.data_nascimento = request.form['data_nascimento']
     atualizar_catequista.endereco = request.form['endereco']
-    atualizar_catequista.grupo = request.form['grupo']
+    atualizar_catequista.fk_id_grupo = request.form['grupo_responsavel']
     atualizar_catequista.nivel = request.form['nivel']
     atualizar_catequista.tel1 = request.form['tel1']
 

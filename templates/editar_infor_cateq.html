@@ -38,11 +38,11 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Grupo responsável</label>
-                    <select name="catequista_responsavel" id="catequista_responsavel" class="form-select rounded-3">
+                    <select name="grupo_responsavel" id="grupo_responsavel" class="form-select rounded-3">
                         {% for grupo in todos_grupos %}
-                            <option value="{{ catequista.id_catequista }}"
+                            <option value="{{ grupo.id_grupo }}"
                                     data-grupo="{{ catequista.grupo.nome_grupo }}">
-                                {{ catequista.grupo.nome_grupo }}
+                                {{ grupo.nome_grupo }}
                             </option>
                         {% endfor %}
                     </select>
@@ -51,9 +51,11 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nível</label>
                     <select name="nivel" class="form-select rounded-3">
-                        {% for catequista in lista_catequistas %}
-                            <option value="{{ catequista.id_catequista }}">
-                                {{ catequista.nivel }}
+                        {% for nivel in ['catequista', 'coordenador'] %}
+                            <option value="{{ nivel }}"
+                            {% if nivel == catequista.nivel %}selected{% endif %}>
+                                {{ nivel }}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
