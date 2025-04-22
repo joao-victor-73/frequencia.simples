@@ -47,8 +47,8 @@
                     <label class="form-label">Grupo</label>
                     <select name="selecionar_grupo" class="form-select">
                             <option value=""> Nenhum </option>
-                        {% for grupo in grupos_catequistas %}
-                            <option value="{{ grupo.grupo }}">{{ grupo.grupo }}</option>
+                        {% for grupo in grupos %}
+                            <option value="{{ grupo.id_grupo }}">{{ grupo.nome }}</option>
                         {% endfor %}
                     </select>
                 </div>

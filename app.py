@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy as sa
+from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import dotenv
@@ -56,16 +57,19 @@ class Catequistas(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200))
-    grupo = db.Column(db.String(100), default='Nao Especificado')
     nivel = db.Column(db.Enum('coordenador', 'catequista'),
                       nullable=False, default='catequista')
     tel1 = db.Column(db.String(20))
+    fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
+        'grupos.id_grupo'), nullable=True)
 
     # Relacionamentos
     crismandos = db.relationship(
         'Crismandos', backref='catequista', lazy=True, cascade="all, delete-orphan")
     usuario = db.relationship(
         'Usuarios', uselist=False, backref='catequista', cascade="all, delete-orphan")
+
+    grupo = db.relationship('Grupos', back_populates='catequistas')
 
 
 # 📌 Crismandos
@@ -86,6 +90,8 @@ class Crismandos(db.Model):
     eucaristia = db.Column(db.Enum('sim', 'nao'), default='nao')
     status_crismando = db.Column(
         db.Enum('ativo', 'desistente'), default='ativo')
+    fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
+        'grupos.id_grupo'), nullable=True)
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
@@ -95,8 +101,26 @@ class Crismandos(db.Model):
     frequencias = db.relationship(
         'Frequencias', backref='crismando', cascade="all, delete-orphan", lazy='dynamic')
 
+    # Relacionamento com a tabela Grupos
+    grupo = db.relationship('Grupos', backref='crismandos')
+
+
+# 📌 Informações sobre os Grupos
+class Grupos(db.Model):
+    __tablename__ = 'grupos'
+
+    id_grupo = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome_grupo = db.Column(db.String(100), nullable=False, unique=True)
+    horario = db.Column(db.String(20))
+    local_grupo = db.Column(db.String(100))
+    descricao = db.Column(db.Text)
+
+    # Relacionamentos
+    catequistas = db.relationship('Catequistas', back_populates='grupo')
 
 # 📌 Informações sobre Chamadas
+
+
 class InforFrequencias(db.Model):
     __tablename__ = 'infor_frequencias'
 
@@ -234,7 +258,10 @@ def register_new_cat():
         data_nascimento = request.form['data_nascimento']
         tel1 = request.form['tel1']
         endereco = request.form['endereco']
-        grupo = request.form['selecionar_grupo']
+        fk_id_grupo = request.form['selecionar_grupo'] or None
+
+        if not fk_id_grupo:
+            fk_id_grupo = None
 
         # Verificar se já existe um catequista com o mesmo nome
         if Catequistas.query.filter_by(nome=nome).first():
@@ -247,7 +274,7 @@ def register_new_cat():
                 data_nascimento=data_nascimento,
                 tel1=tel1,
                 endereco=endereco,
-                grupo=grupo
+                fk_id_grupo=fk_id_grupo
             )
 
             try:
@@ -259,10 +286,10 @@ def register_new_cat():
                 print("Erro ao salvar no banco de dados: ", str(e))
                 db.session.rollback()
 
-    grupos_catequistas = Catequistas.query.with_entities(
-        Catequistas.id_catequista, Catequistas.grupo).all()
+    # Busca todos os grupos disponíveis para exibir no select
+    grupos_disponiveis = Grupos.query.all()
 
-    return render_template('registrar_novo_catequista.html', grupos_catequistas=grupos_catequistas)
+    return render_template('registrar_novo_catequista.html', grupos=grupos_disponiveis)
 
 
 @app.route('/logout')
@@ -316,11 +343,13 @@ def index():
     query = db.session.query(
         Crismandos,
         Catequistas,
+        Grupos,
         subquery_frequencias.c.total_presencas,
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
-           ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+    ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
+    ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -366,12 +395,18 @@ def editar_infor(id_crismando):
 
     # Obtendo os dados associados ao id do crismando
     crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
-    lista_catequistas = db.session.query(Catequistas)
+    # lista_catequistas = db.session.query(Catequistas).options(joinedload(Catequistas.grupo)).all()
+    # lista_catequistas = db.session.query(Catequistas)
+
+    lista_catequistas = db.session.query(
+        Catequistas, Grupos).join(Grupos).all()
 
     if not crismando:
         return "Crismando não encontrado", 404
 
-    return render_template('infor_crismandos.html', crismando=crismando, lista_catequistas=lista_catequistas)
+    return render_template('infor_crismandos.html',
+                           crismando=crismando,
+                           lista_catequistas=lista_catequistas)
 
 
 # Rota para salvar alterações nas informações dos crismandos
@@ -420,12 +455,60 @@ def geral_crismandos():
 @login_required
 @coordenador_required
 def geral_catequistas():
-    todos_os_catequistas = Catequistas.query.all()
+    todos_os_catequistas = Catequistas.query.join(
+    Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
 
     # for catequista in todos_os_catequistas:
     # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
 
-    return render_template('lista_geral_catequistas.html', todos_os_catequistas=todos_os_catequistas)
+    # Todos os grupos disponíveis para o dropdown
+    todos_grupos = Grupos.query.all()
+
+    return render_template('lista_geral_catequistas.html', 
+                           todos_os_catequistas=todos_os_catequistas, 
+                           todos_grupos=todos_grupos)
+
+
+@app.route("/editar_infor_catequista/<int:id_catequista>", methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def editar_infor_catequista(id_catequista):
+
+    # Query para obter os dados associados ao id fornecido
+    # Query para obter os dados associados ao id fornecido e o join para obter o catequista e seu grupo
+    catequista = db.session.query(Catequistas).join(Grupos).filter(
+        Catequistas.id_catequista == id_catequista
+    ).first()
+
+    if not catequista:
+        return "Catequista não encontrado", 404
+
+    return render_template('editar_infor_cateq.html', catequista=catequista)
+
+
+@app.route("/salvar_infor_catequista", methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def salvar_infor_catequista():
+    # Pegando o id que vem de um input hidden de dentro do template "editar_infor_cateq.html"
+    atualizar_catequista = Catequistas.query.filter_by(
+        id_catequista=request.form['id_catequista']).first()
+
+    atualizar_catequista.nome = request.form['nome_catequista']
+    atualizar_catequista.data_nascimento = request.form['data_nascimento']
+    atualizar_catequista.endereco = request.form['endereco']
+    atualizar_catequista.grupo = request.form['grupo']
+    atualizar_catequista.nivel = request.form['nivel']
+    atualizar_catequista.tel1 = request.form['tel1']
+
+    try:
+        db.session.add(atualizar_catequista)
+        db.session.commit()
+    except Exception as e:
+        print("Erro ao salvar no banco de dados: ", str(e))
+        db.session.rollback()
+
+    return redirect(url_for('geral_catequistas'))
 
 
 # Rota para exibir o formulário de frequência

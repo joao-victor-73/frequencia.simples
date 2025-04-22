@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<!-- Importar SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container my-5">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-bottom-0 text-center py-4">
+            <h2 class="card-title fw-bold text-primary-emphasis">Detalhes de {{ catequista.nome }}</h2>
+        </div>
+
+        <div class="card-body px-4 py-4">
+            <form class="row g-4" id="formAtualizacao" action="{{ url_for('salvar_infor_catequista') }}" method="POST">
+                <input type="hidden" name="id_catequista" value="{{ catequista.id_catequista}}">
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Nome</label>
+                    <input type="text" name="nome_catequista" class="form-control rounded-3" value="{{ catequista.nome }}">
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Endereço</label>
+                    <input type="text" name="endereco" class="form-control rounded-3" value="{{ catequista.endereco }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Data de Nascimento</label>
+                    <input type="date" name="data_nascimento" class="form-control rounded-3" value="{{ catequista.data_nascimento }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Número para contato</label>
+                    <input type="text" name="tel1" class="form-control rounded-3" value="{{ catequista.tel1 }}">
+                </div>
+
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Grupo responsável</label>
+                    <select name="catequista_responsavel" id="catequista_responsavel" class="form-select rounded-3">
+                        {% for grupo in todos_grupos %}
+                            <option value="{{ catequista.id_catequista }}"
+                                    data-grupo="{{ catequista.grupo.nome_grupo }}">
+                                {{ catequista.grupo.nome_grupo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Nível</label>
+                    <select name="nivel" class="form-select rounded-3">
+                        {% for catequista in lista_catequistas %}
+                            <option value="{{ catequista.id_catequista }}">
+                                {{ catequista.nivel }}
+                        {% endfor %}
+                    </select>
+                </div>
+
+            
+
+                <div class="col-12 text-center mt-3">
+                    <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
+                    <a href="{{ url_for('geral_catequistas') }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // SweetAlert para confirmação
+    document.getElementById("formAtualizacao").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Você deseja salvar as alterações?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim, salvar!",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -74,8 +74,8 @@
         </thead>
         <tbody>
 
-            {% for crismando, catequista, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
-                {% if current_user.catequista.grupo == catequista.grupo %}
+            {% for crismando, catequista, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
+                {% if current_user.catequista.fk_id_grupo == catequista.fk_id_grupo %}
                     {% set linha_classe = '' %}
                     {% if total_faltas and total_faltas >= 7 %}
                         {% set linha_classe = 'table-danger' %}
@@ -91,7 +91,7 @@
                         <td>{{ total_justificadas or 0 }}</td>
                         <td>{{ crismando.batismo|title }}</td>
                         <td>{{ crismando.eucaristia|title }}</td>
-                        <td>{{ catequista.grupo }}</td>
+                        <td>{{ grupo.nome_grupo }}</td>
                         <td>
                             <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modal_{{ crismando.id }}">
                                 Ver Detalhes
@@ -104,7 +104,7 @@
     </table>
 
     <!-- Modal (pop-up) -->
-    {% for crismando, catequista, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
+    {% for crismando, catequista, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
     <div class="modal fade" id="modal_{{ crismando.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -123,7 +123,7 @@
                     <p><strong>Status:</strong> {{ crismando.status_crismando|title }}</p>
                     <p><strong>Batizado:</strong> {{ crismando.batismo|title }}</p>
                     <p><strong>Eucaristia:</strong> {{ crismando.eucaristia|title }}</p>
-                    <p><strong>Grupo/Catequista:</strong> {{ catequista.grupo }}</p>
+                    <p><strong>Grupo/Catequista:</strong> {{ grupo.nome_grupo }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>

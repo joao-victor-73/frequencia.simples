@@ -82,9 +82,9 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Catequista Responsável</label>
                     <select name="catequista_responsavel" id="catequista_responsavel" class="form-select rounded-3">
-                        {% for catequista in lista_catequistas %}
+                        {% for catequista, grupo in lista_catequistas %}
                             <option value="{{ catequista.id_catequista }}"
-                                    data-grupo="{{ catequista.grupo }}"
+                                    data-grupo="{{ grupo.nome_grupo if grupo else 'Sem grupo' }}"
                                     {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
                                 {{ catequista.nome }}
                             </option>
@@ -94,8 +94,9 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Grupo</label>
-                    <input type="text" name="grupo" id="grupo" class="form-control rounded-3" value="{{ crismando.catequista.grupo }}" readonly>
+                    <input type="text" name="grupo" id="grupo" class="form-control rounded-3" readonly>
                 </div>
+                
 
                 <div class="col-12 text-center mt-3">
                     <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
@@ -108,11 +109,19 @@
 
 <script>
     // Atualiza o campo grupo automaticamente ao trocar o catequista
-    document.getElementById("catequista_responsavel").addEventListener("change", function () {
-        let selectedCatequista = this.options[this.selectedIndex];
-        let grupo = selectedCatequista.getAttribute("data-grupo");
-        document.getElementById("grupo").value = grupo;
-    });
+    const select = document.getElementById('catequista_responsavel');
+    const grupoInput = document.getElementById('grupo');
+
+    function atualizarGrupo() {
+        const grupo = select.options[select.selectedIndex].dataset.grupo;
+        grupoInput.value = grupo;
+    }
+
+    // Atualiza ao carregar a página
+    window.addEventListener('DOMContentLoaded', atualizarGrupo);
+
+    // Atualiza sempre que mudar o select
+    select.addEventListener('change', atualizarGrupo);
 
     // SweetAlert para confirmação
     document.getElementById("formAtualizacao").addEventListener("submit", function (event) {

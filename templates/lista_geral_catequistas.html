@@ -21,11 +21,19 @@
                 <tr>
                     <td>{{ catequista.nome }}</td>
                     <td>{{ catequista.data_nascimento.strftime('%d/%m/%Y') if catequista.data_nascimento else 'N/A' }}</td>
-                    <td>{{ catequista.endereco|title }}</td>
-                    <td>{{ catequista.tel1 }}</td>
-                    <td>{{ catequista.grupo }}</td>
-                    <td>{{ catequista.nivel }}</td>
-                    <td> --- </td>
+                    <td>
+                        {% if not catequista.endereco %}
+                            Sem endereço
+                        {% else %}
+                            {{ catequista.endereco|title }}
+                        {% endif %}
+                    </td>                    
+                    <td>{{ catequista.tel1 if catequista.tel1 else 'Sem nº de contato'}}</td>
+                    <td>{{ catequista.grupo.nome_grupo }}</td>
+                    <td>{{ catequista.nivel|title }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_infor_catequista', id_catequista=catequista.id_catequista) }}" class="btn btn-info"> Editar </a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
