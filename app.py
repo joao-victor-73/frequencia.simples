@@ -263,7 +263,6 @@ def register_new_cat():
         print("Coletando os dados do forms")
         print("Grupo selecionado:", fk_id_grupo)
 
-
         if not fk_id_grupo:
             fk_id_grupo = None
 
@@ -303,7 +302,7 @@ def register_new_cat():
 @coordenador_required
 def cadastrar_grupo():
     from_catequista = request.args.get("from_catequista")
-    
+
     if request.method == 'POST':
         nome_grupo = request.form['nome_grupo'].strip().title()
         horario = request.form['horario']
@@ -324,11 +323,11 @@ def cadastrar_grupo():
             db.session.add(novo_grupo)
             db.session.commit()
             flash("Grupo criado com sucesso!", "success")
-            
+
             # Redireciona de volta para a tela de catequista, já com o grupo preenchido
             if from_catequista:
                 return redirect(url_for('cadastrar_catequista_com_grupo', grupo_id=novo_grupo.id_grupo))
-            
+
             return redirect(url_for('listar_grupos'))
 
         except Exception as e:
@@ -642,7 +641,7 @@ def listar_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
-    grupo_usuario = current_user.catequista.grupo
+    id_grupo_usuario = current_user.catequista.fk_id_grupo
     id_catequista = current_user.catequista.id_catequista
 
     # Base da consulta SEM filtro por catequista ainda
@@ -650,13 +649,15 @@ def listar_frequencias():
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
-        .filter(Catequistas.grupo == grupo_usuario)\
+        .filter(Catequistas.fk_id_grupo == id_grupo_usuario)\
         .filter(InforFrequencias.fk_id_catequista == id_catequista)
 
+    """
     # Catequista comum: restringe à sua autoria
-    query = query.filter(Catequistas.grupo == grupo_usuario)
+    query = query.filter(Catequistas.fk_id_grupo == id_grupo_usuario)
     query = query.filter(InforFrequencias.fk_id_catequista ==
                          current_user.catequista.id_catequista)
+    """
 
     # Filtro por data
     if data_filtro:
@@ -679,7 +680,7 @@ def listar_frequencias():
                            registros=registros_de_frequencias,
                            data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro,
-                           grupo_catequista=grupo_usuario)
+                           grupo_catequista=current_user.catequista.grupo)
 
 
 @app.route('/geral_frequencias', methods=['GET'])
@@ -728,7 +729,7 @@ def geral_frequencias():
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
 @login_required
 def detalhes_frequencia(id):
-    grupo_usuario = current_user.catequista.grupo
+    id_grupo_usuario = current_user.catequista.fk_id_grupo
     origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
         'listar_frequencias')  # Padrão: listar_frequencias
 
@@ -741,7 +742,7 @@ def detalhes_frequencia(id):
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Frequencias.fk_id_infor_freq == id)\
-        .filter(Catequistas.grupo == grupo_usuario).first()
+        .filter(Catequistas.fk_id_grupo == id_grupo_usuario).first()
 
     if not autorizada:
         flash("Você não tem permissão para acessar essa chamada.", "danger")
@@ -752,12 +753,12 @@ def detalhes_frequencia(id):
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Frequencias.fk_id_infor_freq == id)\
-        .filter(Catequistas.grupo == grupo_usuario).all()
+        .filter(Catequistas.fk_id_grupo == id_grupo_usuario).all()
 
     return render_template('detalhes_frequencia.html',
                            frequencia=frequencia,
                            registros=registros,
-                           grupo_catequista=grupo_usuario,
+                           grupo_catequista=current_user.catequista.grupo,
                            origem_url_voltar=origem_url_voltar)
 
 
