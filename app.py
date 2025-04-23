@@ -260,6 +260,10 @@ def register_new_cat():
         endereco = request.form['endereco']
         fk_id_grupo = request.form['selecionar_grupo'] or None
 
+        print("Coletando os dados do forms")
+        print("Grupo selecionado:", fk_id_grupo)
+
+
         if not fk_id_grupo:
             fk_id_grupo = None
 
@@ -280,6 +284,8 @@ def register_new_cat():
             try:
                 db.session.add(novo_catequista)
                 db.session.commit()
+                print(novo_catequista)
+                print(f"Catequista {nome} registrado com sucesso.")
                 flash("Cadastro realizado com sucesso", "success")
 
             except Exception as e:
@@ -290,6 +296,57 @@ def register_new_cat():
     grupos_disponiveis = Grupos.query.all()
 
     return render_template('registrar_novo_catequista.html', grupos=grupos_disponiveis)
+
+
+@app.route('/cadastrar_grupo', methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def cadastrar_grupo():
+    from_catequista = request.args.get("from_catequista")
+    
+    if request.method == 'POST':
+        nome_grupo = request.form['nome_grupo'].strip().title()
+        horario = request.form['horario']
+        local = request.form['local']
+        descricao = request.form['descricao']
+
+        if Grupos.query.filter_by(nome_grupo=nome_grupo).first():
+            flash("Este grupo já existe!", "warning")
+            return redirect(url_for('cadastrar_grupo', from_catequista=from_catequista))
+
+        novo_grupo = Grupos(
+            nome_grupo=nome_grupo,
+            horario=horario,
+            local_grupo=local,
+            descricao=descricao
+        )
+        try:
+            db.session.add(novo_grupo)
+            db.session.commit()
+            flash("Grupo criado com sucesso!", "success")
+            
+            # Redireciona de volta para a tela de catequista, já com o grupo preenchido
+            if from_catequista:
+                return redirect(url_for('cadastrar_catequista_com_grupo', grupo_id=novo_grupo.id_grupo))
+            
+            return redirect(url_for('listar_grupos'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash("Erro ao salvar o grupo.", "danger")
+
+    return render_template('cadastrar_grupo.html')
+
+
+@app.route('/registrar_novo_catequista_com_grupo', methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def cadastrar_catequista_com_grupo():
+    grupo_id = request.args.get("grupo_id", type=int)
+    print(f"ID do grupo: {grupo_id}")
+
+    grupos_disponiveis = Grupos.query.all()
+    return render_template('registrar_novo_catequista.html', grupos=grupos_disponiveis, grupo_selecionado=grupo_id)
 
 
 @app.route('/logout')
