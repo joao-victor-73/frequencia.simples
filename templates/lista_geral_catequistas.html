@@ -1,43 +1,66 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
+<div class="container mt-5">
 
-    <!-- Lista completa dos nomes -->
-    <table class="table table-striped table-responsive table-bordered mt-3">
-        <thead class="table-light text-center">
-            <tr>
-                <th>Nome</th>
-                <th>Data de Nascimento</th>
-                <th>Endereço</th>
-                <th>Nº Contato</th>
-                <th>Grupo</th>
-                <th>Nivel</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">👥 Lista de Catequistas</h2>
+        <p class="text-muted">Abaixo estão listados todos os catequistas cadastrados no sistema.</p>
+    </div>
 
-            {% for catequista in todos_os_catequistas %}
-                <tr>
-                    <td>{{ catequista.nome }}</td>
-                    <td>{{ catequista.data_nascimento.strftime('%d/%m/%Y') if catequista.data_nascimento else 'N/A' }}</td>
-                    <td>
-                        {% if not catequista.endereco %}
-                            Sem endereço
+    <div class="card shadow-sm rounded-4 border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle table-hover text-center">
+                    <thead class="table-dark rounded-top">
+                        <tr>
+                            <th>👤 Nome</th>
+                            <th>🎂 Nascimento</th>
+                            <th>🏠 Endereço</th>
+                            <th>📞 Contato</th>
+                            <th>📌 Grupo</th>
+                            <th>⭐ Nível</th>
+                            <th>⚙️ Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for catequista in todos_os_catequistas %}
+                        <tr class="border-bottom">
+                            <td class="fw-semibold">{{ catequista.nome }}</td>
+                            <td>
+                                {% if catequista.data_nascimento %}
+                                    {{ catequista.data_nascimento.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not catequista.endereco %}
+                                    <span class="text-muted">Sem endereço</span>
+                                {% else %}
+                                    {{ catequista.endereco|title }}
+                                {% endif %}
+                            </td>
+                            <td>{{ catequista.tel1 if catequista.tel1 else 'Sem nº de contato' }}</td>
+                            <td>{{ catequista.grupo.nome_grupo }}</td>
+                            <td>{{ catequista.nivel|title }}</td>
+                            <td>
+                                <a href="{{ url_for('editar_infor_catequista', id_catequista=catequista.id_catequista) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    ✏️ Editar
+                                </a>
+                            </td>
+                        </tr>
                         {% else %}
-                            {{ catequista.endereco|title }}
-                        {% endif %}
-                    </td>                    
-                    <td>{{ catequista.tel1 if catequista.tel1 else 'Sem nº de contato'}}</td>
-                    <td>{{ catequista.grupo.nome_grupo }}</td>
-                    <td>{{ catequista.nivel|title }}</td>
-                    <td>
-                        <a href="{{ url_for('editar_infor_catequista', id_catequista=catequista.id_catequista) }}" class="btn btn-info"> Editar </a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                🚫 Nenhum catequista cadastrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -20,7 +20,7 @@
                     <option value="">Todos os grupos</option>
                     {% for grupo in grupos_disponiveis %}
                         <option value="{{ grupo[0] }}" {% if grupo_filtro == grupo[0] %}selected{% endif %}>
-                            {{ grupo[0] }}
+                            {{ grupo[0] }}  <!-- Exibindo o nome do grupo -->
                         </option>
                     {% endfor %}
                 </select>
@@ -60,16 +60,18 @@
                 </thead>
                 <tbody>
                     {% for registro in registros %}
+                        {% if not grupo_filtro or registro.catequista.grupo.nome_grupo == grupo_filtro %}
                         <tr>
                             <td>{{ registro.titulo_encontro }}</td>
                             <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
-                            <td>{{ registro.catequista.grupo }}</td>
+                            <td>{{ registro.catequista.grupo.nome_grupo }}</td> 
                             <td class="text-center">
                                 <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-info btn-sm">
                                     🔎 Ver Detalhes
                                 </a>
                             </td>
                         </tr>
+                        {% endif %}
                     {% else %}
                         <tr>
                             <td colspan="4" class="text-center text-muted py-3">

@@ -500,11 +500,41 @@ def atualizar_infor():
     return redirect(url_for('index'))
 
 
-@app.route("/lista_geral_crismandos", methods=["GET", "POST"])
+@app.route('/geral_crismandos', methods=['POST', 'GET'])
 @login_required
 @coordenador_required
-def geral_crismandos():
-    pass
+def lista_geral_crismandos():
+    # Subquery para contar presenças, faltas e justificadas
+    subquery_frequencias = db.session.query(
+        Frequencias.fk_id_crismando,
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'presente', 1))).label(
+            'total_presencas'),
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'falta', 1))).label(
+            'total_faltas'),
+        sa.func.count(sa.case((Frequencias.status_frequencia == 'justificada', 1))).label(
+            'total_justificadas')
+    ).group_by(Frequencias.fk_id_crismando).subquery()
+
+    # Join com Catequistas e Frequências
+    query = db.session.query(
+        Crismandos,
+        Catequistas,
+        Grupos,
+        subquery_frequencias.c.total_presencas,
+        subquery_frequencias.c.total_faltas,
+        subquery_frequencias.c.total_justificadas
+    ).join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
+           ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
+                  ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+
+    # Ordenação alfabética dos resultados
+    query = query.order_by(Crismandos.nome)
+
+    # Executamos a consulta e pegamos os resultados
+    lista_crismandos = query.all()
+
+    return render_template('index.html',
+                           lista_crismandos=lista_crismandos)
 
 
 @app.route("/lista_geral_catequistas", methods=["GET", "POST"])
@@ -695,35 +725,49 @@ def geral_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
+    print(f"grupo_filtro: {grupo_filtro}")  # Debug: Verificando valor do filtro
+
+    # Junção entre InforFrequencias, Catequistas e Grupos
     query = db.session.query(InforFrequencias).distinct().join(
-        Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
+        Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista
+    ).join(
+        Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo  # Junção com a tabela Grupos
+    )
 
-    # query = db.session.query(InforFrequencias).join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)
-
+    # Filtro por grupo
     if grupo_filtro:
-        query = query.filter(Catequistas.grupo == grupo_filtro)
+        print(f"Aplicando filtro de grupo: {grupo_filtro}")  # Debug: Verificando filtro aplicado
+        query = query.filter(Grupos.nome_grupo == grupo_filtro)
 
+    # Filtro por data
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(
-                InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
+    # Filtro por título
     if titulo_filtro:
-        query = query.filter(
-            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
+    # Obtendo os registros filtrados
     registros = query.order_by(InforFrequencias.data_chamada.desc()).all()
-    grupos_disponiveis = db.session.query(Catequistas.grupo).distinct().all()
 
+    # Obtendo todos os grupos disponíveis
+    grupos_disponiveis = db.session.query(Grupos.nome_grupo).distinct().all()
+
+    print(f"Quantidade de registros: {len(registros)}")  # Debug: Verificando quantidade de registros
+
+
+    # Renderizando o template
     return render_template('frequencias_gerais.html',
                            registros=registros,
                            grupos_disponiveis=grupos_disponiveis,
                            grupo_filtro=grupo_filtro,
                            data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro)
+
 
 
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
