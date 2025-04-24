@@ -449,6 +449,9 @@ def index():
 @login_required
 def editar_infor(id_crismando):
 
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'index')  # Padrão: index
+
     # Obtendo os dados associados ao id do crismando
     crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
     # lista_catequistas = db.session.query(Catequistas).options(joinedload(Catequistas.grupo)).all()
@@ -462,7 +465,8 @@ def editar_infor(id_crismando):
 
     return render_template('infor_crismandos.html',
                            crismando=crismando,
-                           lista_catequistas=lista_catequistas)
+                           lista_catequistas=lista_catequistas,
+                           origem_url_voltar=origem_url_voltar)
 
 
 # Rota para salvar alterações nas informações dos crismandos
@@ -503,7 +507,20 @@ def atualizar_infor():
 @app.route('/geral_crismandos', methods=['POST', 'GET'])
 @login_required
 @coordenador_required
-def lista_geral_crismandos():
+def geral_crismandos():
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'index')  # Padrão: index
+    # Obter os valores de busca da URL que vem da pagina index.html
+    search_term = request.args.get('busca', '').strip()
+    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
+    grupo_filtro = request.args.get('buscar_grupo')
+
+    # Pega o valor se o checkbox foi marcado
+    filtrar_batizado = request.args.get('batismo')
+
+    # Pega o valor se o checkbox foi marcado
+    filtrar_eucaristia = request.args.get('eucaristia')
+
     # Subquery para contar presenças, faltas e justificadas
     subquery_frequencias = db.session.query(
         Frequencias.fk_id_crismando,
@@ -527,14 +544,51 @@ def lista_geral_crismandos():
            ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
                   ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
+    # Join entre as tabelas Crismandos e Catequistas
+    # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
+
+    # Se o usuário digitou um nome, aplicamos um filtro de nome:
+    if search_term:
+        query = query.filter(Crismandos.nome.ilike(f"%{search_term}%"))
+
+    # Se o usuário escolheu um filtro, aplicamos o filtro de status:
+    if status_filter:
+        query = query.filter(Crismandos.status_crismando == status_filter)
+
+    # Filtro por batismo (1 = Sim | 0 - Não)
+    if filtrar_batizado is not None:
+        query = query.filter(Crismandos.batismo == (
+            'sim' if filtrar_batizado == '1' else 'nao'))
+
+    # Filtro por eucaristia (1 = Sim | 0 - Não)
+    if filtrar_eucaristia is not None:
+        query = query.filter(Crismandos.eucaristia == (
+            'sim' if filtrar_eucaristia == '1' else 'nao'))
+        
+    if grupo_filtro:
+        query = query.filter(Grupos.id_grupo == grupo_filtro)
+
     # Ordenação alfabética dos resultados
     query = query.order_by(Crismandos.nome)
+
+    # Obtendo todos os grupos disponíveis
+    # grupos_disponiveis = db.session.query(Grupos.nome_grupo).distinct().all()
+    grupos_disponiveis = db.session.query(Grupos).all()
+    # Assim, no template você terá acesso a grupo.id_grupo e grupo.nome_grupo, como espera.
 
     # Executamos a consulta e pegamos os resultados
     lista_crismandos = query.all()
 
-    return render_template('index.html',
-                           lista_crismandos=lista_crismandos)
+    return render_template('geral_crismandos.html',
+                           lista_crismandos=lista_crismandos,
+                           search_term=search_term,
+                           # Garantindo a persistência dos filtros de Batismo e Eucaristia
+                           status_crismando=status_filter,
+                           status_filter=status_filter,
+                           filtrar_batizado=filtrar_batizado,
+                           filtrar_eucaristia=filtrar_eucaristia,
+                           grupos_disponiveis=grupos_disponiveis,
+                           origem_url_voltar=origem_url_voltar)
 
 
 @app.route("/lista_geral_catequistas", methods=["GET", "POST"])
@@ -725,7 +779,8 @@ def geral_frequencias():
     data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
 
-    print(f"grupo_filtro: {grupo_filtro}")  # Debug: Verificando valor do filtro
+    # Debug: Verificando valor do filtro
+    print(f"grupo_filtro: {grupo_filtro}")
 
     # Junção entre InforFrequencias, Catequistas e Grupos
     query = db.session.query(InforFrequencias).distinct().join(
@@ -736,20 +791,23 @@ def geral_frequencias():
 
     # Filtro por grupo
     if grupo_filtro:
-        print(f"Aplicando filtro de grupo: {grupo_filtro}")  # Debug: Verificando filtro aplicado
+        # Debug: Verificando filtro aplicado
+        print(f"Aplicando filtro de grupo: {grupo_filtro}")
         query = query.filter(Grupos.nome_grupo == grupo_filtro)
 
     # Filtro por data
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(InforFrequencias.data_chamada == data_formatada)
+            query = query.filter(
+                InforFrequencias.data_chamada == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
     # Filtro por título
     if titulo_filtro:
-        query = query.filter(InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(
+            InforFrequencias.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
     # Obtendo os registros filtrados
     registros = query.order_by(InforFrequencias.data_chamada.desc()).all()
@@ -757,8 +815,8 @@ def geral_frequencias():
     # Obtendo todos os grupos disponíveis
     grupos_disponiveis = db.session.query(Grupos.nome_grupo).distinct().all()
 
-    print(f"Quantidade de registros: {len(registros)}")  # Debug: Verificando quantidade de registros
-
+    # Debug: Verificando quantidade de registros
+    print(f"Quantidade de registros: {len(registros)}")
 
     # Renderizando o template
     return render_template('frequencias_gerais.html',
@@ -767,7 +825,6 @@ def geral_frequencias():
                            grupo_filtro=grupo_filtro,
                            data_filtro=data_filtro,
                            titulo_filtro=titulo_filtro)
-
 
 
 @app.route('/listar_frequencias/<int:id>', methods=['GET'])
