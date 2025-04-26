@@ -1,13 +1,29 @@
 frequencia.simples/
-│── app.py                 # Arquivo principal do Flask
-│── config.py              # Configuração do banco de dados
-│── models.py              # Modelos do banco de dados
-│── routes.py              # Rotas do sistema
-│── database.db            # Arquivo SQLite (será gerado automaticamente)
-│── requirements.txt       # Dependências do projeto
-│── static/                # Arquivos estáticos (CSS, JS, imagens)
-│── templates/             # Arquivos HTML (para o front-end futuramente)
-└── migrations/            # Pasta para gerenciamento do banco (caso use Flask-Migrate)
+│
+├── app/
+│   ├── __init__.py        # Cria e configura o app Flask
+│   ├── models.py          # Todos os models SQLAlchemy
+│   ├── routes/            # Suas rotas separadas
+│   │   ├── __init__.py
+│   │   ├── auth_routes.py   # Login, logout, registro
+│   │   ├── grupos_routes.py # Tudo relacionado a grupos
+│   │   ├── freq_routes.py # Tudo relacionado a frequencias
+│   │   └── outras_rotas.py  # Outras funcionalidades
+│   ├── templates/
+│   │   ├── base.html
+│   │   ├── login.html
+│   │   ├── grupos_de_crisma.html
+│   │   └── etc...
+│   ├── static/
+│   │   ├── css/
+│   │   └── js/
+│   ├── forms.py          # Se você usar Flask-WTF para formulários
+│   └── extensions.py     # Para inicializar extensões como db, login_manager
+│
+├── config.py             # Configurações (produção, desenvolvimento)
+├── run.py                # Arquivo principal para rodar o app
+└── requirements.txt      # Pacotes instalados
+
 
 
                                 
