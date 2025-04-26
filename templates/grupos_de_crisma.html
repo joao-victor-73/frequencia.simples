@@ -38,7 +38,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong>Nome da Mãe:</strong> {{ catequista.grupo.nome_grupo }}</p>
+                        <p><strong>Nome do Grupo:</strong> {{ catequista.grupo.nome_grupo }}</p>
+                        <p><strong>Local do Encontro:</strong> {{ catequista.grupo.local_grupo }}</p>
+                        <p><strong>Horário do Encontro:</strong> {{ catequista.grupo.horario }}</p>
+                        <p><strong>Catequista(s) responsável(is):</strong> {{ catequista.nome }}</p>
+                        <p><strong>Informações Adicionais:</strong> {{ catequista.grupo.descricao }}</p>
                     </div>
                     <div class="modal-footer">
                         <a href="{{ url_for('geral_crismandos', id_grupo=catequista.grupo.id_grupo) }}" class="btn btn-outline-primary">Editar</a>
