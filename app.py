@@ -667,7 +667,8 @@ def grupos_crisma():
 @login_required
 @coordenador_required
 def editar_grupo(id_grupo):
-    
+    pass
+
 
 # Rota para exibir o formulário de frequência
 @app.route("/fazer_frequencia", methods=["GET"])

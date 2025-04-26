@@ -42,6 +42,10 @@
                         <a class="nav-link" href="{{ url_for('fazer_frequencia') }}">Registrar Frequência</a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('grupos_crisma') }}">Grupos Crisma</a>
+                    </li>
+
                     <!-- Dropdown -->
                     {% if current_user.catequista.nivel == 'coordenador' %}
                     <!-- Dessa maneira, apenas os coordenadores poderão acessar esse menu -->
@@ -62,13 +66,14 @@
                         <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
                             Listas
                         </a>
+
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('geral_catequistas') }}">Lista Geral de Catequistas</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('geral_crismandos') }}">Lista Geral de Crismandos</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
-                            </ul>
-                        </li>
-                    </ul>
+                            <li><a class="dropdown-item" href="{{ url_for('geral_catequistas') }}">Lista Geral de Catequistas</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('geral_crismandos') }}">Lista Geral de Crismandos</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
+                        </ul>
+                    </li>
+                </ul>
                     {% endif %}
                     
                 <!-- Avatar e Logout (alinhado à direita) -->

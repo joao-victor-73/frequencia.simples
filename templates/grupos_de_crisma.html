@@ -17,14 +17,38 @@
                     <p><strong>👥 Crismandos:</strong> -- </p>
                 </div>
                 <div class="card-footer text-center">
-                    {% if current_user.nivel == 'coordenador' %}
+                    {% if current_user.catequista.nivel == 'coordenador' %}
                         <a href="{{ url_for('grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                        <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ catequista.grupo.id_grupo }}">
+                            🔎 Ver Detalhes
+                        </a>
                     {% endif %}
-                    <a href="{{ url_for('grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-info btn-sm">🔎 Ver Detalhes</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    {% for catequista in infor_grupos %}
+        <div class="modal fade" id="modal_{{ catequista.grupo.id_grupo }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ catequista.nome }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Nome da Mãe:</strong> {{ catequista.grupo.nome_grupo }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ url_for('geral_crismandos', id_grupo=catequista.grupo.id_grupo) }}" class="btn btn-outline-primary">Editar</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
 </div>
 {% endblock %}
