@@ -22,7 +22,7 @@
             <p class="text-muted">Cadastre as informações do catequista abaixo</p>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('register_new_cat') }}">
+            <form method="POST" action="{{ url_for('auth.register_new_cat') }}">
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome Completo:</label>
                     <input type="nome" name="nome" class="form-control" placeholder=" " required>
@@ -62,11 +62,11 @@
 
                 <div class="d-flex justify-content-between mb-3">
                     <button type="submit" class="btn btn-primary">Cadastrar</button>
-                    <a href="{{ url_for('index') }}" class="btn btn-danger">Voltar</a>
+                    <a href="{{ url_for('crismando_bp.index') }}" class="btn btn-danger">Voltar</a>
                 </div>
                 
                 <div class="d-flex justify-content-center mb-3">
-                    <a href="{{ url_for('geral_catequistas') }}" class="btn btn-info">Visualizar lista</a>
+                    <a href="{{ url_for('catequista_bp.geral_catequistas') }}" class="btn btn-info">Visualizar lista</a>
                 </div>
 
             </form>
@@ -81,7 +81,7 @@
         const hidden = document.getElementById('grupo-hidden');
 
         if (select.value === "novo_grupo") {
-            window.location.href = "{{ url_for('cadastrar_grupo', from_catequista=1) }}";
+            window.location.href = "{{ url_for('grupo_bp.cadastrar_grupo', from_catequista=1) }}";
         } else {
             hidden.value = select.value;
         }

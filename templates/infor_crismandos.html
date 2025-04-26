@@ -11,7 +11,7 @@
         </div>
 
         <div class="card-body px-4 py-4">
-            <form class="row g-4" id="formAtualizacao" action="{{ url_for('atualizar_infor') }}" method="POST">
+            <form class="row g-4" id="formAtualizacao" action="{{ url_for('crismando_bp.atualizar_infor') }}" method="POST">
                 <input type="hidden" name="id_crismando" value="{{ crismando.id }}">
                 <input type="hidden" name="id_catequista" value="{{ crismando.fk_id_catequista }}">
 

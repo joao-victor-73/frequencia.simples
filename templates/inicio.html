@@ -28,7 +28,7 @@
         <!-- PARTE DO NAVBAR -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4 fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" href="{{ url_for('inicio') }}">
+                <a class="navbar-brand fw-bold text-primary" href="{{ url_for('other.inicio') }}">
                     <img src="{{ url_for('static', filename='image/logo_snsc_2.jpg') }}" alt="Avatar" class="rounded-circle me-2" width="60" height="60">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -39,7 +39,7 @@
                     <!-- Itens do menu (alinhados à esquerda) -->
                     <ul class="navbar-nav me-auto"> 
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ url_for('inicio') }}">Início</a>
+                            <a class="nav-link active" href="{{ url_for('other.inicio') }}">Início</a>
                         </li>
 
                         <li class="nav-item">
@@ -75,7 +75,7 @@
                 <!-- PARTE PARA LOGAR NO SISTEMA -->
                 <div class="div4 text-center">
                     <div class="container px-4">
-                        <a class="btn btn-lg btn-light" href="{{ url_for('login') }}">Faça seu login!</a>
+                        <a class="btn btn-lg btn-light" href="{{ url_for('auth.login') }}">Faça seu login!</a>
                     </div>
                 </div>
             </div>

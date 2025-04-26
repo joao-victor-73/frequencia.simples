@@ -10,7 +10,7 @@
 
     <!-- FORMULÁRIO DE FILTRAGEM -->
     <div class="card border-0 shadow rounded-4 p-4 mb-4">
-        <form method="GET" action="{{ url_for('geral_frequencias') }}" class="row g-3">
+        <form method="GET" action="{{ url_for('frequencia_bp.geral_frequencias') }}" class="row g-3">
 
             <!-- Filtro por grupo -->
             <div class="col-md-3">
@@ -40,7 +40,7 @@
             <!-- Botões -->
             <div class="col-md-3 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100">🔍 Filtrar</button>
-                <a href="{{ url_for('geral_frequencias') }}" class="btn btn-outline-secondary w-100">❌ Limpar</a>
+                <a href="{{ url_for('frequencia_bp.geral_frequencias') }}" class="btn btn-outline-secondary w-100">❌ Limpar</a>
             </div>
         </form>
     </div>
@@ -66,7 +66,7 @@
                                 <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
                                 <td>{{ registro.catequista.grupo.nome_grupo }}</td>
                                 <td>
-                                    <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                    <a href="{{ url_for('frequencia_bp.detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
                                         🔎 Ver Detalhes
                                     </a>
                                 </td>

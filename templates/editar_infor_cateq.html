@@ -12,7 +12,7 @@
         </div>
 
         <div class="card-body px-4 py-4">
-            <form class="row g-4" id="formAtualizacao" action="{{ url_for('salvar_infor_catequista') }}" method="POST">
+            <form class="row g-4" id="formAtualizacao" action="{{ url_for('catequista_bp.salvar_infor_catequista') }}" method="POST">
                 <input type="hidden" name="id_catequista" value="{{ catequista.id_catequista}}">
 
                 <div class="col-md-12">
@@ -64,7 +64,7 @@
 
                 <div class="col-12 text-center mt-3">
                     <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
-                    <a href="{{ url_for('geral_catequistas') }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
+                    <a href="{{ url_for('catequista_bp.geral_catequistas') }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
                 </div>
             </form>
         </div>

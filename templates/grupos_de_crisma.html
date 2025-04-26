@@ -18,7 +18,7 @@
                 </div>
                 <div class="card-footer text-center">
                     {% if current_user.catequista.nivel == 'coordenador' %}
-                        <a href="{{ url_for('grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                        <a href="{{ url_for('grupo_bp.grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
                         <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ catequista.grupo.id_grupo }}">
                             🔎 Ver Detalhes
                         </a>
@@ -45,7 +45,7 @@
                         <p><strong>Informações Adicionais:</strong> {{ catequista.grupo.descricao }}</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="{{ url_for('geral_crismandos', id_grupo=catequista.grupo.id_grupo) }}" class="btn btn-outline-primary">Editar</a>
+                        <a href="{{ url_for('crismando_bp.geral_crismandos', id_grupo=catequista.grupo.id_grupo) }}" class="btn btn-outline-primary">Editar</a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
