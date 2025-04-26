@@ -2,69 +2,72 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <div class="alert alert-primary" role="alert">
-        <div class="mb-4 text-center">
-            <h2 class="text-primary">📋 Frequências Registradas</h2>
-            <h3> <strong>📌 Exibindo chamadas do grupo:</strong> {{ grupo_catequista.nome_grupo }} </h3>
-        </div>
+
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📋 Frequências Registradas</h2>
+        <p class="text-muted">📌 Exibindo chamadas do grupo: <strong>{{ grupo_catequista.nome_grupo }}</strong></p>
     </div>
         
     <!-- FORMULÁRIO DE FILTRAGEM -->
-    <div class="card shadow-sm p-3 mb-6">
-        <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-6">
+    <div class="card border-0 shadow rounded-3 p-3 mb-3">
+        <form method="GET" action="{{ url_for('listar_frequencias') }}" class="row g-3">
             
             <!-- Campo de Data -->
             <div class="col-md-3">
-                <label for="data_filtro" class="form-label fw-semibold">📅 Filtrar por Data:</label>
+                <label for="data_filtro" class="form-label fw-bold">📅 Data:</label>
                 <input type="date" id="data_filtro" name="data_filtro" class="form-control" value="{{ request.args.get('data_filtro', '') }}">
             </div>
 
             <!-- Campo de Título -->
             <div class="col-md-3">
-                <label for="busca_titulo" class="form-label fw-semibold">🔍 Buscar pelo Título:</label>
+                <label for="busca_titulo" class="form-label fw-bold">🔍 Título:</label>
                 <input type="text" id="busca_titulo" name="busca_titulo" class="form-control" placeholder="Digite o título do encontro" value="{{ request.args.get('busca_titulo', '') }}">
             </div>
 
             <!-- Botões de ação -->
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-3 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100">Filtrar 🔍</button>
-                <a href="{{ url_for('listar_frequencias') }}" class="btn btn-outline-secondary ms-2 w-100">Limpar ❌</a>
+                <a href="{{ url_for('listar_frequencias') }}" class="btn btn-outline-secondary w-100">Limpar ❌</a>
             </div>
         </form>
     </div>
 
     <!-- TABELA DE FREQUÊNCIAS -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">📌 Título</th>
-                        <th scope="col">📆 Data</th>
-                        <th scope="col" class="text-center">⚙️ Ações</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    {% for registro in registros %}
-                    <tr class="border-bottom">
-                        <td class="fw-semibold">{{ registro.titulo_encontro }}</td>
-                        <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
-                        <td class="text-center">
-                            <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq, origem=request.path) }}" class="btn btn-info btn-sm">
-                                🔎 Ver Detalhes
-                            </a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-3">
-                            🚫 Nenhuma frequência encontrada.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+            
+                <table class="table table-hover align-middle text-center">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>📌 Título</th>
+                            <th>📆 Data</th>
+                            <th>⚙️ Ações</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for registro in registros %}
+                        <tr>
+                            <td>{{ registro.titulo_encontro }}</td>
+                            <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('detalhes_frequencia', id=registro.id_infor_freq, origem=request.path) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                    🔎 Ver Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">
+                                🚫 Nenhuma frequência encontrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
     </div>
 </div>

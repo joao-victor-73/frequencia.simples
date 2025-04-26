@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📚 Grupos de Catequese</h2>
+    </div>
+
+    <div class="row">
+        {% for catequista in infor_grupos %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title text-primary fw-bold">{{ catequista.grupo.nome_grupo }}</h4>
+                    <p><strong>📅 Encontros:</strong> {{ catequista.grupo.local_grupo }}</p>
+                    <p><strong>👤 Catequistas:</strong> {{ catequista.nome}}</p>
+                    <p><strong>👥 Crismandos:</strong> -- </p>
+                </div>
+                <div class="card-footer text-center">
+                    {% if current_user.nivel == 'coordenador' %}
+                        <a href="{{ url_for('grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                    {% endif %}
+                    <a href="{{ url_for('grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-info btn-sm">🔎 Ver Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

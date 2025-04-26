@@ -8,11 +8,11 @@
         <p class="text-muted">Abaixo estão listados todos os catequistas cadastrados no sistema.</p>
     </div>
 
-    <div class="card shadow-sm rounded-4 border-0">
-        <div class="card-body">
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-body p-4">
             <div class="table-responsive">
-                <table class="table align-middle table-hover text-center">
-                    <thead class="table-dark rounded-top">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="bg-primary text-white rounded-top">
                         <tr>
                             <th>👤 Nome</th>
                             <th>🎂 Nascimento</th>
@@ -25,7 +25,7 @@
                     </thead>
                     <tbody>
                         {% for catequista in todos_os_catequistas %}
-                        <tr class="border-bottom">
+                        <tr>
                             <td class="fw-semibold">{{ catequista.nome }}</td>
                             <td>
                                 {% if catequista.data_nascimento %}
@@ -45,14 +45,14 @@
                             <td>{{ catequista.grupo.nome_grupo }}</td>
                             <td>{{ catequista.nivel|title }}</td>
                             <td>
-                                <a href="{{ url_for('editar_infor_catequista', id_catequista=catequista.id_catequista) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                    ✏️ Editar
+                                <a href="{{ url_for('editar_infor_catequista', id_catequista=catequista.id_catequista) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                    Editar
                                 </a>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-3">
+                            <td colspan="7" class="text-muted py-3">
                                 🚫 Nenhum catequista cadastrado.
                             </td>
                         </tr>

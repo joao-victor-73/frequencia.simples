@@ -512,7 +512,8 @@ def geral_crismandos():
         'index')  # Padrão: index
     # Obter os valores de busca da URL que vem da pagina index.html
     search_term = request.args.get('busca', '').strip()
-    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
+    status_filter = request.args.get(
+        'buscar_status_crismando', '').strip()  # obtém o status selecionado
     grupo_filtro = request.args.get('buscar_grupo')
 
     # Pega o valor se o checkbox foi marcado
@@ -564,7 +565,7 @@ def geral_crismandos():
     if filtrar_eucaristia is not None:
         query = query.filter(Crismandos.eucaristia == (
             'sim' if filtrar_eucaristia == '1' else 'nao'))
-        
+
     if grupo_filtro:
         query = query.filter(Grupos.id_grupo == grupo_filtro)
 
@@ -649,6 +650,24 @@ def salvar_infor_catequista():
 
     return redirect(url_for('geral_catequistas'))
 
+
+# Rota para exibir os grupos de crisma
+@app.route("/grupos_crisma", methods=['GET', 'POST'])
+@login_required
+def grupos_crisma():
+    # Query para coletar informações de todos os grupos e os catequistas ligados aos grupos
+    infor_grupos = Catequistas.query.join(
+        Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
+
+    return render_template('grupos_de_crisma.html', infor_grupos=infor_grupos)
+
+
+# Rota para editar informações de grupos de crisma
+@app.route("/editar_grupo_crisma/int:<id_grupo>", methods=['POST', 'GET'])
+@login_required
+@coordenador_required
+def editar_grupo(id_grupo):
+    
 
 # Rota para exibir o formulário de frequência
 @app.route("/fazer_frequencia", methods=["GET"])
