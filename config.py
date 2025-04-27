@@ -13,5 +13,9 @@ secret_key = os.environ['SECRET_KEY']
 class Config:
     SECRET_KEY = secret_key
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password}@{host}/{database}"
+<<<<<<< Updated upstream
+=======
+    # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:RQuWPWiVzhgzwiiVbvgzKFcEyEPyCrsJ@maglev.proxy.rlwy.net:54567/railway"
+>>>>>>> Stashed changes
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REMEMBER_COOKIE_DURATION = os.environ['REMEMBER_COOKIE_DURATION']
