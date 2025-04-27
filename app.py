@@ -33,6 +33,10 @@ def create_app():
 
     return app
 
+
+app = create_app() # IMPORTANTE: aqui você cria o app SEM rodar localmente
+
+
+# Só roda servidor se for no ambiente local (desenvolvimento)
 if __name__ == "__main__":
-    app = create_app()
     app.run(debug=True)
