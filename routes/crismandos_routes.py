@@ -11,9 +11,9 @@ crismando_bp = Blueprint('crismando_bp', __name__)  # nome do blueprint
 
 
 # Rota de começo
-@crismando_bp.route("/inicio", methods=["GET"])
+@crismando_bp.route("/lista_de_crismandos", methods=["GET"])
 @login_required
-def index():
+def lista_de_crismandos():
     # lista_crismandos = Crismandos.query.all()
     # lista_crismandos = db.session.query(Crismandos, Catequistas).join(Catequistas).all()
 

@@ -6,7 +6,7 @@
         
         <!-- FILTRO para a busca -->
         <div class="card p-4 shadow rounded-4">
-            <form method="GET" action="{{ url_for('crismando_bp.index') }}" >
+            <form method="GET" action="{{ url_for('crismando_bp.lista_de_crismandos') }}" >
                 <div class="row g-3 mb-3">
 
                     <!-- Buscar pelo nome -->
@@ -59,7 +59,7 @@
 
                     <div class="d-flex justify-content-center mt-3 gap-3">
                         <button type="submit" class="btn btn-primary px-4 rounded-3">Buscar</button>
-                        <a href="{{ url_for('crismando_bp.index') }}" class="btn btn-outline-secondary px-4 rounded-3">Limpar Filtros</a>
+                        <a href="{{ url_for('crismando_bp.lista_de_crismandos') }}" class="btn btn-outline-secondary px-4 rounded-3">Limpar Filtros</a>
                     </div>
                 </div>
             </form>

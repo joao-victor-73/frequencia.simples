@@ -20,7 +20,7 @@ def login():
             login_user(usuario)
             flash("Login realizado com sucesso", "success")
 
-            return redirect(url_for('crismando.index'))
+            return redirect(url_for('crismando_bp.lista_de_crismandos'))
         else:
             flash('Email ou senha incorretos!', 'danger')
 
