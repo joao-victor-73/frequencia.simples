@@ -3,10 +3,41 @@ from flask_login import login_user, login_required, logout_user, current_user
 from models.models import Usuarios, Catequistas, Grupos
 from utils.decorators import coordenador_required
 from models import db
+from flask_mail import Message
+from datetime import datetime
+import pytz
+from extensions import mail
 
 
 # Criação do Blueprint
 auth_bp = Blueprint('auth', __name__)  # nome do blueprint
+
+
+def enviar_email_login(usuario):
+    ip = request.remote_addr
+    horario = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime('%d/%m/%Y às %H:%M:%S')
+
+    msg = Message(
+        subject="Alerta de Login",
+        recipients=[usuario.email]
+    )
+
+    msg.body = f"""
+        Olá, {usuario.catequista.nome if usuario.catequista else 'usuário'}!
+
+        Um login foi realizado em sua conta:
+
+        🕒 Data e hora: {horario}
+        📍 IP: {ip}
+
+        Se você reconhece essa atividade, pode ignorar este e-mail.
+        Caso contrário, entre em contato com um coordenador ou altere sua senha imediatamente.
+
+        Equipe Crisma
+    """
+
+    mail.send(msg)
+
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -18,6 +49,8 @@ def login():
         usuario = Usuarios.query.filter_by(email=email).first()
         if usuario and usuario.check_password(senha):
             login_user(usuario)
+            enviar_email_login(usuario)
+
             flash("Login realizado com sucesso", "success")
 
             return redirect(url_for('crismando_bp.lista_de_crismandos'))
