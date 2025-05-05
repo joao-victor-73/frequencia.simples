@@ -121,34 +121,57 @@
             </table>
         </div>
 
+        <!-- Modal (pop-up) -->
         {% for crismando, catequista, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
-        <div class="modal fade" id="modal_{{ crismando.id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ crismando.nome }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Nome da Mãe:</strong> {{ crismando.nome_mae }}</p>
-                        <p><strong>Nome do Pai:</strong> {{ crismando.nome_pai }}</p>
-                        <p><strong>Data de Nascimento:</strong> {{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</p>
-                        <p><strong>Endereço:</strong> {{ crismando.endereco }}</p>
-                        <p><strong>Telefone 1:</strong> {{ crismando.tel1 }}</p>
-                        <p><strong>Telefone 2:</strong> {{ crismando.tel2 if crismando.tel2 and crismando.tel2 != 'None' else 'Sem Contato' }}</p>
-                        <p><strong>Status:</strong> {{ crismando.status_crismando|title }}</p>
-                        <p><strong>Batizado:</strong> {{ crismando.batismo|title }}</p>
-                        <p><strong>Eucaristia:</strong> {{ crismando.eucaristia|title }}</p>
-                        <p><strong>Grupo:</strong> {{ grupo.nome_grupo }}</p>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{{ url_for('crismando_bp.editar_infor', id_crismando=crismando.id) }}" class="btn btn-outline-primary">Editar</a>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <div class="modal fade" id="modal_{{ crismando.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ crismando.nome }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p><strong>Nome:</strong> {{ crismando.nome }}</p>
+                            <p><strong>Nome da Mãe:</strong> {{ crismando.nome_mae }}</p>
+                            <p><strong>Nome do Pai:</strong> {{ crismando.nome_pai }}</p>
+                            <p><strong>Nome do Padrinho/Madrinha:</strong> {{ crismando.nome_padrim }}</p>
+                            <p><strong>Data de Nascimento:</strong> {{ crismando.data_nascimento.strftime('%d/%m/%Y') if crismando.data_nascimento else 'N/A' }}</p>
+                            
+                            <p>
+                                <strong>Estado Civil:</strong> 
+                                {% if crismando.estado_civil == 'solteiro' %} Solteiro(a) {% endif %}
+                                {% if crismando.estado_civil == 'namorado' %} Solteiro(a), mas tenho namorado(a)/Noivo(a) {% endif %}
+                                {% if crismando.estado_civil == 'casado_civil' %} Casado(a) civilmente (mas não sou casado(a) na Igreja) {% endif %}
+                                {% if crismando.estado_civil == 'casado_civil_igreja' %} Casado(a) no Civil e na Igreja (Matrimonio). {% endif %}
+                                                            
+                            </p>
+                            
+                            <p><strong>Endereço:</strong> {{ crismando.endereco }}</p>
+                            <p><strong>Telefone 1:</strong> {{ crismando.tel1 }}</p>
+                            <p><strong>Telefone 2:</strong> {% if crismando.tel2 == 'None' or crismando.tel2 == '' %} Sem Contato {% endif %}  {{crismando.tel2}}</p>
+                            <p><strong>Status:</strong> {{ crismando.status_crismando|title }}</p>
+                            <p><strong>Batizado:</strong> {{ crismando.batismo|title }}</p>
+                            <p><strong>Eucaristia:</strong> {{ crismando.eucaristia|title }}</p>
+                            <p><strong>Possui Filhos?</strong> {{ crismando.possui_filhos|title }} </p>
+                            <p>
+                                <strong>Possui Deficiencia?</strong> 
+                                {% if crismando.possui_deficiencia == 'tea' %}
+                                    Transtorno do Espectro Autista (TEA)
+                                {% endif %}
+                                {{ crismando.possui_deficiencia|title }} 
+                            </p>
+                            <p><strong>Grupo:</strong> {{ grupo.nome_grupo }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{{ url_for('crismando_bp.editar_infor', id_crismando=crismando.id) }}" class="btn btn-outline-primary">Editar</a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         {% endfor %}
     </div>
+
 
 {% endblock %}

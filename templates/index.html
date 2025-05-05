@@ -127,14 +127,33 @@
                             <p><strong>Nome:</strong> {{ crismando.nome }}</p>
                             <p><strong>Nome da Mãe:</strong> {{ crismando.nome_mae }}</p>
                             <p><strong>Nome do Pai:</strong> {{ crismando.nome_pai }}</p>
-                            <p><strong>Data de Nascimento:</strong> {{ crismando.data_nascimento.strftime('%d-%m-%Y') if crismando.data_nascimento else 'N/A' }}</p>
+                            <p><strong>Nome do Padrinho/Madrinha:</strong> {{ crismando.nome_padrim }}</p>
+                            <p><strong>Data de Nascimento:</strong> {{ crismando.data_nascimento.strftime('%d/%m/%Y') if crismando.data_nascimento else 'N/A' }}</p>
+                            
+                            <p>
+                                <strong>Estado Civil:</strong> 
+                                {% if crismando.estado_civil == 'solteiro' %} Solteiro(a) {% endif %}
+                                {% if crismando.estado_civil == 'namorado' %} Solteiro(a), mas tenho namorado(a)/Noivo(a) {% endif %}
+                                {% if crismando.estado_civil == 'casado_civil' %} Casado(a) civilmente (mas não sou casado(a) na Igreja) {% endif %}
+                                {% if crismando.estado_civil == 'casado_civil_igreja' %} Casado(a) no Civil e na Igreja (Matrimonio). {% endif %}
+                                                            
+                            </p>
+                            
                             <p><strong>Endereço:</strong> {{ crismando.endereco }}</p>
                             <p><strong>Telefone 1:</strong> {{ crismando.tel1 }}</p>
                             <p><strong>Telefone 2:</strong> {% if crismando.tel2 == 'None' or crismando.tel2 == '' %} Sem Contato {% endif %}  {{crismando.tel2}}</p>
                             <p><strong>Status:</strong> {{ crismando.status_crismando|title }}</p>
                             <p><strong>Batizado:</strong> {{ crismando.batismo|title }}</p>
                             <p><strong>Eucaristia:</strong> {{ crismando.eucaristia|title }}</p>
-                            <p><strong>Grupo/Catequista:</strong> {{ grupo.nome_grupo }}</p>
+                            <p><strong>Possui Filhos?</strong> {{ crismando.possui_filhos|title }} </p>
+                            <p>
+                                <strong>Possui Deficiencia?</strong> 
+                                {% if crismando.possui_deficiencia == 'tea' %}
+                                    Transtorno do Espectro Autista (TEA)
+                                {% endif %}
+                                {{ crismando.possui_deficiencia|title }} 
+                            </p>
+                            <p><strong>Grupo:</strong> {{ grupo.nome_grupo }}</p>
                         </div>
                         <div class="modal-footer">
                             <a href="{{ url_for('crismando_bp.editar_infor', id_crismando=crismando.id) }}" class="btn btn-outline-primary">Editar</a>

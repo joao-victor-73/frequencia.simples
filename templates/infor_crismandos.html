@@ -45,6 +45,11 @@
                     <input type="text" name="nome_pai" class="form-control rounded-3" value="{{ crismando.nome_pai }}">
                 </div>
 
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Nome do Padrinho/Madrinha</label>
+                    <input type="text" name="nome_padrim" class="form-control rounded-3" value="{{ crismando.nome_padrim }}">
+                </div>
+
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Endereço</label>
                     <input type="text" name="endereco" class="form-control rounded-3" value="{{ crismando.endereco }}">
@@ -76,6 +81,37 @@
                     <select name="eucaristia" class="form-select rounded-3">
                         <option value="sim" {% if crismando.eucaristia == 'sim' %} selected {% endif %}>Sim</option>
                         <option value="nao" {% if crismando.eucaristia == 'nao' %} selected {% endif %}>Não</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Estado Civil</label>
+                    <select name="estado_civil" class="form-select rounded-3">
+                        <option value="solteiro" {% if crismando.possui_filhos == 'solteiro' %} selected {% endif %}>Solteiro(a)</option>
+                        <option value="namorado" {% if crismando.possui_filhos == 'namorado' %} selected {% endif %}>Solteiro(a), mas tenho namorado(a)/Noivo(a)</option>
+                        <option value="casado_civil" {% if crismando.possui_filhos == 'casado_civil' %} selected {% endif %}>Casado(a) civilmente (mas não sou casado(a) na Igreja).</option>
+                        <option value="casado_civil_igreja" {% if crismando.possui_filhos == 'casado_civil_igreja' %} selected {% endif %}>Casado(a) no Civil e na Igreja (Matrimonio).</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Possui filhos?</label>
+                    <select name="possui_filhos" class="form-select rounded-3">
+                        <option value="sim" {% if crismando.possui_filhos == 'sim' %} selected {% endif %}>Sim</option>
+                        <option value="nao" {% if crismando.possui_filhos == 'nao' %} selected {% endif %}>Não</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Possui deficiencia?</label>
+                    <select name="possui_deficiencia" class="form-select rounded-3">
+                        <option value="nao" {% if crismando.possui_deficiencia == 'nao' %} selected {% endif %}>Não</option>
+                        <option value="fisica" {% if crismando.possui_deficiencia == 'fisica' %} selected {% endif %}>Física</option>
+                        <option value="auditiva" {% if crismando.possui_deficiencia == 'auditiva' %} selected {% endif %}>Auditiva</option>
+                        <option value="visual" {% if crismando.possui_deficiencia == 'visual' %} selected {% endif %}>Visual</option>
+                        <option value="intelectual" {% if crismando.possui_deficiencia == 'intelectual' %} selected {% endif %}>Intelectual</option>
+                        <option value="multipla" {% if crismando.possui_deficiencia == 'multipla' %} selected {% endif %}>Multipla</option>
+                        <option value="tea" {% if crismando.possui_deficiencia == 'tea' %} selected {% endif %}>Transtorno do Espectro Autista (TEA)</option>
                     </select>
                 </div>
 

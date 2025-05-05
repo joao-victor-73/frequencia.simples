@@ -36,19 +36,20 @@ class Crismandos(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
     nome_mae = db.Column(db.String(100), nullable=False)
-    nome_pai = db.Column(db.String(100), nullable=False,
-                         default='Nao mencionado')
+    nome_pai = db.Column(db.String(100), nullable=False,default='Nao mencionado')
+    nome_padrim = db.Column(db.String(100), default="Não Tem")
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200), nullable=False)
     cidade = db.Column(db.String(100))
+    estado_civil = db.Column(db.String(200))
+    possui_filhos = db.Column(db.String(10))
+    possui_deficiencia = db.Column(db.String(50))
     tel1 = db.Column(db.String(20), nullable=False)
     tel2 = db.Column(db.String(20))
     batismo = db.Column(db.Enum('sim', 'nao'), default='nao')
     eucaristia = db.Column(db.Enum('sim', 'nao'), default='nao')
-    status_crismando = db.Column(
-        db.Enum('ativo', 'desistente'), default='ativo')
-    fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
-        'grupos.id_grupo'), nullable=True)
+    status_crismando = db.Column(db.Enum('ativo', 'desistente'), default='ativo')
+    fk_id_grupo = db.Column(db.Integer, db.ForeignKey('grupos.id_grupo'), nullable=True)
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(

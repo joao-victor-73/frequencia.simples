@@ -128,11 +128,15 @@ def atualizar_infor():
     atualiza_crismando.tel2 = request.form['telefone2']
     atualiza_crismando.nome_mae = request.form['nome_mae']
     atualiza_crismando.nome_pai = request.form['nome_pai']
+    atualiza_crismando.nome_padrim = request.form['nome_padrim']
     atualiza_crismando.endereco = request.form['endereco']
     atualiza_crismando.cidade = request.form['cidade']
     atualiza_crismando.status_crismando = request.form['status_crismando']
     atualiza_crismando.batismo = request.form['batismo']
     atualiza_crismando.eucaristia = request.form['eucaristia']
+    atualiza_crismando.estado_civil = request.form['estado_civil']
+    atualiza_crismando.possui_filhos = request.form['possui_filhos']
+    atualiza_crismando.possui_deficiencia = request.form['possui_deficiencia']
 
     # Atualiza o catequista responsável (pega o id da mesma maneira que o do crismando)
     # Atualiza a FK do catequista
@@ -145,7 +149,7 @@ def atualizar_infor():
         print("Erro ao salvar no banco de dados: ", str(e))
         db.session.rollback()
 
-    return redirect(url_for('index'))
+    return redirect(url_for('crismando_bp.lista_de_crismandos'))
 
 
 @crismando_bp.route('/geral_crismandos', methods=['POST', 'GET'])
