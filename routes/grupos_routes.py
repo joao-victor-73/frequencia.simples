@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models.models import Catequistas, Grupos
+from sqlalchemy.orm import joinedload
+from models.models import Catequistas, Grupos, Crismandos
 from flask_login import login_required
 from utils.decorators import coordenador_required
 from models import db
@@ -54,10 +55,24 @@ def cadastrar_grupo():
 @login_required
 def grupos_crisma():
     # Query para coletar informações de todos os grupos e os catequistas ligados aos grupos
-    infor_grupos = Catequistas.query.join(
-        Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
+    # infor_grupos = Catequistas.query.join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
+    # return render_template('grupos_de_crisma.html', infor_grupos=infor_grupos)
 
-    return render_template('grupos_de_crisma.html', infor_grupos=infor_grupos)
+    grupos = Grupos.query.options(
+        joinedload(Grupos.catequistas),
+        joinedload(Grupos.crismandos)
+    ).all()
+
+    """
+    Essa instrução acima diz basicamente o seguinte:
+        "Quando você buscar os grupos, traga também os crismandos relacionados e os catequistas também,
+        tudo em uma única query usando JOIN."
+
+    O joinedload faz o SQLAlchemy gerar uma única query com JOIN que traga todos os relacionamentos desejados
+    entre tabelas (desde que tenham sido especificados no relacionamento (backref)).
+    """
+
+    return render_template('grupos_de_crisma.html', grupos=grupos)
 
 
 # Rota para editar informações de grupos de crisma

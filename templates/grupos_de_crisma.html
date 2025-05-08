@@ -7,51 +7,66 @@
     </div>
 
     <div class="row">
-        {% for catequista in infor_grupos %}
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h4 class="card-title text-primary fw-bold">{{ catequista.grupo.nome_grupo }}</h4>
-                    <p><strong>📅 Encontros:</strong> {{ catequista.grupo.local_grupo }}</p>
-                    <p><strong>👤 Catequistas:</strong> {{ catequista.nome}}</p>
-                    <p><strong>👥 Crismandos:</strong> -- </p>
-                </div>
-                <div class="card-footer text-center">
-                    {% if current_user.catequista.nivel == 'coordenador' %}
-                        <a href="{{ url_for('grupo_bp.grupos_crisma', grupo_id=catequista.grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
-                        <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ catequista.grupo.id_grupo }}">
-                            🔎 Ver Detalhes
-                        </a>
-                    {% endif %}
+        {% for grupo in grupos %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title text-primary fw-bold">{{ grupo.nome_grupo }}</h4>
+                        <p><strong>📅 Encontros:</strong> {{ grupo.local_grupo }}</p>
+                        <p><strong>👤 Catequistas:</strong> 
+                            {% for catequista in grupo.catequistas %}
+                                {{ catequista.nome }}
+                                {% if not loop.last %}
+                                    , 
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>👥 Crismandos Ativos:</strong> 
+                            {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'ativo') | list | length }}
+                        </p>
+                        <p><strong>👥 Crismandos desistentes:</strong> 
+                            {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'desistente') | list | length }}
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        {% if current_user.catequista.nivel == 'coordenador' %}
+                            <a href="{{ url_for('grupo_bp.grupos_crisma', grupo_id=grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ grupo.id_grupo }}">
+                                🔎 Ver Detalhes
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
         {% endfor %}
     </div>
+    
 
-    {% for catequista in infor_grupos %}
-        <div class="modal fade" id="modal_{{ catequista.grupo.id_grupo }}" tabindex="-1" aria-hidden="true">
+    {% for grupo in grupos %}
+        <div class="modal fade" id="modal_{{ grupo.id_grupo }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content rounded-4">
                     <div class="modal-header">
-                        <h5 class="modal-title">{{ catequista.nome }}</h5>
+                        <h5 class="modal-title">Grupo: {{ grupo.nome_grupo }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong>Nome do Grupo:</strong> {{ catequista.grupo.nome_grupo }}</p>
-                        <p><strong>Local do Encontro:</strong> {{ catequista.grupo.local_grupo }}</p>
-                        <p><strong>Horário do Encontro:</strong> {{ catequista.grupo.horario }}</p>
-                        <p><strong>Catequista(s) responsável(is):</strong> {{ catequista.nome }}</p>
-                        <p><strong>Informações Adicionais:</strong> {{ catequista.grupo.descricao }}</p>
+                        <p><strong>Local do Encontro:</strong> {{ grupo.local_grupo }}</p>
+                        <p><strong>Horário do Encontro:</strong> {{ grupo.horario }}</p>
+                        <p><strong>Catequista(s) responsável(is):</strong> 
+                            {% for catequista in grupo.catequistas %}
+                                {{ catequista.nome }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Informações Adicionais:</strong> {{ grupo.descricao }}</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="{{ url_for('crismando_bp.geral_crismandos', id_grupo=catequista.grupo.id_grupo) }}" class="btn btn-outline-primary">Editar</a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>
         </div>
-    {% endfor %}
+{% endfor %}
 
 
 </div>
