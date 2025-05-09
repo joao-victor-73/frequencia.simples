@@ -76,4 +76,4 @@ def salvar_infor_catequista():
         print("Erro ao salvar no banco de dados: ", str(e))
         db.session.rollback()
 
-    return redirect(url_for('catequista.geral_catequistas'))
+    return redirect(url_for('catequista_bp.geral_catequistas'))

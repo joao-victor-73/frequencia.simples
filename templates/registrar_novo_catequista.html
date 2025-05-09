@@ -13,6 +13,14 @@
 
     <!-- Estilo customizado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/register_style.css') }}">
+
+    <!-- Importando a biblioteca InputMask para fazer uma mascara de input -->
+    <!-- Carrega a biblioteca jQuery (necessário para o inputmask funcionar) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Carrega a biblioteca Inputmask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+
 </head>
 <body>
 
@@ -35,7 +43,7 @@
                 
                 <div class="mb-3">
                     <label for="tel1" class="form-label">Numero para Contato</label>
-                    <input type="text" name="tel1" class="form-control" placeholder="" required>
+                    <input type="text" name="tel1" id="tel1" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
@@ -93,6 +101,13 @@
         const hidden = document.getElementById('grupo-hidden');
         hidden.value = select.value;
     });
+
+
+    // JS para aplicar a mascara
+    $(document).ready(function () {
+        $('#tel1').inputmask("(99)9.9999-9999"); // Mascara para o numero de contato
+    });
+
 </script>
 
 

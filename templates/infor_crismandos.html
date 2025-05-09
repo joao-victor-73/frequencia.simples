@@ -4,6 +4,13 @@
 <!-- Importar SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- Importando a biblioteca InputMask para fazer uma mascara de input -->
+<!-- Carrega a biblioteca jQuery (necessário para o inputmask funcionar) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Carrega a biblioteca Inputmask -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+
 <div class="container my-5">
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-header bg-white border-bottom-0 text-center py-4">
@@ -27,12 +34,12 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Número para contato 1</label>
-                    <input type="text" name="telefone1" class="form-control rounded-3" value="{{ crismando.tel1 }}">
+                    <input type="text" id="telefone1" name="telefone1" maxlegth="15" class="form-control rounded-3"  value="{{ crismando.tel1 }}">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Número para contato 2</label>
-                    <input type="text" name="telefone2" class="form-control rounded-3" {% if crismando.tel2 == 'None' or crismando.tel2 == '' %} value='Sem Contato' {% endif %}  value="{{crismando.tel2}}"  >
+                    <input type="text" id="telefone2" name="telefone2" maxlegth="15" class="form-control rounded-3" {% if crismando.tel2 == '' or crismando.tel2 == 'None' %} value='Sem Contato' {% endif %}  value="{{crismando.tel2}}"  >
                 </div>
 
                 <div class="col-12">
@@ -176,5 +183,14 @@
             }
         });
     });
+
+
+    // JS para aplicar a mascara
+    $(document).ready(function() {
+        $("#telefone1").inputmask("(99)9.9999-9999"); // Máscara para número de contato 1
+        $("#telefone2").inputmask("(99)9.9999-9999"); // Máscara para número de contato 2
+    });
+
 </script>
+
 {% endblock %}

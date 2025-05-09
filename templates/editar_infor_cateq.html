@@ -4,6 +4,12 @@
 
 <!-- Importar SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Importando a biblioteca InputMask para fazer uma mascara de input -->
+<!-- Carrega a biblioteca jQuery (necessário para o inputmask funcionar) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Carrega a biblioteca Inputmask -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 
 <div class="container my-5">
     <div class="card shadow-sm border-0 rounded-4">
@@ -32,7 +38,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Número para contato</label>
-                    <input type="text" name="tel1" class="form-control rounded-3" value="{{ catequista.tel1 }}">
+                    <input type="text" name="tel1" id="tel1" class="form-control rounded-3" value="{{ catequista.tel1 }}">
                 </div>
 
 
@@ -88,6 +94,11 @@
                 this.submit();
             }
         });
+    });
+
+    // JS para aplicar a mascara
+    $(document).ready(function () {
+        $('#tel1').inputmask("(99)9.9999-9999"); // Mascara para o numero de contato
     });
 </script>
 
