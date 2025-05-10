@@ -76,8 +76,81 @@ def grupos_crisma():
 
 
 # Rota para editar informações de grupos de crisma
-@grupos_bp.route("/editar_grupo_crisma/int:<id_grupo>", methods=['POST', 'GET'])
+@grupos_bp.route("/editar_grupo_crisma/int:<grupo_id>", methods=['POST', 'GET'])
 @login_required
 @coordenador_required
-def editar_grupo(id_grupo):
-    pass
+def editar_grupo(grupo_id):
+
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'grupo_bp.grupos_crisma')  # Padrão é a lista de grupos
+
+    # Pega o grupo requisitado (fornecido através do grupo_id)
+    grupo_requisitado = db.session.query(
+        Grupos).filter_by(id_grupo=grupo_id).first()
+
+    # Pega os catequistas vinculados a esse grupo
+    lista_catequistas_responsaveis = db.session.query(
+        Catequistas).filter_by(fk_id_grupo=grupo_id).all()
+
+    if not grupo_requisitado:
+        return "Grupo não foi encontrado", 404
+
+    # Aqui buscamos TODOS os catequistas
+    todos_catequistas = Catequistas.query.all()
+
+    return render_template("infor_grupo.html",
+                           grupo_requisitado=grupo_requisitado,
+                           lista_catequistas_responsaveis=lista_catequistas_responsaveis,
+                           todos_catequistas=todos_catequistas,
+                           origem_url_voltar=origem_url_voltar)
+
+
+@grupos_bp.route("/atualizar_info_grupo", methods=['POST'])
+@login_required
+@coordenador_required
+def atualizar_info_grupo():
+    grupo_id = request.form['grupo_id']
+    atualiza_grupo = Grupos.query.filter_by(id_grupo=grupo_id).first()
+
+    if not atualiza_grupo:
+        return "Grupo não encontrado", 404
+
+    atualiza_grupo.nome_grupo = request.form['nome_grupo']
+    atualiza_grupo.local_grupo = request.form['local_grupo']
+    atualiza_grupo.horario = request.form['horario']
+    atualiza_grupo.descricao = request.form['descricao']
+
+    try:
+        db.session.add(atualiza_grupo)
+        db.session.commit()
+    except Exception as e:
+        print("Erro ao salvar no banco de dados: ", str(e))
+        db.session.rollback()
+
+    flash("Informações do grupo atualizadas com sucesso!", "success")
+    return redirect(url_for("grupo_bp.editar_grupo", grupo_id=grupo_id))
+
+
+@grupos_bp.route("/atualizar_catequistas_grupo", methods=['POST'])
+@login_required
+@coordenador_required
+def atualizar_catequistas_grupo():
+    grupo_id = request.form['grupo_id']
+    grupo = Grupos.query.get(grupo_id)
+
+    if not grupo:
+        return "Grupo não encontrado", 404
+
+    # Remove vínculos anteriores
+    Catequistas.query.filter_by(fk_id_grupo=grupo_id).update({Catequistas.fk_id_grupo: None})
+
+    # Adiciona os novos
+    ids_catequistas = request.form.getlist("catequistas_selecionados")
+    for id_cat in ids_catequistas:
+        catequista = Catequistas.query.get(int(id_cat))
+        if catequista:
+            catequista.fk_id_grupo = grupo_id
+
+    db.session.commit()
+    flash("Catequistas do grupo atualizados com sucesso!", "success")
+    return redirect(url_for("grupo_bp.editar_grupo", grupo_id=grupo_id))

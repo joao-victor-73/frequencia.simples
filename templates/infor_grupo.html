@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+    <!-- Importar SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style type="text/css">
+        .toggle-chip input[type="checkbox"] 
+            {
+                display: none;
+            }
+
+        .toggle-chip.active,
+        .toggle-chip input[type="checkbox"]:checked + label 
+            {
+                background-color: #0d6efd;
+                color: white;
+            }
+
+    </style>
+
+    <div class="container my-5">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom-0 text-center py-4">
+                <h2 class="card-title fw-bold text-primary-emphasis">Detalhes do grupo {{ grupo_requisitado.nome_grupo }}</h2>
+            </div>
+
+            <div class="card-body px-4 py-4">
+                <form class="row g-4" id="formAtualizacao" action="{{ url_for('grupo_bp.atualizar_info_grupo') }}" method="POST">
+                    <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nome do grupo</label>
+                        <input type="text" name="nome_grupo" class="form-control rounded-3" value="{{ grupo_requisitado.nome_grupo }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <labrel class="form-label fw-semibold">Local dos encontros</label>
+                        <input type="text" name="local_grupo" class="form-control rounded-3" value="{{grupo_requisitado.local_grupo}}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="horario" class="form-label">Horário dos Encontros:</label>
+                        <input type="time" name="horario" class="form-control" value="{{grupo_requisitado.horario}}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Descrição</label>
+                        <input type="textarea" name="descricao" class="form-control rounded-3" value="{{ grupo_requisitado.descricao }}">
+                    </div>
+
+                    <!-- Serve apenas para visualizar os catequistas responsaveis atuais -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Catequista Responsável</label>
+                        <select class="form-select rounded-3">
+                            {% for catequista in lista_catequistas_responsaveis %}
+                            <option value="{{ catequista.id_catequista }}">
+                                {{ catequista.nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        
+                    </div>
+
+                    <div class="col-12 text-center mt-3">
+                        <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
+                        <a href="{{ url_for("grupo_bp.grupos_crisma") }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
+                        <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalCatequistas">
+                            Gerenciar Catequistas do Grupo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+   <div class="modal fade" id="modalCatequistas" tabindex="-1" aria-labelledby="modalCatequistasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content rounded-4 shadow-sm">
+                <form action="{{ url_for('grupo_bp.atualizar_catequistas_grupo') }}" method="POST">
+                    
+                    <div class="modal-header bg-light rounded-top-4 px-4 py-3 border-bottom">
+                        <h5 class="modal-title fw-semibold text-primary" id="modalCatequistasLabel">
+                            Gerenciar Catequistas Responsáveis
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    
+                    <div class="modal-body px-4 py-4 bg-white">
+                        <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
+
+                        <p class="mb-3 text-muted">Clique nos nomes para marcar ou desmarcar os catequistas responsáveis por este grupo.</p>
+
+                        <div class="row g-3">
+                            {% for catequista in todos_catequistas %}
+                            <div class="col-md-6 col-lg-4">
+                                <label class="btn btn-outline-primary w-100 text-center rounded-pill toggle-chip {% if catequista.fk_id_grupo == grupo_requisitado.id_grupo %}active{% endif %}">
+                                    <input type="checkbox" name="catequistas_selecionados" value="{{ catequista.id_catequista }}"
+                                        class="btn-check" autocomplete="off"
+                                        {% if catequista.fk_id_grupo == grupo_requisitado.id_grupo %} checked {% endif %}>
+                                    {{ catequista.nome }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light border-top px-4 py-3">
+                        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill">Salvar</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // SweetAlert para confirmação
+        document.getElementById("formAtualizacao").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Você deseja salvar as alterações?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sim, salvar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const chips = document.querySelectorAll('.toggle-chip input[type="checkbox"]');
+
+        chips.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function () {
+                const label = this.closest('.toggle-chip');
+                if (this.checked) {
+                    label.classList.add('active');
+                } else {
+                    label.classList.remove('active');
+                }
+                });
+            });
+        });
+
+    </script>
+
+
+{% endblock %}

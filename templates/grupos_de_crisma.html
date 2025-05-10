@@ -24,13 +24,13 @@
                         <p><strong>👥 Crismandos Ativos:</strong> 
                             {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'ativo') | list | length }}
                         </p>
-                        <p><strong>👥 Crismandos desistentes:</strong> 
+                        <p><strong>👥 Crismandos Desistentes:</strong> 
                             {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'desistente') | list | length }}
                         </p>
                     </div>
                     <div class="card-footer text-center">
                         {% if current_user.catequista.nivel == 'coordenador' %}
-                            <a href="{{ url_for('grupo_bp.grupos_crisma', grupo_id=grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{{ url_for('grupo_bp.editar_grupo', grupo_id=grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
                             <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ grupo.id_grupo }}">
                                 🔎 Ver Detalhes
                             </a>
