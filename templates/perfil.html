@@ -1,10 +1,21 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block conteudo %}
+    <!-- Importando a biblioteca InputMask para fazer uma mascara de input -->
+    <!-- Carrega a biblioteca jQuery (necessário para o inputmask funcionar) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Carrega a biblioteca Inputmask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <div class="container py-4">
         <h2 class="mb-4 text-primary">Editar Perfil</h2>
 
-        <form method="POST" action="{{ url_for('other.atualizar_perfil') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('other.atualizar_perfil') }}" id="formAtualizacao" enctype="multipart/form-data">
+
+            <input type="hidden" name="id_catequista" value="{{ current_user.catequista.id_catequista}}">
             
             <div class="row mb-4">
                 <div class="col-md-3 text-center">
@@ -23,8 +34,26 @@
                         <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Telefone</label>
-                        <input type="text" name="telefone" class="form-control" value="{{ current_user.catequista.telefone }}">
+                        <label class="form-label">Número de Contato</label>
+                        <input type="text" name="tel1" id="tel1" maxlength="15" class="form-control" value="{{ current_user.catequista.tel1 }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Endereço</label>
+                        <input 
+                        type="text" 
+                        name="endereco" 
+                        class="form-control" 
+                        {% if current_user.catequista.endereco == '' %}  {% endif %} value="{{ current_user.catequista.endereco }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <input type="date" name="data_nascimento" class="form-control" value="{{ current_user.catequista.data_nascimento }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Grupo Responsável</label>
+                        <input type="text" name="telefone" class="form-control" value="{{ current_user.catequista.grupo.nome_grupo }}" disabled>
                     </div>
                 </div>
             </div>
@@ -40,7 +69,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nova senha</label>
-                    <input type="password" name="nova_senha" class="form-control">
+                    <input type="password" name="nova_senha" class="form-control" autocomplete="off">
                 </div>
                 <div class="col-md-6 mb-4">
                     <label class="form-label">Confirmar nova senha</label>
@@ -48,7 +77,39 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Salvar alterações</button>
+            <div class="col-12 text-center mt-3">
+                <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
+                <a href="{{ url_for('crismando_bp.lista_de_crismandos') }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
+            </div>
         </form>
     </div>
+
+    <script>
+        // SweetAlert para confirmação
+        document.getElementById("formAtualizacao").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const form = this; 
+
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Você deseja salvar as alterações?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sim, salvar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+
+
+        // JS para aplicar a mascara
+        $(document).ready(function() {
+            $("#tel1").inputmask("(99)9.9999-9999"); // Máscara para número de contato 1
+        });
+
+    </script>
 {% endblock %}
