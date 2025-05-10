@@ -73,24 +73,22 @@
                             <li><a class="dropdown-item" href="{{ url_for('frequencia_bp.geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
                         </ul>
                     </li>
-                </ul>
                     {% endif %}
+                </ul>
                     
                 <!-- Avatar e Logout (alinhado à direita) -->
-                <ul class="navbar-nav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="{{ url_for('static', filename='image/man_icon.png') }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
-                                {{ current_user.catequista.nome }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('other.perfil') }}">Perfil</a></li>
-                                <li><a class="dropdown-item" href="https://forms.gle/mXPNTkx3R589asKb6">Relatar Bug</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('other.inicio') }}">Sair</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <img src="{{ url_for('static', filename='image/man_icon.png') }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                            {{ current_user.catequista.nome }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('other.perfil') }}">Perfil</a></li>
+                            <li><a class="dropdown-item" href="https://forms.gle/mXPNTkx3R589asKb6">Relatar Bug</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('other.inicio') }}">Sair</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

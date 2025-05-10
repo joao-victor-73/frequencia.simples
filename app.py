@@ -3,7 +3,6 @@ from flask_login import LoginManager
 from config import Config
 from models import db
 from routes import register_routes
-from extensions import mail
 
 login_manager = LoginManager()
 
@@ -12,7 +11,6 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
-    mail.init_app(app)
 
     login_manager = LoginManager(app)
     login_manager.init_app(app)
