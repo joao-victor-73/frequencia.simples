@@ -1,5 +1,54 @@
 {% extends 'base.html' %}
 
-{% block conteudo %}
+{% block content %}
+    <div class="container py-4">
+        <h2 class="mb-4 text-primary">Editar Perfil</h2>
 
+        <form method="POST" action="{{ url_for('other.atualizar_perfil') }}" enctype="multipart/form-data">
+            
+            <div class="row mb-4">
+                <div class="col-md-3 text-center">
+                    <img src="{{ url_for('static', filename='uploads/' ~ current_user.foto) }}" class="img-thumbnail rounded-circle" width="150" height="150" alt="Foto de perfil">
+                    <div class="mt-2">
+                        <input class="form-control" type="file" name="foto">
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" name="nome" class="form-control" value="{{ current_user.catequista.nome }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control" value="{{ current_user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" name="telefone" class="form-control" value="{{ current_user.catequista.telefone }}">
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="text-secondary mb-3">Alterar Senha</h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Senha atual</label>
+                    <input type="password" name="senha_atual" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nova senha</label>
+                    <input type="password" name="nova_senha" class="form-control">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">Confirmar nova senha</label>
+                    <input type="password" name="confirmar_senha" class="form-control">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar alterações</button>
+        </form>
+    </div>
 {% endblock %}

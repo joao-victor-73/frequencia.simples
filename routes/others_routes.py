@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models.models import Usuarios, Catequistas, Grupos
-from flask_login import login_required
+import os
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask_login import login_required, current_user
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from models import db
-
 
 # Criação do Blueprint
 others_bp = Blueprint('other', __name__)  # nome do blueprint
