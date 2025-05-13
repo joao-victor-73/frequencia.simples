@@ -26,6 +26,7 @@ def atualizar_perfil():
     tel1 = request.form.get('tel1')
     data_nascimento = request.form.get('data_nascimento')
     endereco = request.form.get('endereco')
+    avatar_perfil = request.form.get('avatar_perfil')
 
     # Atualiza dados pessoais
     current_user.email = email
@@ -33,6 +34,7 @@ def atualizar_perfil():
     current_user.catequista.tel1 = tel1
     current_user.catequista.data_nascimento = data_nascimento
     current_user.catequista.endereco = endereco
+    current_user.avatar_perfil = avatar_perfil
 
     """
     # Atualiza imagem (se houver)

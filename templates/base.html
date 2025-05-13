@@ -80,7 +80,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <img src="{{ url_for('static', filename='image/man_icon.png') }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                            <img src="{{ url_for('static', filename='image/avatars/' ~ current_user.avatar_perfil) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
                             {{ current_user.catequista.nome }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

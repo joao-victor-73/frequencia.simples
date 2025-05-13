@@ -116,6 +116,7 @@ class Usuarios(db.Model, UserMixin):
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=False)
+    avatar_perfil = db.Column(db.String(50))
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
