@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+#
 load_dotenv()
+
 
 host = os.environ['MYSQL_HOST']
 user = os.environ['MYSQL_USER']
@@ -9,7 +11,6 @@ password = os.environ['MYSQL_PASSWORD']
 database = os.environ['MYSQL_DATABASE']
 secret_key = os.environ['SECRET_KEY']
 port = os.environ['MYSQL_PORT']
-
 
 
 class Config:
