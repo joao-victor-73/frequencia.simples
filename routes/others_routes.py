@@ -52,7 +52,7 @@ def atualizar_perfil():
     confirmar_senha = request.form.get('confirmar_senha')
 
     if senha_atual or nova_senha or confirmar_senha:
-        if not check_password_hash(current_user.senha, senha_atual):
+        if not check_password_hash(current_user.senha_hash, senha_atual):
             flash("Senha atual incorreta.", "danger")
             return redirect(url_for('other.perfil'))
 
