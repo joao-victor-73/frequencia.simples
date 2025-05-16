@@ -60,7 +60,7 @@ def atualizar_perfil():
             flash("As senhas novas não coincidem.", "danger")
             return redirect(url_for('other.perfil'))
 
-        current_user.senha = generate_password_hash(nova_senha)
+        current_user.senha_hash = generate_password_hash(nova_senha)
 
     # Salva alterações no banco de dados
     db.session.commit()
