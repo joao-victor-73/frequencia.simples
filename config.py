@@ -11,6 +11,7 @@ secret_key = os.environ['SECRET_KEY']
 port = os.environ['MYSQL_PORT']
 
 
+
 class Config:
     SECRET_KEY = secret_key
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
