@@ -48,7 +48,7 @@ def lista_de_crismandos():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).outerjoin(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
-           ).outerjoin(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
+           ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
                   ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
     # Join entre as tabelas Crismandos e Catequistas
@@ -190,7 +190,7 @@ def geral_crismandos():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).outerjoin(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista
-           ).outerjoin(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
+           ).join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo
                   ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
     # Join entre as tabelas Crismandos e Catequistas
