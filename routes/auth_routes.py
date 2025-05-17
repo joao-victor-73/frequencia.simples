@@ -2,11 +2,12 @@ from flask_login import login_user, login_required, logout_user
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models.models import Usuarios, Catequistas, Grupos
 from utils.decorators import coordenador_required
-from models import db 
+from models import db
 
 
 # Criação do Blueprint
 auth_bp = Blueprint('auth', __name__)  # nome do blueprint
+
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -79,7 +80,7 @@ def register_new_cat():
         # Verificar se já existe um catequista com o mesmo nome
         if Catequistas.query.filter_by(nome=nome).first():
             flash(f"O catequista '{nome}' já está cadastrado!", "warning")
-            return redirect(url_for("catequista.cadastrar_catequista"))
+            return redirect(url_for("auth.register_new_cat"))
 
         else:
             novo_catequista = Catequistas(

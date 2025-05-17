@@ -17,14 +17,14 @@ def fazer_frequencia():
     # crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
     # lista_crismandos = Crismandos.query.filter_by(status_crismando='ativo').all()
 
-    grupo_do_catequista = current_user.catequista.grupo
     # Vai pegar o usuário logado e trazer a informação de qual grupo ele é responsável
+    grupo_do_catequista = current_user.catequista.grupo
 
-    # Filtra os crismandos com o mesmo grupo
-    lista_crismandos = db.session.query(Crismandos).join(Catequistas)\
-        .filter(Catequistas.grupo == grupo_do_catequista)\
-        .filter(Crismandos.status_crismando == 'ativo')\
-        .order_by(Crismandos.nome).all()
+    grupo_id = grupo_do_catequista.id_grupo
+
+    # Buscar crismandos ativos do grupo
+    lista_crismandos = Crismandos.query\
+        .filter_by(fk_id_grupo=grupo_id, status_crismando='ativo').order_by(Crismandos.nome).all()
 
     return render_template('fazer_frequencia.html', lista_crismandos=lista_crismandos)
 
