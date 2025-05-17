@@ -3,7 +3,6 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
 # Classes / Models para as TABELAS
 
 # 📌 Catequistas
@@ -36,7 +35,8 @@ class Crismandos(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
     nome_mae = db.Column(db.String(100), nullable=False)
-    nome_pai = db.Column(db.String(100), nullable=False,default='Nao mencionado')
+    nome_pai = db.Column(db.String(100), nullable=False,
+                         default='Nao mencionado')
     nome_padrim = db.Column(db.String(100), default="Não Tem")
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200), nullable=False)
@@ -46,10 +46,12 @@ class Crismandos(db.Model):
     possui_deficiencia = db.Column(db.String(50))
     tel1 = db.Column(db.String(20), nullable=False)
     tel2 = db.Column(db.String(20))
-    batismo = db.Column(db.Enum('sim', 'nao'), default='nao')
-    eucaristia = db.Column(db.Enum('sim', 'nao'), default='nao')
-    status_crismando = db.Column(db.Enum('ativo', 'desistente'), default='ativo')
-    fk_id_grupo = db.Column(db.Integer, db.ForeignKey('grupos.id_grupo'), nullable=True)
+    batismo = db.Column(db.Enum('Sim', 'Nao', 'Nao Sei'), default='Nao')
+    eucaristia = db.Column(db.Enum('Sim', 'Nao', 'Nao Sei'), default='Nao')
+    status_crismando = db.Column(
+        db.Enum('ativo', 'desistente'), default='ativo')
+    fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
+        'grupos.id_grupo'), nullable=True)
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
