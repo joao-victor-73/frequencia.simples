@@ -81,6 +81,7 @@
             <table class="table table-bordered table-hover align-middle text-center rounded-3 overflow-hidden">
                 <thead class="table-light">
                     <tr>
+                        <th></th>
                         <th>Nome</th>
                         <th>Status</th>
                         <th>Presenças</th>
@@ -102,6 +103,7 @@
                         {% endif %}
 
                         <tr class="{{ linha_classe }}">
+                            <td> {{ loop.index }} </td>
                             <td>{{ crismando.nome }}</td>
                             <td>{{ crismando.status_crismando|title }}</td>
                             <td>{{ total_presencas or 0 }}</td>

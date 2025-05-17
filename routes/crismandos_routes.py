@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models.models import Usuarios, Catequistas, Crismandos, Grupos, Frequencias, InforFrequencias
-from flask_login import login_required
+from flask_login import login_required, current_user
 from utils.decorators import coordenador_required
 from models import db
 import sqlalchemy as sa
@@ -98,18 +98,28 @@ def editar_infor(id_crismando):
 
     # Obtendo os dados associados ao id do crismando
     crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
+
+
     # lista_catequistas = db.session.query(Catequistas).options(joinedload(Catequistas.grupo)).all()
     # lista_catequistas = db.session.query(Catequistas)
 
-    lista_catequistas = db.session.query(
-        Catequistas, Grupos).join(Grupos).all()
+    # lista_catequistas = db.session.query(Catequistas).filter_by(fk_id_grupo=crismando.fk_id_grupo).all()
+
+    # Pega os catequistas do grupo do crismando
+    catequistas_do_grupo = db.session.query(Catequistas).filter_by(fk_id_grupo=crismando.fk_id_grupo).all()
+
+    # Se for coordenador, envia a lista de todos os grupos também
+    lista_grupos = []
+    if current_user.catequista.nivel == 'coordenador':
+        lista_grupos = Grupos.query.all()
 
     if not crismando:
         return "Crismando não encontrado", 404
 
     return render_template('infor_crismandos.html',
                            crismando=crismando,
-                           lista_catequistas=lista_catequistas,
+                           catequistas_do_grupo=catequistas_do_grupo,
+                           lista_grupos=lista_grupos,
                            origem_url_voltar=origem_url_voltar)
 
 
@@ -119,8 +129,7 @@ def editar_infor(id_crismando):
 def atualizar_infor():
 
     # Pega o id do crismando. (esse id vem de um input hidden la no template 'infor_crismandos')
-    atualiza_crismando = Crismandos.query.filter_by(
-        id=request.form['id_crismando']).first()
+    atualiza_crismando = Crismandos.query.filter_by(id=request.form['id_crismando']).first()
 
     atualiza_crismando.nome = request.form['nome_crismando']
     atualiza_crismando.data_nascimento = request.form['data_nascimento']
@@ -138,9 +147,9 @@ def atualizar_infor():
     atualiza_crismando.possui_filhos = request.form['possui_filhos']
     atualiza_crismando.possui_deficiencia = request.form['possui_deficiencia']
 
-    # Atualiza o catequista responsável (pega o id da mesma maneira que o do crismando)
-    # Atualiza a FK do catequista
-    atualiza_crismando.fk_id_catequista = request.form['catequista_responsavel']
+    # Se for coordenador, atualiza também o grupo
+    if current_user.catequista.nivel == 'coordenador':
+        atualiza_crismando.fk_id_grupo = request.form['grupo_id']
 
     try:
         db.session.add(atualiza_crismando)

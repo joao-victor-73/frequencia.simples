@@ -94,10 +94,11 @@
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Estado Civil</label>
                     <select name="estado_civil" class="form-select rounded-3">
-                        <option value="solteiro" {% if crismando.possui_filhos == 'solteiro' %} selected {% endif %}>Solteiro(a)</option>
-                        <option value="namorado" {% if crismando.possui_filhos == 'namorado' %} selected {% endif %}>Solteiro(a), mas tenho namorado(a)/Noivo(a)</option>
-                        <option value="casado_civil" {% if crismando.possui_filhos == 'casado_civil' %} selected {% endif %}>Casado(a) civilmente (mas não sou casado(a) na Igreja).</option>
-                        <option value="casado_civil_igreja" {% if crismando.possui_filhos == 'casado_civil_igreja' %} selected {% endif %}>Casado(a) no Civil e na Igreja (Matrimonio).</option>
+                        <option value="solteiro" {% if crismando.estado_civil == 'solteiro' %} selected {% endif %}>Solteiro(a)</option>
+                        <option value="namorado" {% if crismando.estado_civil == 'namorado' %} selected {% endif %}>Solteiro(a), mas tenho namorado(a)/Noivo(a)</option>
+                        <option value="casado_civil" {% if crismando.estado_civil == 'casado_civil' %} selected {% endif %}>Casado(a) civilmente (mas não sou casado(a) na Igreja).</option>
+                        <option value="casado_civil_igreja" {% if crismando.estado_civil == 'casado_civil_igreja' %} selected {% endif %}>Casado(a) no Civil e na Igreja (Matrimonio).</option>
+                        <option value="mora_junto" {% if crismando.estado_civil == 'mora_junto' %} selected {% endif %}>Moro junto (não sou casado(a) na Igreja e também não sou no Civil).</option>
                     </select>
                 </div>
 
@@ -122,29 +123,51 @@
                     </select>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Catequista Responsável</label>
-                    <select name="catequista_responsavel" id="catequista_responsavel" class="form-select rounded-3">
-                        {% for catequista, grupo in lista_catequistas %}
-                            <option value="{{ catequista.id_catequista }}"
-                                    data-grupo="{{ grupo.nome_grupo if grupo else 'Sem grupo' }}"
-                                    {% if catequista.id_catequista == crismando.fk_id_catequista %} selected {% endif %}>
-                                {{ catequista.nome }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                {% if current_user.catequista.nivel == 'coordenador' %}
 
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Grupo</label>
-                    <input type="text" name="grupo" id="grupo" class="form-control rounded-3" readonly>
-                </div>
-                
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Catequistas Responsáveis:</label>
+                        <ul class="list-group">
+                            {% for catequista in catequistas_do_grupo %}
+                                <li class="list-group-item">{{ catequista.nome }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
 
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Alterar Grupo:</label>
+                        <select name="grupo_id" class="form-select rounded-3">
+                            {% for grupo in lista_grupos %}
+                                <option value="{{ grupo.id_grupo }}"
+                                    {% if grupo.id_grupo == crismando.fk_id_grupo %} selected {% endif %}>
+                                    {{ grupo.nome_grupo }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                {% else %}
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Catequistas Responsáveis:</label>
+                        <ul class="list-group">
+                            {% for catequista in catequistas_do_grupo %}
+                                <li class="list-group-item">{{ catequista.nome }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Turma:</label>
+                        <input type="text" class="form-control rounded-3" value="{{ crismando.grupo.nome_grupo }}" readonly>
+                    </div>
+                    
+                {% endif %}
+                    
                 <div class="col-12 text-center mt-3">
                     <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
                     <a href="{{ origem_url_voltar }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
                 </div>
+
             </form>
         </div>
     </div>
