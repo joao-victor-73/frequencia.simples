@@ -43,6 +43,8 @@ df["data_nascimento"] = pd.to_datetime(df["data_nascimento"], format="%d/%m/%Y")
 # Removendo acentuação de respostas Enum
 df["batismo"] = df["batismo"].apply(remove_acentos)
 df["eucaristia"] = df["eucaristia"].apply(remove_acentos)
+df["possui_deficiencia"] = df["possui_deficiencia"].apply(remove_acentos)
+df["possui_filhos"] = df["possui_filhos"].apply(remove_acentos)
 
 
 # Substitui espaços por underscores
