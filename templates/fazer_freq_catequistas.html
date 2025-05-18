@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📝 Registro de Frequência dos Catequistas</h2>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <form action="{{ url_for('frequencia_bp.salvar_frequencia_catequistas') }}" method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📌 Título:</label>
+                    <input type="text" name="titulo_encontro" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📅 Data da Chamada:</label>
+                    <input type="date" name="data_chamada" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>👤 Nome do Crismando</th>
+                            <th class="text-center">📌 Faltou?</th>
+                            <th>📝 Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for catequista in catequistas %}
+                        <tr>
+                            <td class="fw-semibold">{{ catequista.nome }}</td>
+                            <td class="text-center">
+                                <input type="checkbox" name="faltou_{{ catequista.id_catequista }}" value="faltou">
+                            </td>
+                            <td>
+                                <textarea name="observacao_{{ catequista.id_catequista }}" class="form-control"></textarea>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success">💾 Salvar</button>
+                <a href="{{ url_for('frequencias_bp.listar_frequencias_catequistas') }}" class="btn btn-secondary ms-2">⬅️ Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

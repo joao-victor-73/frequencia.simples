@@ -35,12 +35,27 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ url_for('crismando_bp.lista_de_crismandos') }}">Sua turma</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('frequencia_bp.listar_frequencias') }}">Frequências</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('frequencia_bp.fazer_frequencia') }}">Registrar Frequência</a>
-                    </li>
+
+                    {% if current_user.catequista.id_catequista == 26 %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('frequencia_bp.listar_frequencias_catequistas') }}">Frequências</a>
+                        </li>
+                        
+                        <li class="na-item">
+                            <a class="nav-link" href="{{ url_for('frequencia_bp.fazer_frequencia_catequistas') }}">Registrar Formação</a>
+                        </li>                                
+    
+                    {% else %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('frequencia_bp.listar_frequencias') }}">Frequências</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('frequencia_bp.fazer_frequencia') }}">Registrar Frequência</a>
+                        </li>
+
+                    {% endif %}
 
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('grupo_bp.grupos_crisma') }}">Turmas Crisma</a>

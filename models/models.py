@@ -136,3 +136,26 @@ class Usuarios(db.Model, UserMixin):
     def get_id(self):
         # Flask-Login precisa desse método, dizendo qual que é o ID desse modelo.
         return str(self.id_usuario)
+
+
+
+# FREQUENCIAS CATEQUISTAS
+class FrequenciaCatequistas(db.Model):
+    __tablename__ = 'frequencias_catequistas'
+
+    id_freq_catequista = db.Column(db.Integer, primary_key=True)
+    titulo_encontro = db.Column(db.String(100), nullable=False)
+    data_encontro = db.Column(db.Date, nullable=False)
+
+    presencas = db.relationship('PresencaCatequista', backref='frequencia', lazy=True)
+
+
+class PresencaCatequista(db.Model):
+    __tablename__ = 'presenca_catequistas'
+
+    id = db.Column(db.Integer, primary_key=True)
+    status_frequencia = db.Column(db.Enum('presente', 'falta', 'justificada'), default='presente')
+    observacao = db.Column(db.String(255))
+
+    fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'), nullable=False)
+    fk_id_freq_catequista = db.Column(db.Integer, db.ForeignKey('frequencias_catequistas.id_freq_catequista'), nullable=False)

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📋 Frequências Registradas dos Catequistas</h2>
+        <p class="text-muted">📌 Exibindo registros de chamadas das Formações de Catequistas </p>
+    </div>
+        
+    <!-- FORMULÁRIO DE FILTRAGEM -->
+    <div class="card border-0 shadow rounded-3 p-3 mb-3">
+        <form method="GET" action="{{ url_for('frequencia_bp.listar_frequencias_catequistas') }}" class="row g-3">
+            
+            <!-- Campo de Data -->
+            <div class="col-md-3">
+                <label for="data_filtro" class="form-label fw-bold">📅 Data:</label>
+                <input type="date" id="data_filtro" name="data_filtro" class="form-control" value="{{ request.args.get('data_filtro', '') }}">
+            </div>
+
+            <!-- Campo de Título -->
+            <div class="col-md-3">
+                <label for="busca_titulo" class="form-label fw-bold">🔍 Título:</label>
+                <input type="text" id="busca_titulo" name="busca_titulo" class="form-control" placeholder="Digite o título do encontro" value="{{ request.args.get('busca_titulo', '') }}">
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar 🔍</button>
+                <a href="{{ url_for('frequencia_bp.listar_frequencias_catequistas') }}" class="btn btn-outline-secondary w-100">Limpar ❌</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABELA DE FREQUÊNCIAS -->
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+            
+                <table class="table table-hover align-middle text-center">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>#</th>
+                            <th>📌 Título</th>
+                            <th>📆 Data</th>
+                            <th>⚙️ Ações</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for registro in registros %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ registro.titulo_encontro }}</td>
+                            <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('frequencias_bp.detalhar_frequencia_catequistas', id=freq.id_freq_catequista) }}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+                                    🔎 Ver Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">
+                                🚫 Nenhuma frequência encontrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
