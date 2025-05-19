@@ -230,8 +230,10 @@ def detalhes_frequencia(id):
 @coordenador_required
 def fazer_frequencia_catequistas():
 
-
     catequistas = db.session.query(Catequistas).order_by(Catequistas.nome).all()
+
+    catequistas = Catequistas.query.filter(Catequistas.id_catequista != 26).all()
+
 
     return render_template("fazer_freq_catequistas.html", 
                            catequistas=catequistas)
@@ -243,12 +245,11 @@ def fazer_frequencia_catequistas():
 @coordenador_required
 def salvar_frequencia_catequistas():
     titulo = request.form.get('titulo_encontro')
-    data_chamada = request.form.get('data_chamada')
+    data_encontro = request.form.get('data_chamada')
 
     nova_info_freq = FrequenciaCatequistas(
         titulo_encontro=titulo,
-        data_encontro=datetime.strptime(data_chamada, '%Y-%m-%d'),
-        fk_id_catequista=current_user.id_usuario
+        data_encontro=datetime.strptime(data_encontro, '%Y-%m-%d')
     )
     db.session.add(nova_info_freq)
     db.session.commit()
@@ -270,14 +271,14 @@ def salvar_frequencia_catequistas():
             status_frequencia=status,
             observacao=observacao,
             fk_id_catequista=catequista.id_catequista,
-            fk_id_infor_freq_catequistas=id_infor_freq
+            fk_id_freq_catequista=id_infor_freq
         )
         db.session.add(nova_frequencia)
 
     db.session.commit()
     flash("Frequência dos catequistas registrada com sucesso!", "success")
 
-    return redirect(url_for("frequencias_bp.listar_frequencias_catequistas"))
+    return redirect(url_for("frequencia_bp.listar_frequencias_catequistas"))
 
 
 
@@ -313,8 +314,8 @@ def listar_frequencias_catequistas():
 @coordenador_required
 def detalhar_frequencia_catequistas(id):
     encontro = FrequenciaCatequistas.query.get_or_404(id)
-    presencas = PresencaCatequista.query.filter_by(fk_id_freq_catequista=id).join(Catequistas).order_by(Catequistas.nome).all()
+    registros = PresencaCatequista.query.filter_by(fk_id_freq_catequista=id).join(Catequistas).order_by(Catequistas.nome).all()
 
     return render_template("detalhar_freq_catequistas.html",
                            encontro=encontro,
-                           presencas=presencas)
+                           registros=registros)

@@ -52,16 +52,16 @@
                         <tr>
                             <td>{{ loop.index }}</td>
                             <td>{{ registro.titulo_encontro }}</td>
-                            <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ registro.data_encontro.strftime('%d/%m/%Y') }}</td>
                             <td class="text-center">
-                                <a href="{{ url_for('frequencias_bp.detalhar_frequencia_catequistas', id=freq.id_freq_catequista) }}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+                                <a href="{{ url_for('frequencia_bp.detalhar_frequencia_catequistas', id=registro.id_freq_catequista) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
                                     🔎 Ver Detalhes
                                 </a>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-3">
+                            <td colspan="4" class="text-center text-muted py-3">
                                 🚫 Nenhuma frequência encontrada.
                             </td>
                         </tr>

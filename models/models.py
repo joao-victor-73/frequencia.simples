@@ -159,3 +159,7 @@ class PresencaCatequista(db.Model):
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'), nullable=False)
     fk_id_freq_catequista = db.Column(db.Integer, db.ForeignKey('frequencias_catequistas.id_freq_catequista'), nullable=False)
+
+    # Isso aqui é para garantir que existe uma relação no modelo PresencaCatequista com o modelo Catequista.
+    catequista = db.relationship('Catequistas', backref='presencas')
+
