@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models.models import Catequistas, Crismandos, Grupos, Frequencias, InforFrequencias
+from models.models import Catequistas, Crismandos, Grupos, Frequencias, InforFrequencias, FrequenciaCatequistas, PresencaCatequista
 from flask_login import login_required, current_user
 from utils.decorators import coordenador_required
 from models import db
@@ -221,3 +221,101 @@ def detalhes_frequencia(id):
                            registros=registros,
                            grupo_catequista=current_user.catequista.grupo,
                            origem_url_voltar=origem_url_voltar)
+
+
+
+
+@frequencias_bp.route("/frequencia_catequistas", methods=["GET"])
+@login_required
+@coordenador_required
+def fazer_frequencia_catequistas():
+
+    catequistas = db.session.query(Catequistas).order_by(Catequistas.nome).all()
+
+    catequistas = Catequistas.query.filter(Catequistas.id_catequista != 26).all()
+
+
+    return render_template("fazer_freq_catequistas.html", 
+                           catequistas=catequistas)
+
+
+
+@frequencias_bp.route("/salvar_frequencia_catequistas", methods=["POST"])
+@login_required
+@coordenador_required
+def salvar_frequencia_catequistas():
+    titulo = request.form.get('titulo_encontro')
+    data_encontro = request.form.get('data_chamada')
+
+    nova_info_freq = FrequenciaCatequistas(
+        titulo_encontro=titulo,
+        data_encontro=datetime.strptime(data_encontro, '%Y-%m-%d')
+    )
+    db.session.add(nova_info_freq)
+    db.session.commit()
+
+    id_infor_freq = nova_info_freq.id_freq_catequista
+
+    lista_catequistas = db.session.query(Catequistas).order_by(Catequistas.nome).all()
+
+    for catequista in lista_catequistas:
+        status = 'presente'
+        observacao = request.form.get(f'observacao_{catequista.id_catequista}', None)
+
+        if observacao:
+            status = 'justificada'
+        elif request.form.get(f'faltou_{catequista.id_catequista}'):
+            status = 'falta'
+
+        nova_frequencia = PresencaCatequista(
+            status_frequencia=status,
+            observacao=observacao,
+            fk_id_catequista=catequista.id_catequista,
+            fk_id_freq_catequista=id_infor_freq
+        )
+        db.session.add(nova_frequencia)
+
+    db.session.commit()
+    flash("Frequência dos catequistas registrada com sucesso!", "success")
+
+    return redirect(url_for("frequencia_bp.listar_frequencias_catequistas"))
+
+
+
+@frequencias_bp.route("/listar_frequencias_catequistas", methods=["GET"])
+@login_required
+@coordenador_required
+def listar_frequencias_catequistas():
+    data_filtro = request.args.get("data_filtro")
+    titulo_filtro = request.args.get("busca_titulo")
+
+    query = db.session.query(FrequenciaCatequistas).order_by(FrequenciaCatequistas.data_encontro.desc())
+
+    if data_filtro:
+        try:
+            data_formatada = datetime.strptime(data_filtro, "%Y-%m-%d").date()
+            query = query.filter(FrequenciaCatequistas.data_encontro == data_formatada)
+        except ValueError:
+            flash("Formato de data inválido!", "danger")
+
+    if titulo_filtro:
+        query = query.filter(FrequenciaCatequistas.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+
+    registros = query.all()
+
+    return render_template("historico_frequencias_catequistas.html",
+                           registros=registros,
+                           data_filtro=data_filtro,
+                           titulo_filtro=titulo_filtro)
+
+
+@frequencias_bp.route('/detalhar_frequencia_catequistas/<int:id>')
+@login_required
+@coordenador_required
+def detalhar_frequencia_catequistas(id):
+    encontro = FrequenciaCatequistas.query.get_or_404(id)
+    registros = PresencaCatequista.query.filter_by(fk_id_freq_catequista=id).join(Catequistas).order_by(Catequistas.nome).all()
+
+    return render_template("detalhar_freq_catequistas.html",
+                           encontro=encontro,
+                           registros=registros)

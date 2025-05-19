@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📋 Detalhes da Frequência</h2>
+    </div>
+
+    <!-- Informações do Encontro -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>📌 Formação para Catequistas</strong> </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>📌 Título:</strong> {{ encontro.titulo_encontro }}</p>
+                    <p class="mb-2"><strong>📅 Data:</strong> {{ encontro.data_encontro.strftime('%d/%m/%Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Presenças -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>👤 Catequista</th>
+                        <th>📌 Status</th>
+                        <th>📝 Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td class="fw-semibold">{{ registro.catequista.nome }}</td>
+                        <td class="text-center">
+                            {% if registro.status_frequencia == 'presente' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Presente</span>
+                            {% elif registro.status_frequencia == 'falta' %}
+                                <span class="badge bg-danger text-dark"><i class="bi bi-x-circle-fill"></i> Faltou</span>
+                            {% elif registro.status_frequencia == 'justificada' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill"></i> Justificada</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ registro.observacao or '—' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            🚫 Nenhum registro encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Botão de Voltar -->
+    <div class="text-center mt-4">
+        <a href="{{ origem_url_voltar }}" class="btn btn-outline-secondary">
+            ⬅️ Voltar
+        </a>
+    </div>
+</div>
+
+
+{% endblock %}
