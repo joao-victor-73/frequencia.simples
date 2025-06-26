@@ -162,3 +162,10 @@ cython_debug/
 
 
 .vscode
+
+
+# Pasta de backups da base de dados
+backups_bd
+
+
+arquivos_diversificados
