@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<!-- Importar SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Importando a biblioteca InputMask para fazer uma mascara de input -->
+<!-- Carrega a biblioteca jQuery (necessário para o inputmask funcionar) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Carrega a biblioteca Inputmask -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📝 Cadastro de Crismando</h2>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <form action="{{ url_for('crismando_bp.salvar_crismando') }}" method="POST" id="formCadCrismando">
+            <div class="row g-3">
+                <!-- Nome -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">👤 Nome Completo:</label>
+                    <input type="text" name="nome" class="form-control" required>
+                </div>
+                
+                <!-- Data de nascimento -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">🎂 Data de Nascimento:</label>
+                    <input type="date" name="data_nascimento" class="form-control" required>
+                </div>
+
+                <!-- Telefone 1 -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📞 Contato 1:</label>
+                    <input type="text" id="contato1" name="tel1" maxlegth="15" class="form-control rounded-3" required>
+                </div>
+
+                <!-- Telefone 2 -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📞 Contato 2:</label>
+                    <input type="text" id="contato2" name="tel2" maxlegth="15" class="form-control rounded-3">
+                </div>
+
+                <!-- Nome da mãe -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">👩 Nome da Mãe:</label>
+                    <input type="text" name="nome_mae" class="form-control rounded-3">
+                </div>
+
+                <!-- Nome do pai -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">👨 Nome do Pai:</label>
+                    <input type="text" name="nome_pai" class="form-control">
+                </div>
+
+                <!-- Endereço -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">🏠 Endereço:</label>
+                    <input type="text" name="endereco" class="form-control" placeholder="Rua, Nº, Bairro">
+                </div>
+
+                <!-- Cidade -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">🌆 Cidade:</label>
+                    <input type="text" name="cidade" class="form-control" placeholder="Cidade - UF">
+                </div>
+
+                <!-- Grupo -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">📌 Turma:</label>
+                    <select name="fk_id_grupo" class="form-select" required>
+                        <option value="">Selecione a turma</option>
+                        {% for grupo in grupos_disponiveis %}
+                            {% if grupo.id_grupo != 27 %}
+                                <option value="{{ grupo.id_grupo }}">{{ grupo.nome_grupo }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Batismo -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">⛪ É Batizado?</label>
+                    <select name="batismo" class="form-select" >
+                        <option value="sim">Sim</option>
+                        <option value="nao" selected>Não</option>
+                    </select>
+                </div>
+
+                <!-- Eucaristia -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">🕊️ Fez a 1º Comunhão?</label>
+                    <select name="eucaristia" class="form-select">
+                        <option value="sim">Sim</option>
+                        <option value="nao" selected>Não</option>
+                    </select>
+                </div>
+
+                <!-- Estado civil -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">💍 Estado Civil:</label>
+                    <select name="estado_civil" class="form-select">
+                        <option value="solteiro"selected >Solteiro(a)</option>
+                        <option value="namorado" >Solteiro(a), mas tenho namorado(a)/Noivo(a)</option>
+                        <option value="casado_civil" >Casado(a) civilmente (mas não sou casado(a) na Igreja).</option>
+                        <option value="casado_civil_igreja" >Casado(a) no Civil e na Igreja (Matrimonio).</option>
+                        <option value="mora_junto" >Moro junto (não sou casado(a) na Igreja e também não sou no Civil).</option>
+                    </select>
+                </div>
+
+                <!-- Possui filhos -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">👶 Possui filhos?</label>
+                    <select name="possui_filhos" class="form-select">
+                        <option value="nao" selected >Não</option>
+                        <option value="sim" >Sim</option>
+                    </select>
+                </div>
+
+                <!-- Possui deficiência -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">♿ Possui deficiência?</label>
+                    <select name="possui_deficiencia" id="possui_deficiencia" class="form-select" required>
+                        <option value="nao" selected>Não</option>
+                        <option value="sim">Sim</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 d-none" id="campo_deficiencia_descricao">
+                    <label class="form-label fw-bold">💬 Descreva a deficiência:</label>
+                    <input type="text" name="descricao_deficiencia" id="descricao_deficiencia" class="form-control">
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success">💾 Salvar</button>
+                <a href="{{ url_for('crismando_bp.lista_de_crismandos') }}" class="btn btn-secondary ms-2">⬅️ Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectDeficiencia = document.getElementById("possui_deficiencia");
+        const campoDescricao = document.getElementById("campo_deficiencia_descricao");
+
+        selectDeficiencia.addEventListener("change", function() {
+            if (this.value === "sim") {
+                campoDescricao.classList.remove("d-none");
+            } else {
+                campoDescricao.classList.add("d-none");
+                document.getElementById("descricao_deficiencia").value = ""; // limpa
+            }
+        });
+    });
+
+    // SweetAlert para confirmação
+    document.getElementById("formCadCrismando").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Você deseja salvar essas informações?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim, salvar!",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+
+
+    // JS para aplicar a mascara
+    $(document).ready(function() {
+        $("#contato1").inputmask("(99)9.9999-9999"); // Máscara para número de contato 1
+        $("#contato2").inputmask("(99)9.9999-9999"); // Máscara para número de contato 2
+    });
+
+</script>
+
+{% endblock %}

@@ -83,8 +83,8 @@
                 </thead>
                 <tbody>
 
-                    {% for crismando, catequista, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
-                        {% if current_user.catequista.fk_id_grupo == catequista.fk_id_grupo %}
+                    {% for crismando, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
+                        {% if current_user.catequista.fk_id_grupo == grupo.id_grupo %}
                             {% set linha_classe = '' %}
                             {% if total_faltas and total_faltas >= 7 %}
                                 {% set linha_classe = 'table-danger' %}
@@ -114,7 +114,7 @@
         </div>
 
         <!-- Modal (pop-up) -->
-        {% for crismando, catequista, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
+        {% for crismando, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
             <div class="modal fade" id="modal_{{ crismando.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content rounded-4">

@@ -42,14 +42,13 @@ def lista_de_crismandos():
     # Join com Catequistas e Frequências
     query = db.session.query(
         Crismandos,
-        Catequistas,
         Grupos,
         subquery_frequencias.c.total_presencas,
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-        ).join(Catequistas, Catequistas.fk_id_grupo == Grupos.id_grupo
-            ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -193,14 +192,13 @@ def geral_crismandos():
     # Join com Catequistas e Frequências
     query = db.session.query(
         Crismandos,
-        Catequistas,
         Grupos,
         subquery_frequencias.c.total_presencas,
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-        ).join(Catequistas, Catequistas.fk_id_grupo == Grupos.id_grupo
-            ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -247,3 +245,78 @@ def geral_crismandos():
                            filtrar_eucaristia=filtrar_eucaristia,
                            grupos_disponiveis=grupos_disponiveis,
                            origem_url_voltar=origem_url_voltar)
+
+
+@crismando_bp.route('/registrar_crismando', methods=['POST', 'GET'])
+@login_required
+def registrar_crismando():
+    grupos_disponiveis = db.session.query(Grupos).all()
+    catequistas_disponiveis = db.session.query(Catequistas).all()
+
+    return render_template('registrar_crismando.html',
+                           grupos_disponiveis=grupos_disponiveis,
+                           catequistas_disponiveis=catequistas_disponiveis)
+
+
+
+@crismando_bp.route('/salvar_crismando', methods=['POST', 'GET'])
+@login_required
+def salvar_crismando():
+    if request.method == 'POST':
+        nome = request.form['nome'].strip().title()
+        nome_mae = request.form['nome_mae'].strip().title()
+        nome_pai = request.form['nome_pai'].strip().title()
+        data_nascimento = request.form['data_nascimento']
+        tel1 = request.form['tel1']
+        tel2 = request.form['tel2']
+        endereco = request.form['endereco']
+        cidade = request.form['cidade']
+        fk_id_grupo = request.form['fk_id_grupo']
+        batismo = request.form['batismo']
+        eucaristia = request.form['eucaristia']
+        estado_civil = request.form['estado_civil']
+        possui_filhos = request.form['possui_filhos']
+
+        possui_deficiencia = request.form['possui_deficiencia']
+        if possui_deficiencia == 'sim':
+            descricao = request.form.get('descricao_deficiencia', '').strip()
+            possui_deficiencia = descricao or 'sim'
+        else:
+            possui_deficiencia = 'nao'
+
+        if Crismandos.query.filter_by(nome=nome).first():
+            flash(f"O Crismando '{nome}' já está cadastrado!", "warning")
+            return redirect(url_for("crismando_bp.lista_de_crismandos"))
+        
+        else:
+            novo_crismando = Crismandos(
+                nome=nome,
+                nome_pai=nome_pai,
+                nome_mae=nome_mae,
+                data_nascimento=data_nascimento,
+                tel1=tel1,
+                tel2=tel2,
+                endereco=endereco,
+                cidade=cidade,
+                fk_id_grupo=fk_id_grupo,
+                batismo=batismo,
+                eucaristia=eucaristia,
+                estado_civil=estado_civil,
+                possui_filhos=possui_filhos,
+                possui_deficiencia=possui_deficiencia
+            )
+
+            try:
+                db.session.add(novo_crismando)
+                db.session.commit()
+                print(novo_crismando)
+                print(f"Novo crismando: {nome}, foi registrado com sucesso.")
+                flash("Cadastro realizado com sucesso", "success")
+            
+            except Exception as e:
+                print("Erro ao salvar no banco de dados: ", str(e))
+                db.session.rollback()
+
+
+
+    return redirect(url_for('crismando_bp.lista_de_crismandos'))

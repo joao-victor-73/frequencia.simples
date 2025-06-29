@@ -17,6 +17,12 @@
                 background-color: #0d6efd;
                 color: white;
             }
+        
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
 
     </style>
 
@@ -27,7 +33,7 @@
             </div>
 
             <div class="card-body px-4 py-4">
-                <form class="row g-4" id="formAtualizacao" action="{{ url_for('grupo_bp.atualizar_info_grupo') }}" method="POST">
+                <form class="row g-4" id="formAtualizacao" action="{{ url_for('grupo_bp.grupos_crisma') }}" method="POST">
                     <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
 
                     <div class="col-md-6">
@@ -78,7 +84,7 @@
     </div>
 
    <div class="modal fade" id="modalCatequistas" tabindex="-1" aria-labelledby="modalCatequistasLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content rounded-4 shadow-sm">
                 <form action="{{ url_for('grupo_bp.atualizar_catequistas_grupo') }}" method="POST">
                     
@@ -94,18 +100,19 @@
 
                         <p class="mb-3 text-muted">Clique nos nomes para marcar ou desmarcar os catequistas responsáveis por este grupo.</p>
 
-                        <div class="row g-3">
-                            {% for catequista in todos_catequistas %}
-                            <div class="col-md-6 col-lg-4">
-                                <label class="btn btn-outline-primary w-100 text-center rounded-pill toggle-chip {% if catequista.fk_id_grupo == grupo_requisitado.id_grupo %}active{% endif %}">
-                                    <input type="checkbox" name="catequistas_selecionados" value="{{ catequista.id_catequista }}"
-                                        class="btn-check" autocomplete="off"
-                                        {% if catequista.fk_id_grupo == grupo_requisitado.id_grupo %} checked {% endif %}>
+                        <div class="btn-group-toggle d-flex flex-wrap gap-2">
+                            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                                {% for catequista in todos_catequistas %}
+                                    <input type="checkbox" class="btn-check" name="catequistas_selecionados" id="catequista{{ catequista.id_catequista }}" value="{{ catequista.id_catequista }}"
+                                    {% if catequista.fk_id_grupo == grupo_requisitado.id_grupo %} checked {% endif %}>
+                                    <label class="btn btn-outline-primary rounded-pill"
+                                    for="catequista{{ catequista.id_catequista }}">
                                     {{ catequista.nome }}
-                                </label>
+                                    </label>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
                         </div>
+
                     </div>
 
                     <div class="modal-footer bg-light border-top px-4 py-3">
