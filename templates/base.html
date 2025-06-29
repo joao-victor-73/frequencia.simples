@@ -36,6 +36,7 @@
                         <a class="nav-link active" href="{{ url_for('crismando_bp.lista_de_crismandos') }}">Sua turma</a>
                     </li>
 
+                    <!-- Verificando se o usuário não é o usuário que faz a frequencia das formações de catequistas  -->
                     {% if current_user.catequista.id_catequista == 26 %}
 
                         <li class="nav-item">
@@ -71,8 +72,9 @@
                                 Registros
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('auth.registro') }}">Registrar novo usuário</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('auth.register_new_cat') }}">Registrar novo Catequista</a></li>                                
+                                    <li> <a class="dropdown-item" href="{{ url_for('auth.registro') }}">Registrar novo usuário</a></li>
+                                    <li> <a class="dropdown-item" href="{{ url_for('auth.register_new_cat') }}">Registrar novo Catequista</a></li>
+                                    <li> <a class="dropdown-item" href="{{ url_for('crismando_bp.registrar_crismando') }}"> Registrar crismando </a> </li>                               
                             </ul>
                         </li>
                         
@@ -88,6 +90,12 @@
                             <li><a class="dropdown-item" href="{{ url_for('frequencia_bp.geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
                         </ul>
                     </li>
+
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('crismando_bp.registrar_crismando') }}"> Registrar crismando </a>
+                        </li>
+
                     {% endif %}
                 </ul>
                     
