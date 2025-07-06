@@ -71,7 +71,7 @@
                 <div class="text-center mb-4">
                     <label class="form-label">Escolha um avatar</label>
                     <div class="d-flex justify-content-center flex-wrap gap-3 border rounded p-3 shadow-sm">
-                        {% for i in range(1, 6) %}
+                        {% for i in range(1, 11) %}
                         <label onclick="selecionarAvatar(this)">
                             <input type="radio" name="avatar_perfil" value="avatar{{ i }}.png"
                                 class="d-none" {% if current_user.foto == 'avatar' ~ i ~ '.png' %}checked{% endif %}>
@@ -110,7 +110,7 @@
                         <input type="date" name="data_nascimento" class="form-control" value="{{ current_user.catequista.data_nascimento }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Grupo Responsável</label>
+                        <label class="form-label">Turma Responsável</label>
                         <input type="text" name="telefone" class="form-control" value="{{ current_user.catequista.grupo.nome_grupo }}" disabled>
                     </div>
                 </div>

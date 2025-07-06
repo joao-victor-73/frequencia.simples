@@ -29,7 +29,7 @@
     <div class="container my-5">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header bg-white border-bottom-0 text-center py-4">
-                <h2 class="card-title fw-bold text-primary-emphasis">Detalhes do grupo {{ grupo_requisitado.nome_grupo }}</h2>
+                <h2 class="card-title fw-bold text-primary-emphasis">Detalhes da Turma {{ grupo_requisitado.nome_grupo }}</h2>
             </div>
 
             <div class="card-body px-4 py-4">
@@ -37,7 +37,7 @@
                     <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
 
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Nome do grupo</label>
+                        <label class="form-label fw-semibold">Nome da Turma</label>
                         <input type="text" name="nome_grupo" class="form-control rounded-3" value="{{ grupo_requisitado.nome_grupo }}">
                     </div>
 
@@ -74,7 +74,7 @@
                         <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
                         <a href="{{ url_for("grupo_bp.grupos_crisma") }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
                         <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalCatequistas">
-                            Gerenciar Catequistas do Grupo
+                            Gerenciar Catequistas da Turma
                         </button>
                     </div>
                 </form>
@@ -98,7 +98,7 @@
                     <div class="modal-body px-4 py-4 bg-white">
                         <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
 
-                        <p class="mb-3 text-muted">Clique nos nomes para marcar ou desmarcar os catequistas responsáveis por este grupo.</p>
+                        <p class="mb-3 text-muted">Clique nos nomes para marcar ou desmarcar os catequistas responsáveis por esta turma.</p>
 
                         <div class="btn-group-toggle d-flex flex-wrap gap-2">
                             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
