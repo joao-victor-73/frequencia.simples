@@ -14,6 +14,7 @@
                 <table class="table table-hover align-middle text-center">
                     <thead class="bg-primary text-white rounded-top">
                         <tr>
+                            <th></th>
                             <th>👤 Nome</th>
                             <th>🎂 Nascimento</th>
                             <th>🏠 Endereço</th>
@@ -26,6 +27,7 @@
                     <tbody>
                         {% for catequista in todos_os_catequistas %}
                         <tr>
+                            <td> {{ loop.index }} </td>
                             <td class="fw-semibold">{{ catequista.nome }}</td>
                             <td>
                                 {% if catequista.data_nascimento %}
