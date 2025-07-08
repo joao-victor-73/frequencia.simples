@@ -207,7 +207,7 @@ def detalhes_frequencia(id):
 
     if not autorizada:
         flash("Você não tem permissão para acessar essa chamada.", "danger")
-        return redirect(url_for('frequencia.listar_frequencias'))
+        return redirect(url_for('frequencia_bp.listar_frequencias'))
 
     # Buscar todos os registros dessa chamada, mas apenas do grupo do usuário
     registros = db.session.query(Frequencias)\
