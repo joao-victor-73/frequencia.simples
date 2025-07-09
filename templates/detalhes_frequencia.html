@@ -11,8 +11,13 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <p class="mb-2"><strong>📌 Grupo:</strong> {{ grupo_catequista.nome_grupo }}</p>
-                    <p class="mb-2"><strong>📌 Catequista:</strong> {{ frequencia.catequista.nome }}</p>
+                    <p class="mb-2"><strong>📌 Turma:</strong> {{ grupo_catequista.nome_grupo }}</p>
+                    
+                    <p class="mb-2"><strong>📌 Catequistas:</strong>
+                        {% for catequista in catequistas_do_grupo %}
+                            {{ catequista.nome }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>                
                 </div>
                 <div class="col-md-6">
                     <p class="mb-2"><strong>📌 Título:</strong> {{ frequencia.titulo_encontro }}</p>

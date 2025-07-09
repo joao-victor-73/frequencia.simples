@@ -50,10 +50,19 @@ def salvar_frequencia():
 
         id_infor_freq = nova_info_freq.id_infor_freq
 
+        """
         lista_crismandos = db.session.query(Crismandos)\
             .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
             .filter(Crismandos.status_crismando == 'ativo')\
             .filter(Catequistas.grupo == grupo_catequista).all()
+        """
+
+        lista_crismandos = Crismandos.query.filter_by(
+            fk_id_grupo=grupo_catequista.id_grupo,
+            status_crismando='ativo'
+        ).order_by(Crismandos.nome).all()
+
+        print(f"Crismandos encontrados: {len(lista_crismandos)}")  # temporário
 
         for crismando in lista_crismandos:
             status = 'presente'
@@ -70,6 +79,9 @@ def salvar_frequencia():
                 fk_id_crismando=crismando.id,
                 fk_id_infor_freq=id_infor_freq
             )
+            # temporário
+            print(
+                f"Salvando frequência para: {crismando.nome} - ID: {crismando.id}")
             db.session.add(nova_frequencia)
 
         db.session.commit()
@@ -92,7 +104,6 @@ def listar_frequencias():
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario)\
         .filter(InforFrequencias.fk_id_catequista == id_catequista)
 
@@ -119,6 +130,8 @@ def listar_frequencias():
 
     registros_de_frequencias = query.order_by(
         InforFrequencias.data_chamada.desc()).all()
+
+    print(f"Registros encontrados: {len(registros_de_frequencias)}") # Temporário
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
@@ -191,37 +204,52 @@ def geral_frequencias():
 @login_required
 def detalhes_frequencia(id):
     id_grupo_usuario = current_user.catequista.fk_id_grupo
-    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('frequencia_bp.listar_frequencias')  # Padrão: listar_frequencias
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'frequencia_bp.listar_frequencias')  # Padrão: listar_frequencias
 
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
         return "Frequência não encontrada", 404
+    
+    # Obtemos o grupo da frequência, e não do usuário logado
+    catequista_responsavel_do_grupo = Catequistas.query.get(frequencia.fk_id_catequista)
+    grupo_da_frequencia_id = catequista_responsavel_do_grupo.fk_id_grupo
 
     # Verifica se há algum crismando desse grupo vinculado a essa frequência
     autorizada = db.session.query(Frequencias)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Frequencias.fk_id_infor_freq == id)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario).first()
 
     if not autorizada:
-        flash("Você não tem permissão para acessar essa chamada.", "danger")
-        return redirect(url_for('frequencia_bp.listar_frequencias'))
+        eh_coordenador = current_user.catequista.nivel == 'coordenador'
+        eh_autor = frequencia.fk_id_catequista == current_user.catequista.id_catequista
+
+        if not eh_coordenador and not eh_autor:
+            # Temporário
+            print("Frequência ID:", id)
+            print("ID grupo do usuário:", id_grupo_usuario)
+            print("Existe autorização?", bool(autorizada))
+            flash("Você não tem permissão para acessar essa chamada.", "danger")
+            return redirect(url_for('frequencia_bp.listar_frequencias'))
 
     # Buscar todos os registros dessa chamada, mas apenas do grupo do usuário
     registros = db.session.query(Frequencias)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .join(Catequistas, Crismandos.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Frequencias.fk_id_infor_freq == id)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario).all()
+    
+
+    # Buscamos os catequistas do grupo da frequência
+    catequistas_do_grupo = db.session.query(Catequistas).filter_by(fk_id_grupo=grupo_da_frequencia_id).all()
+
 
     return render_template('detalhes_frequencia.html',
                            frequencia=frequencia,
                            registros=registros,
                            grupo_catequista=current_user.catequista.grupo,
+                           catequistas_do_grupo=catequistas_do_grupo,
                            origem_url_voltar=origem_url_voltar)
-
-
 
 
 @frequencias_bp.route("/frequencia_catequistas", methods=["GET"])
@@ -229,14 +257,14 @@ def detalhes_frequencia(id):
 @coordenador_required
 def fazer_frequencia_catequistas():
 
-    catequistas = db.session.query(Catequistas).order_by(Catequistas.nome).all()
+    catequistas = db.session.query(
+        Catequistas).order_by(Catequistas.nome).all()
 
-    catequistas = Catequistas.query.filter(Catequistas.id_catequista != 26).all()
+    catequistas = Catequistas.query.filter(
+        Catequistas.id_catequista != 26).all()
 
-
-    return render_template("fazer_freq_catequistas.html", 
+    return render_template("fazer_freq_catequistas.html",
                            catequistas=catequistas)
-
 
 
 @frequencias_bp.route("/salvar_frequencia_catequistas", methods=["POST"])
@@ -255,11 +283,13 @@ def salvar_frequencia_catequistas():
 
     id_infor_freq = nova_info_freq.id_freq_catequista
 
-    lista_catequistas = db.session.query(Catequistas).order_by(Catequistas.nome).all()
+    lista_catequistas = db.session.query(
+        Catequistas).order_by(Catequistas.nome).all()
 
     for catequista in lista_catequistas:
         status = 'presente'
-        observacao = request.form.get(f'observacao_{catequista.id_catequista}', None)
+        observacao = request.form.get(
+            f'observacao_{catequista.id_catequista}', None)
 
         if observacao:
             status = 'justificada'
@@ -280,7 +310,6 @@ def salvar_frequencia_catequistas():
     return redirect(url_for("frequencia_bp.listar_frequencias_catequistas"))
 
 
-
 @frequencias_bp.route("/listar_frequencias_catequistas", methods=["GET"])
 @login_required
 @coordenador_required
@@ -288,17 +317,20 @@ def listar_frequencias_catequistas():
     data_filtro = request.args.get("data_filtro")
     titulo_filtro = request.args.get("busca_titulo")
 
-    query = db.session.query(FrequenciaCatequistas).order_by(FrequenciaCatequistas.data_encontro.desc())
+    query = db.session.query(FrequenciaCatequistas).order_by(
+        FrequenciaCatequistas.data_encontro.desc())
 
     if data_filtro:
         try:
             data_formatada = datetime.strptime(data_filtro, "%Y-%m-%d").date()
-            query = query.filter(FrequenciaCatequistas.data_encontro == data_formatada)
+            query = query.filter(
+                FrequenciaCatequistas.data_encontro == data_formatada)
         except ValueError:
             flash("Formato de data inválido!", "danger")
 
     if titulo_filtro:
-        query = query.filter(FrequenciaCatequistas.titulo_encontro.ilike(f"%{titulo_filtro}%"))
+        query = query.filter(
+            FrequenciaCatequistas.titulo_encontro.ilike(f"%{titulo_filtro}%"))
 
     registros = query.all()
 
@@ -313,7 +345,8 @@ def listar_frequencias_catequistas():
 @coordenador_required
 def detalhar_frequencia_catequistas(id):
     encontro = FrequenciaCatequistas.query.get_or_404(id)
-    registros = PresencaCatequista.query.filter_by(fk_id_freq_catequista=id).join(Catequistas).order_by(Catequistas.nome).all()
+    registros = PresencaCatequista.query.filter_by(fk_id_freq_catequista=id).join(
+        Catequistas).order_by(Catequistas.nome).all()
 
     return render_template("detalhar_freq_catequistas.html",
                            encontro=encontro,
