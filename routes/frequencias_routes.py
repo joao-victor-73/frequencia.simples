@@ -75,7 +75,7 @@ def salvar_frequencia():
         db.session.commit()
         flash("Frequencias registradas com sucesso!", "success")
 
-        return redirect(url_for('frequencia.listar_frequencias'))
+        return redirect(url_for('frequencia_bp.listar_frequencias'))
 
 
 # Rota para listar frequências registradas
@@ -133,7 +133,7 @@ def listar_frequencias():
 def geral_frequencias():
     if current_user.catequista.nivel != 'coordenador':
         flash("Acesso restrito!", "danger")
-        return redirect(url_for('frequencia.listar_frequencias'))
+        return redirect(url_for('frequencia_bp.listar_frequencias'))
 
     grupo_filtro = request.args.get('grupo_filtro')
     data_filtro = request.args.get('data_filtro')
@@ -191,8 +191,7 @@ def geral_frequencias():
 @login_required
 def detalhes_frequencia(id):
     id_grupo_usuario = current_user.catequista.fk_id_grupo
-    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
-        'listar_frequencias')  # Padrão: listar_frequencias
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('frequencia_bp.listar_frequencias')  # Padrão: listar_frequencias
 
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
