@@ -317,6 +317,4 @@ def salvar_crismando():
                 print("Erro ao salvar no banco de dados: ", str(e))
                 db.session.rollback()
 
-
-
     return redirect(url_for('crismando_bp.lista_de_crismandos'))
