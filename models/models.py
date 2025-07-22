@@ -1,6 +1,12 @@
 from . import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+
+def horario_brasil():
+    return datetime.now(ZoneInfo("America/Sao_Paulo"))
 
 
 # Classes / Models para as TABELAS
@@ -18,6 +24,7 @@ class Catequistas(db.Model):
     tel1 = db.Column(db.String(20))
     fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
         'grupos.id_grupo'), nullable=True)
+    status_informacoes = db.Column(db.Integer, default=1)
 
     # Relacionamentos
     crismandos = db.relationship(
@@ -52,6 +59,7 @@ class Crismandos(db.Model):
         db.Enum('ativo', 'desistente'), default='ativo')
     fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
         'grupos.id_grupo'), nullable=True)
+    status_informacoes = db.Column(db.Integer, default=1)
 
     # Foreign Key
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
@@ -74,6 +82,7 @@ class Grupos(db.Model):
     horario = db.Column(db.String(20))
     local_grupo = db.Column(db.String(100))
     descricao = db.Column(db.Text)
+    status_informacoes = db.Column(db.Integer, default=1)
 
     # Relacionamentos
     catequistas = db.relationship('Catequistas', back_populates='grupo')
@@ -87,9 +96,11 @@ class InforFrequencias(db.Model):
     id_infor_freq = db.Column(db.Integer, primary_key=True, autoincrement=True)
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
+    data_registro = db.Column(db.DateTime, default=horario_brasil) #  Armazena a data/hora que foi salvo a frequência
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    
 
     catequista = db.relationship(
         'Catequistas', backref='infor_frequencias', foreign_keys=[fk_id_catequista])

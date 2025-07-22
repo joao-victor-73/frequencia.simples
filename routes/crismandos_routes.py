@@ -164,12 +164,11 @@ def atualizar_infor():
 @login_required
 @coordenador_required
 def geral_crismandos():
-    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
-        'crismando.index')  # Padrão: index
     # Obter os valores de busca da URL que vem da pagina index.html
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('crismando.index')  # Padrão: index
+    
     search_term = request.args.get('busca', '').strip()
-    status_filter = request.args.get(
-        'buscar_status_crismando', '').strip()  # obtém o status selecionado
+    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
     grupo_filtro = request.args.get('buscar_grupo')
 
     # Pega o valor se o checkbox foi marcado
@@ -197,7 +196,8 @@ def geral_crismandos():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
+        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando
+                    ).filter( Crismandos.status_informacoes == 1)
 
 
     # Join entre as tabelas Crismandos e Catequistas
@@ -317,4 +317,17 @@ def salvar_crismando():
                 print("Erro ao salvar no banco de dados: ", str(e))
                 db.session.rollback()
 
+    return redirect(url_for('crismando_bp.lista_de_crismandos'))
+
+
+@crismando_bp.route('/deletar_crismando/<int:id>', methods=['POST', 'GET'])
+@login_required
+def deletar_crismando(id):
+
+    crismando = Crismandos.query.get_or_404(id)
+
+    crismando.status_informacoes = 0
+    db.session.commit()
+
+    flash("Informações do crismando deletada com sucesso!", 'success')
     return redirect(url_for('crismando_bp.lista_de_crismandos'))
