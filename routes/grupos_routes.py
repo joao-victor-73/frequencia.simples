@@ -61,7 +61,7 @@ def grupos_crisma():
     grupos = Grupos.query.options(
         joinedload(Grupos.catequistas),
         joinedload(Grupos.crismandos)
-    ).all()
+    ).filter(Grupos.status_informacoes == 1).all()
 
     """
     Essa instrução acima diz basicamente o seguinte:
@@ -154,3 +154,18 @@ def atualizar_catequistas_grupo():
     db.session.commit()
     flash("Catequistas do grupo atualizados com sucesso!", "success")
     return redirect(url_for("grupo_bp.editar_grupo", grupo_id=grupo_id))
+
+
+
+@grupos_bp.route('/deletar_grupo/<int:id_grupo>', methods=['POST', 'GET'])
+@coordenador_required
+@login_required
+def deletar_grupo(id_grupo):
+
+    grupo = Grupos.query.get_or_404(id_grupo)
+
+    grupo.status_informacoes = 0
+    db.session.commit()
+
+    flash("Informações da turma foram deletadas com sucesso!", 'success')
+    return redirect(url_for('grupo_bp.grupos_crisma'))

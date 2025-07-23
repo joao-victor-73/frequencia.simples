@@ -36,10 +36,15 @@
                     </div>
                     <div class="card-footer text-center">
                         {% if current_user.catequista.nivel == 'coordenador' %}
-                            <a href="{{ url_for('grupo_bp.editar_grupo', grupo_id=grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{{ url_for('grupo_bp.editar_grupo', grupo_id=grupo.id_grupo) }}" class="btn btn-outline-warning btn-sm">✏️ Editar</a>
                             <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ grupo.id_grupo }}">
                                 🔎 Ver Detalhes
                             </a>
+                            <a href="{{ url_for('grupo_bp.deletar_grupo', id_grupo=grupo.id_grupo) }}"
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('❗ Tem certeza que deseja deletar este crismando?');"> 
+                                🗑️Deletar
+                            </a>                            
                         {% endif %}
                     </div>
                 </div>
