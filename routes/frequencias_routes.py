@@ -106,7 +106,8 @@ def listar_frequencias():
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)\
-        .filter(Catequistas.fk_id_grupo == id_grupo_usuario)
+        .filter(Catequistas.fk_id_grupo == id_grupo_usuario)\
+        .filter(InforFrequencias.status_frequencia_inf == 1)
 
     """
     # Catequista comum: restringe à sua autoria
@@ -162,7 +163,7 @@ def geral_frequencias():
         Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista
     ).join(
         Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo  # Junção com a tabela Grupos
-    )
+    ).filter(InforFrequencias.status_frequencia_inf == 1)
 
     # Filtro por grupo
     if grupo_filtro:
@@ -364,3 +365,28 @@ def detalhar_frequencia_catequistas(id):
     return render_template("detalhar_freq_catequistas.html",
                            encontro=encontro,
                            registros=registros)
+
+
+@frequencias_bp.route('/deletar_frequencia/<int:id_infor_freq>', methods=['POST'])
+@login_required
+def deletar_frequencia(id_infor_freq):
+    frequencia = InforFrequencias.query.get_or_404(id_infor_freq)
+    next_url = request.form.get('next') or url_for('frequencias_bp.geral_frequencias')
+
+
+    try:
+        frequencia.status_frequencia_inf = 0 # "Deletando" a frequencia
+
+        # Marca todas as frequências (crismandos) associadas como inativas
+        for freq in Frequencias.query.filter_by(fk_id_infor_freq=id_infor_freq).all():
+            freq.status_freq = 0
+
+        db.session.commit()
+
+        flash("Registro da frequência deletada com sucesso!", 'success')
+        return redirect(next_url)
+    
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao deletar a frequência.', 'danger')
+        return redirect(next_url)

@@ -70,9 +70,15 @@
                                         🔎 Ver Detalhes
                                     </a>
                                     |
-                                    <a href="#" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                        Deletar
-                                    </a>
+
+                                    <form method="POST" action="{{ url_for('frequencia_bp.deletar_frequencia', id_infor_freq=registro.id_infor_freq) }}">
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                                onclick="return confirm('Tem certeza que deseja apagar esta frequência?');">
+                                            Deletar
+                                        </button>
+                                    </form>
+                                    
                                 </td>
                             </tr>
                             {% endif %}

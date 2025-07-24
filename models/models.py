@@ -98,6 +98,7 @@ class InforFrequencias(db.Model):
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
     data_registro = db.Column(db.DateTime(timezone=True), default=horario_brasil) #  Armazena a data/hora que foi salvo a frequência
+    status_frequencia_inf = db.Column(db.Integer, default=1)
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
@@ -115,6 +116,7 @@ class Frequencias(db.Model):
     status_frequencia = db.Column(
         db.Enum('presente', 'falta', 'justificada'), default='presente')
     observacao = db.Column(db.Text)
+    status_freq_inf = db.Column(db.Integer, default=1)
 
     # Foreign Keys
     fk_id_crismando = db.Column(db.Integer, db.ForeignKey(
