@@ -6,7 +6,8 @@ from zoneinfo import ZoneInfo
 
 
 def horario_brasil():
-    return datetime.now(ZoneInfo("America/Sao_Paulo"))
+    # Retorna um datetime com fuso de São Paulo e explícito
+    return datetime.now(tz=ZoneInfo("America/Sao_Paulo"))
 
 
 # Classes / Models para as TABELAS
@@ -96,7 +97,7 @@ class InforFrequencias(db.Model):
     id_infor_freq = db.Column(db.Integer, primary_key=True, autoincrement=True)
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
-    data_registro = db.Column(db.DateTime, default=horario_brasil) #  Armazena a data/hora que foi salvo a frequência
+    data_registro = db.Column(db.DateTime(timezone=True), default=horario_brasil) #  Armazena a data/hora que foi salvo a frequência
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)

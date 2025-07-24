@@ -3,7 +3,8 @@ from models.models import Catequistas, Crismandos, Grupos, Frequencias, InforFre
 from flask_login import login_required, current_user
 from utils.decorators import coordenador_required
 from models import db
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 
 # Criação do Blueprint
@@ -104,8 +105,8 @@ def listar_frequencias():
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
-        .filter(Catequistas.fk_id_grupo == id_grupo_usuario)\
-        .filter(InforFrequencias.fk_id_catequista == id_catequista)
+        .join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)\
+        .filter(Catequistas.fk_id_grupo == id_grupo_usuario)
 
     """
     # Catequista comum: restringe à sua autoria
@@ -131,7 +132,8 @@ def listar_frequencias():
     registros_de_frequencias = query.order_by(
         InforFrequencias.data_chamada.desc()).all()
 
-    print(f"Registros encontrados: {len(registros_de_frequencias)}") # Temporário
+    # Temporário
+    print(f"Registros encontrados: {len(registros_de_frequencias)}")
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
@@ -210,10 +212,21 @@ def detalhes_frequencia(id):
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
         return "Frequência não encontrada", 404
-    
+
     # Obtemos o grupo da frequência, e não do usuário logado
-    catequista_responsavel_do_grupo = Catequistas.query.get(frequencia.fk_id_catequista)
+    catequista_responsavel_do_grupo = Catequistas.query.get(
+        frequencia.fk_id_catequista)
     grupo_da_frequencia_id = catequista_responsavel_do_grupo.fk_id_grupo
+    grupo_da_frequencia = Grupos.query.get(grupo_da_frequencia_id)
+
+    #  previne que uma data "naive" seja tratada como local incorretamente
+    # ao salvar o registro de uma frequencia
+    data_registro = frequencia.data_registro
+    if data_registro.tzinfo is None:
+        data_registro = data_registro.replace(tzinfo=timezone.utc)
+
+    data_registro_formatada = data_registro.astimezone(
+        ZoneInfo("America/Sao_Paulo"))
 
     # Verifica se há algum crismando desse grupo vinculado a essa frequência
     autorizada = db.session.query(Frequencias)\
@@ -238,16 +251,16 @@ def detalhes_frequencia(id):
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .filter(Frequencias.fk_id_infor_freq == id)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario).all()
-    
 
     # Buscamos os catequistas do grupo da frequência
-    catequistas_do_grupo = db.session.query(Catequistas).filter_by(fk_id_grupo=grupo_da_frequencia_id).all()
-
+    catequistas_do_grupo = db.session.query(Catequistas).filter_by(
+        fk_id_grupo=grupo_da_frequencia_id).all()
 
     return render_template('detalhes_frequencia.html',
                            frequencia=frequencia,
+                           data_registro_formatada=data_registro_formatada,
                            registros=registros,
-                           grupo_catequista=current_user.catequista.grupo,
+                           grupo_catequista=grupo_da_frequencia,
                            catequistas_do_grupo=catequistas_do_grupo,
                            origem_url_voltar=origem_url_voltar)
 
