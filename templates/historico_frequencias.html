@@ -51,19 +51,26 @@
                         <tr>
                             <td>{{ registro.titulo_encontro }}</td>
                             <td>{{ registro.data_chamada.strftime('%d/%m/%Y') }}</td>
-                            <td class="text-center">
-                                <a href="{{ url_for('frequencia_bp.detalhes_frequencia', id=registro.id_infor_freq, origem=request.path) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
-                                    🔎 Ver Detalhes
-                                </a>
-                                |
-                                <form method="POST" action="{{ url_for('frequencia_bp.deletar_frequencia', id_infor_freq=registro.id_infor_freq) }}">
-                                    <input type="hidden" name="next" value="{{ request.path }}">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3"
-                                            onclick="return confirm('Tem certeza que deseja apagar esta frequência?');">
-                                        Deletar
-                                    </button>
-                                </form>
+
+                            <td class="align-middle">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a href="{{ url_for('frequencia_bp.detalhes_frequencia', id=registro.id_infor_freq) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                        🔎 Ver Detalhes
+                                    </a>
+                                    |
+
+                                    <form method="POST" 
+                                    action="{{ url_for('frequencia_bp.deletar_frequencia', id_infor_freq=registro.id_infor_freq) }}"
+                                    class="d-inline">
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                                onclick="return confirm('Tem certeza que deseja apagar esta frequência?');">
+                                            Deletar
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
+                            
                         </tr>
                         {% else %}
                         <tr>
