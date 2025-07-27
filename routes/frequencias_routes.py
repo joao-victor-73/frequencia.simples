@@ -354,6 +354,25 @@ def listar_frequencias_catequistas():
                            titulo_filtro=titulo_filtro)
 
 
+@frequencias_bp.route("/deletar_frequencia_catequistas/<int:id_freq_catequista>", methods=["POST"])
+@login_required
+@coordenador_required
+def deletar_frequencia_catequistas(id_freq_catequista):
+    # Buscar o registro de frequência pelo ID
+    info_frequencia = FrequenciaCatequistas.query.get_or_404(id_freq_catequista)
+
+    # Deletar as presenças vinculadas
+    PresencaCatequista.query.filter_by(fk_id_freq_catequista=id_freq_catequista).delete()
+
+    # Deletar o cabeçalho de frequência
+    db.session.delete(info_frequencia)
+    db.session.commit()
+
+    flash("Frequência dos catequistas deletada com sucesso!", "success")
+    return redirect(url_for("frequencia_bp.listar_frequencias_catequistas"))
+
+
+
 @frequencias_bp.route('/detalhar_frequencia_catequistas/<int:id>')
 @login_required
 @coordenador_required

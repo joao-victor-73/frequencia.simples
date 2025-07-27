@@ -160,8 +160,9 @@ class FrequenciaCatequistas(db.Model):
     id_freq_catequista = db.Column(db.Integer, primary_key=True)
     titulo_encontro = db.Column(db.String(100), nullable=False)
     data_encontro = db.Column(db.Date, nullable=False)
+    status_inf_fre_catequista = db.Column(db.Integer, default=1)
 
-    presencas = db.relationship('PresencaCatequista', backref='frequencia', lazy=True)
+    presencas = db.relationship('PresencaCatequista', backref='frequencia', cascade="all, delete", lazy=True)
 
 
 class PresencaCatequista(db.Model):
@@ -170,6 +171,7 @@ class PresencaCatequista(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_frequencia = db.Column(db.Enum('presente', 'falta', 'justificada'), default='presente')
     observacao = db.Column(db.String(255))
+    status_inf_presenca_cat = db.Column(db.Integer, default=1)
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'), nullable=False)
     fk_id_freq_catequista = db.Column(db.Integer, db.ForeignKey('frequencias_catequistas.id_freq_catequista'), nullable=False)

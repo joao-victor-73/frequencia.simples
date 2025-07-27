@@ -53,11 +53,23 @@
                             <td>{{ loop.index }}</td>
                             <td>{{ registro.titulo_encontro }}</td>
                             <td>{{ registro.data_encontro.strftime('%d/%m/%Y') }}</td>
-                            <td class="text-center">
-                                <a href="{{ url_for('frequencia_bp.detalhar_frequencia_catequistas', id=registro.id_freq_catequista) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                            
+                            <td class="align-middle">
+                                <a href="{{ url_for('frequencia_bp.detalhes_frequencia', id=registro.id_freq_catequista) }}" class="btn btn-outline-info btn-sm rounded-pill px-3">
                                     🔎 Ver Detalhes
                                 </a>
+                                <form method="POST"
+                                    action="{{ url_for('frequencia_bp.deletar_frequencia_catequistas', id_freq_catequista=registro.id_freq_catequista) }}"
+                                    class="d-inline">
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                            onclick="return confirm('Tem certeza que deseja apagar esta frequência de formação?');">
+                                        🗑️ Deletar
+                                    </button>
+                                </form>
                             </td>
+
                         </tr>
                         {% else %}
                         <tr>
