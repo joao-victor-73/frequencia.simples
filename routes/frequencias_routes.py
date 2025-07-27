@@ -223,11 +223,16 @@ def detalhes_frequencia(id):
     #  previne que uma data "naive" seja tratada como local incorretamente
     # ao salvar o registro de uma frequencia
     data_registro = frequencia.data_registro
-    if data_registro.tzinfo is None:
-        data_registro = data_registro.replace(tzinfo=timezone.utc)
 
-    data_registro_formatada = data_registro.astimezone(
-        ZoneInfo("America/Sao_Paulo"))
+    if data_registro is not None:
+
+        if data_registro.tzinfo is None:
+            data_registro = data_registro.replace(tzinfo=timezone.utc)
+
+        data_registro_formatada = data_registro.astimezone(ZoneInfo("America/Sao_Paulo"))
+
+    else:
+        data_registro_formatada = "Data não disponível"
 
     # Verifica se há algum crismando desse grupo vinculado a essa frequência
     autorizada = db.session.query(Frequencias)\
