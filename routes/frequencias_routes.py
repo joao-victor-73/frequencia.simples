@@ -3,7 +3,8 @@ from models.models import Catequistas, Crismandos, Grupos, Frequencias, InforFre
 from flask_login import login_required, current_user
 from utils.decorators import coordenador_required
 from models import db
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 
 # Criação do Blueprint
@@ -104,8 +105,9 @@ def listar_frequencias():
     query = db.session.query(InforFrequencias).distinct()\
         .join(Frequencias, InforFrequencias.id_infor_freq == Frequencias.fk_id_infor_freq)\
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
+        .join(Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario)\
-        .filter(InforFrequencias.fk_id_catequista == id_catequista)
+        .filter(InforFrequencias.status_frequencia_inf == 1)
 
     """
     # Catequista comum: restringe à sua autoria
@@ -131,7 +133,8 @@ def listar_frequencias():
     registros_de_frequencias = query.order_by(
         InforFrequencias.data_chamada.desc()).all()
 
-    print(f"Registros encontrados: {len(registros_de_frequencias)}") # Temporário
+    # Temporário
+    print(f"Registros encontrados: {len(registros_de_frequencias)}")
 
     return render_template('historico_frequencias.html',
                            registros=registros_de_frequencias,
@@ -160,7 +163,7 @@ def geral_frequencias():
         Catequistas, InforFrequencias.fk_id_catequista == Catequistas.id_catequista
     ).join(
         Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo  # Junção com a tabela Grupos
-    )
+    ).filter(InforFrequencias.status_frequencia_inf == 1)
 
     # Filtro por grupo
     if grupo_filtro:
@@ -210,10 +213,21 @@ def detalhes_frequencia(id):
     frequencia = InforFrequencias.query.get(id)
     if not frequencia:
         return "Frequência não encontrada", 404
-    
+
     # Obtemos o grupo da frequência, e não do usuário logado
-    catequista_responsavel_do_grupo = Catequistas.query.get(frequencia.fk_id_catequista)
+    catequista_responsavel_do_grupo = Catequistas.query.get(
+        frequencia.fk_id_catequista)
     grupo_da_frequencia_id = catequista_responsavel_do_grupo.fk_id_grupo
+    grupo_da_frequencia = Grupos.query.get(grupo_da_frequencia_id)
+
+    #  previne que uma data "naive" seja tratada como local incorretamente
+    # ao salvar o registro de uma frequencia
+    data_registro = frequencia.data_registro
+    if data_registro.tzinfo is None:
+        data_registro = data_registro.replace(tzinfo=timezone.utc)
+
+    data_registro_formatada = data_registro.astimezone(
+        ZoneInfo("America/Sao_Paulo"))
 
     # Verifica se há algum crismando desse grupo vinculado a essa frequência
     autorizada = db.session.query(Frequencias)\
@@ -238,16 +252,16 @@ def detalhes_frequencia(id):
         .join(Crismandos, Frequencias.fk_id_crismando == Crismandos.id)\
         .filter(Frequencias.fk_id_infor_freq == id)\
         .filter(Catequistas.fk_id_grupo == id_grupo_usuario).all()
-    
 
     # Buscamos os catequistas do grupo da frequência
-    catequistas_do_grupo = db.session.query(Catequistas).filter_by(fk_id_grupo=grupo_da_frequencia_id).all()
-
+    catequistas_do_grupo = db.session.query(Catequistas).filter_by(
+        fk_id_grupo=grupo_da_frequencia_id).all()
 
     return render_template('detalhes_frequencia.html',
                            frequencia=frequencia,
+                           data_registro_formatada=data_registro_formatada,
                            registros=registros,
-                           grupo_catequista=current_user.catequista.grupo,
+                           grupo_catequista=grupo_da_frequencia,
                            catequistas_do_grupo=catequistas_do_grupo,
                            origem_url_voltar=origem_url_voltar)
 
@@ -340,6 +354,25 @@ def listar_frequencias_catequistas():
                            titulo_filtro=titulo_filtro)
 
 
+@frequencias_bp.route("/deletar_frequencia_catequistas/<int:id_freq_catequista>", methods=["POST"])
+@login_required
+@coordenador_required
+def deletar_frequencia_catequistas(id_freq_catequista):
+    # Buscar o registro de frequência pelo ID
+    info_frequencia = FrequenciaCatequistas.query.get_or_404(id_freq_catequista)
+
+    # Deletar as presenças vinculadas
+    PresencaCatequista.query.filter_by(fk_id_freq_catequista=id_freq_catequista).delete()
+
+    # Deletar o cabeçalho de frequência
+    db.session.delete(info_frequencia)
+    db.session.commit()
+
+    flash("Frequência dos catequistas deletada com sucesso!", "success")
+    return redirect(url_for("frequencia_bp.listar_frequencias_catequistas"))
+
+
+
 @frequencias_bp.route('/detalhar_frequencia_catequistas/<int:id>')
 @login_required
 @coordenador_required
@@ -351,3 +384,28 @@ def detalhar_frequencia_catequistas(id):
     return render_template("detalhar_freq_catequistas.html",
                            encontro=encontro,
                            registros=registros)
+
+
+@frequencias_bp.route('/deletar_frequencia/<int:id_infor_freq>', methods=['POST'])
+@login_required
+def deletar_frequencia(id_infor_freq):
+    frequencia = InforFrequencias.query.get_or_404(id_infor_freq)
+    next_url = request.form.get('next') or url_for('frequencias_bp.geral_frequencias')
+
+
+    try:
+        frequencia.status_frequencia_inf = 0 # "Deletando" a frequencia
+
+        # Marca todas as frequências (crismandos) associadas como inativas
+        for freq in Frequencias.query.filter_by(fk_id_infor_freq=id_infor_freq).all():
+            freq.status_freq = 0
+
+        db.session.commit()
+
+        flash("Registro da frequência deletada com sucesso!", 'success')
+        return redirect(next_url)
+    
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao deletar a frequência.', 'danger')
+        return redirect(next_url)

@@ -22,18 +22,29 @@
                             {% endfor %}
                         </p>
                         <p><strong>👥 Crismandos Ativos:</strong> 
-                            {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'ativo') | list | length }}
+                            {{ grupo.crismandos
+                                | selectattr('status_crismando', 'equalto', 'ativo') 
+                                | selectattr('status_informacoes', 'equalto', 1) 
+                                | list | length }}
                         </p>
                         <p><strong>👥 Crismandos Desistentes:</strong> 
-                            {{ grupo.crismandos | selectattr('status_crismando', 'equalto', 'desistente') | list | length }}
+                            {{ grupo.crismandos 
+                                | selectattr('status_crismando', 'equalto', 'desistente') 
+                                | selectattr('status_informacoes', 'equalto', 0)
+                                | list | length }}
                         </p>
                     </div>
                     <div class="card-footer text-center">
                         {% if current_user.catequista.nivel == 'coordenador' %}
-                            <a href="{{ url_for('grupo_bp.editar_grupo', grupo_id=grupo.id_grupo) }}" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a href="{{ url_for('grupo_bp.editar_grupo', grupo_id=grupo.id_grupo) }}" class="btn btn-outline-warning btn-sm">✏️ Editar</a>
                             <a class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ grupo.id_grupo }}">
                                 🔎 Ver Detalhes
                             </a>
+                            <a href="{{ url_for('grupo_bp.deletar_grupo', id_grupo=grupo.id_grupo) }}"
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('❗ Tem certeza que deseja deletar este crismando?');"> 
+                                🗑️Deletar
+                            </a>                            
                         {% endif %}
                     </div>
                 </div>
@@ -47,7 +58,7 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content rounded-4">
                     <div class="modal-header">
-                        <h5 class="modal-title">Grupo: {{ grupo.nome_grupo }}</h5>
+                        <h5 class="modal-title">Turma: {{ grupo.nome_grupo }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">

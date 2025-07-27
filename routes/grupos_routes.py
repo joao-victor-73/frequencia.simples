@@ -61,7 +61,7 @@ def grupos_crisma():
     grupos = Grupos.query.options(
         joinedload(Grupos.catequistas),
         joinedload(Grupos.crismandos)
-    ).all()
+    ).filter(Grupos.status_informacoes == 1).all()
 
     """
     Essa instrução acima diz basicamente o seguinte:
@@ -90,13 +90,13 @@ def editar_grupo(grupo_id):
 
     # Pega os catequistas vinculados a esse grupo
     lista_catequistas_responsaveis = db.session.query(
-        Catequistas).filter_by(fk_id_grupo=grupo_id).all()
+        Catequistas).filter_by(fk_id_grupo=grupo_id).filter(Catequistas.status_informacoes == 1).all()
 
     if not grupo_requisitado:
         return "Grupo não foi encontrado", 404
 
     # Aqui buscamos TODOS os catequistas
-    todos_catequistas = Catequistas.query.all()
+    todos_catequistas = Catequistas.query.filter(Catequistas.status_informacoes == 1).all()
 
     return render_template("infor_grupo.html",
                            grupo_requisitado=grupo_requisitado,
@@ -154,3 +154,18 @@ def atualizar_catequistas_grupo():
     db.session.commit()
     flash("Catequistas do grupo atualizados com sucesso!", "success")
     return redirect(url_for("grupo_bp.editar_grupo", grupo_id=grupo_id))
+
+
+
+@grupos_bp.route('/deletar_grupo/<int:id_grupo>', methods=['POST', 'GET'])
+@coordenador_required
+@login_required
+def deletar_grupo(id_grupo):
+
+    grupo = Grupos.query.get_or_404(id_grupo)
+
+    grupo.status_informacoes = 0
+    db.session.commit()
+
+    flash("Informações da turma foram deletadas com sucesso!", 'success')
+    return redirect(url_for('grupo_bp.grupos_crisma'))

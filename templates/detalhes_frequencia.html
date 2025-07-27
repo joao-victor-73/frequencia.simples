@@ -6,26 +6,41 @@
         <h2 class="text-primary fw-bold">📋 Detalhes da Frequência</h2>
     </div>
 
-    <!-- Informações do Encontro -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <p class="mb-2"><strong>📌 Turma:</strong> {{ grupo_catequista.nome_grupo }}</p>
-                    
-                    <p class="mb-2"><strong>📌 Catequistas:</strong>
-                        {% for catequista in catequistas_do_grupo %}
-                            {{ catequista.nome }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    </p>                
-                </div>
-                <div class="col-md-6">
-                    <p class="mb-2"><strong>📌 Título:</strong> {{ frequencia.titulo_encontro }}</p>
-                    <p class="mb-2"><strong>📅 Data:</strong> {{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</p>
-                </div>
+<!-- Informações do Encontro -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+
+                <p><strong><i class="bi bi-chat-right-fill"></i> Turma:</strong> {{ grupo_catequista.nome_grupo }}</p>
+                <p><strong><i class="bi bi-building-fill"></i> Local do encontro:</strong> {{ grupo_catequista.local_grupo }}</p>
+                
+                <p><strong><i class="bi bi-people-fill"></i> Catequistas do grupo:</strong><br>
+                    {% for catequista in catequistas_do_grupo %}
+                        - {{ catequista.nome }}<br>
+                    {% endfor %}
+                </p>
+            </div>
+
+            <div class="col-md-6">
+                <p><strong><i class="bi bi-fonts"></i> Título do encontro:</strong> {{ frequencia.titulo_encontro }}</p>
+                
+                {% if current_user.catequista.nivel == 'coordenador' %}
+                    <p><strong><i class="bi bi-calendar-date-fill"></i> Data do encontro:</strong> {{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</p>
+                    <p><strong><i class="bi bi-calendar-date-fill"></i> Frequência feita em: </strong> {{ data_registro_formatada.strftime('%d/%m/%Y ás %H:%M:%S') }}</p>
+                {% else %}
+                    <p><strong><i class="bi bi-calendar-date-fill"></i> Data do encontro:</strong> {{ frequencia.data_chamada.strftime('%d/%m/%Y') }}</p>
+             
+                {% endif %}
+                
+
+
+                <p><strong><i class="bi bi-file-person-fill"></i> Catequista responsável pela frequência:</strong> {{ frequencia.catequista.nome }}</p>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Tabela de Presenças -->
     <div class="card shadow-sm">

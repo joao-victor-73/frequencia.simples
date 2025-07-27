@@ -24,14 +24,32 @@ def cadastrar_catequista_com_grupo():
 @login_required
 @coordenador_required
 def geral_catequistas():
-    todos_os_catequistas = Catequistas.query.join(
-        Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo).all()
+    todos_os_catequistas = (
+        Catequistas.query
+        .join(Grupos, Catequistas.fk_id_grupo == Grupos.id_grupo)
+        .filter(Catequistas.status_informacoes == 1)
+        .all()
+    )
 
     # for catequista in todos_os_catequistas:
     # print(catequista.nome, catequista.data_nascimento, catequista.tel1, catequista.endereco)
 
     return render_template('lista_geral_catequistas.html',
                            todos_os_catequistas=todos_os_catequistas)
+
+
+@catequista_bp.route('/deletar_catequista/<int:id_catequista>', methods=['POST', 'GET'])
+@coordenador_required
+@login_required
+def deletar_catequista(id_catequista):
+
+    catequista = Catequistas.query.get_or_404(id_catequista)
+
+    catequista.status_informacoes = 0
+    db.session.commit()
+
+    flash("Informações do catequista deletada com sucesso!", 'success')
+    return redirect(url_for('catequista_bp.geral_catequistas'))
 
 
 @catequista_bp.route("/editar_infor_catequista/<int:id_catequista>", methods=['POST', 'GET'])
@@ -77,3 +95,4 @@ def salvar_infor_catequista():
         db.session.rollback()
 
     return redirect(url_for('catequista_bp.geral_catequistas'))
+

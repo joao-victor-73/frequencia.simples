@@ -17,7 +17,7 @@
                     
                     <!-- FILTRO DE BUSCA PELO GRUPO -->
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Grupo</label>
+                        <label class="form-label fw-bold">Turma</label>
                         <select name="buscar_grupo" class="form-select rounded-3">
                             <option value="" {% if request.args.get('buscar_grupo', '') == '' %} selected {% endif %}>Todos</option>
                             {% for grupo in grupos_disponiveis %}
@@ -163,10 +163,14 @@
                                 {% endif %}
                                 {{ crismando.possui_deficiencia|title }} 
                             </p>
-                            <p><strong>Grupo:</strong> {{ grupo.nome_grupo }}</p>
+                            <p><strong>Turma:</strong> {{ grupo.nome_grupo }}</p>
                         </div>
                         <div class="modal-footer">
                             <a href="{{ url_for('crismando_bp.editar_infor', id_crismando=crismando.id) }}" class="btn btn-outline-primary">Editar</a>
+                            <a href="{{ url_for('crismando_bp.deletar_crismando', id=crismando.id) }}"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('❗ Tem certeza que deseja deletar este crismando?');"> Deletar
+                            </a>                            
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </div>

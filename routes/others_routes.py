@@ -5,6 +5,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from models import db, Catequistas
 
+from flask import jsonify
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 # Criação do Blueprint
 others_bp = Blueprint('other', __name__)  # nome do blueprint
 
@@ -76,3 +80,15 @@ def inicio():
 @others_bp.route("/relatar_bug", methods=["GET"])
 def relatar_bug():
     return render_template('inicio.html')
+
+
+@others_bp.route("/teste_horario")
+def teste_horario():
+    now_brasil = datetime.now(ZoneInfo("America/Sao_Paulo"))
+    now_utc = datetime.utcnow()
+
+    return jsonify({
+        "hora_brasil": now_brasil.strftime('%Y-%m-%d %H:%M:%S %Z%z'),
+        "hora_utc": now_utc.strftime('%Y-%m-%d %H:%M:%S UTC'),
+        "timezone_info": str(now_brasil.tzinfo)
+    })

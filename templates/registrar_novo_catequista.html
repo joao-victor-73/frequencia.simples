@@ -26,7 +26,7 @@
 
     <div class="card">
         <div class="card-header">
-            <h2>Cadastro de um novo catequista</h2>
+            <h2>Registrar um novo catequista</h2>
             <p class="text-muted">Cadastre as informações do catequista abaixo</p>
         </div>
         <div class="card-body">
@@ -66,7 +66,7 @@
                 <input type="hidden" name="selecionar_grupo" id="grupo-hidden" value="{{ grupo_selecionado }}"> 
 
                 <div class="mb-3">
-                    <label class="form-label">Grupo</label>
+                    <label class="form-label">Turma</label>
                     <select id="grupo-select" name="selecionar_grupo" class="form-select" onchange="verificaGrupoSelecionado()">
                         <option value=""> Nenhum </option>
                         {% for grupo in grupos %}
@@ -75,7 +75,7 @@
                                 {{ grupo.nome_grupo }}
                             </option>
                         {% endfor %}
-                        <option value="novo_grupo">+ Criar novo grupo</option>
+                        <option value="novo_grupo">+ Criar nova turma</option>
                     </select>
                 </div>
 
