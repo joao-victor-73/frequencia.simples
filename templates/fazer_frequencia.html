@@ -51,4 +51,15 @@
         </form>
     </div>
 </div>
+
+<script>
+    const form = document.querySelector('form');
+    const botao = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function () {
+        botao.disabled = true;
+        botao.innerText = 'Salvando...'; // opcional
+    });
+</script>
+
 {% endblock %}
