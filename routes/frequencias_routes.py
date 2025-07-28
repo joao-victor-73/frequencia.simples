@@ -37,8 +37,15 @@ def salvar_frequencia():
     if request.method == 'POST':
         grupo_catequista = current_user.catequista.grupo
 
-        titulo = request.form.get('titulo_encontro')
+        # titulo = request.form.get('titulo_encontro')
         data_chamada = request.form.get('data_chamada')
+
+        numero = request.form['numero_encontro'].zfill(2)
+        tema = request.form['tema_encontro'].strip()
+
+        titulo = f"Encontro {numero}"
+        if tema:
+            titulo += f" - {tema}"
 
         # Criar registro em InforFrequencias
         nova_info_freq = InforFrequencias(titulo_encontro=titulo,

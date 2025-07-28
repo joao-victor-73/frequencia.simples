@@ -8,14 +8,24 @@
 
     <div class="card shadow-sm p-4">
         <form action="{{ url_for('frequencia_bp.salvar_frequencia') }}" method="POST">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">📌 Título:</label>
-                    <input type="text" name="titulo_encontro" class="form-control" placeholder="Nº - Nome" required>
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-7">
+                    <label class="form-label fw-bold">📌 Título do Encontro:</label>
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-primary text-white fw-bold">Encontro</span>
+                        <input type="number" name="numero_encontro" min="1" class="form-control" placeholder="01" required style="max-width: 80px;">
+                        <span class="input-group-text">-</span>
+                        <input type="text" name="tema_encontro" class="form-control" placeholder="Tema (opcional)">
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">📅 Data da Chamada:</label>
-                    <input type="date" name="data_chamada" class="form-control" required>
+
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">📅 Data do Encontro:</label>
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-event"></i></span>
+                        <input type="date" name="data_chamada" class="form-control" required>
+                    </div>
                 </div>
             </div>
 
