@@ -82,7 +82,7 @@ def lista_de_crismandos():
     query = query.order_by(Crismandos.nome)
 
     # Executamos a consulta e pegamos os resultados
-    lista_crismandos = query.all()
+    lista_crismandos = query.filter(Crismandos.status_informacoes == 1).all()
 
     return render_template('index.html',
                            lista_crismandos=lista_crismandos,
