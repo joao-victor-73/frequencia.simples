@@ -25,10 +25,16 @@
                 </select>
             </div>
 
-            <!-- Filtro por data -->
+            <!-- Filtro por data inicial -->
             <div class="col-md-3">
-                <label for="data_filtro" class="form-label fw-bold">📅 Data:</label>
-                <input type="date" name="data_filtro" class="form-control" value="{{ data_filtro or '' }}">
+                <label for="data_inicial" class="form-label fw-bold">📅 Data Inicial:</label>
+                <input type="date" name="data_inicial" class="form-control" value="{{ data_inicial or '' }}">
+            </div>
+
+            <!-- Filtro por data final -->
+            <div class="col-md-3">
+                <label for="data_final" class="form-label fw-bold">📅 Data Final:</label>
+                <input type="date" name="data_final" class="form-control" value="{{ data_final or '' }}">
             </div>
 
             <!-- Filtro por título -->
