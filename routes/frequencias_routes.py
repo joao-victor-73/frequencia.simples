@@ -37,8 +37,15 @@ def salvar_frequencia():
     if request.method == 'POST':
         grupo_catequista = current_user.catequista.grupo
 
-        titulo = request.form.get('titulo_encontro')
+        # titulo = request.form.get('titulo_encontro')
         data_chamada = request.form.get('data_chamada')
+
+        numero = request.form['numero_encontro'].zfill(2)
+        tema = request.form['tema_encontro'].strip()
+
+        titulo = f"Encontro {numero}"
+        if tema:
+            titulo += f" - {tema}"
 
         # Criar registro em InforFrequencias
         nova_info_freq = InforFrequencias(titulo_encontro=titulo,
@@ -152,8 +159,11 @@ def geral_frequencias():
         return redirect(url_for('frequencia_bp.listar_frequencias'))
 
     grupo_filtro = request.args.get('grupo_filtro')
-    data_filtro = request.args.get('data_filtro')
     titulo_filtro = request.args.get('busca_titulo')
+
+    # Variáveis para coletar informação das datas (iniciais e finais)
+    data_inicial = request.args.get('data_inicial')
+    data_final = request.args.get('data_final')
 
     # Debug: Verificando valor do filtro
     print(f"grupo_filtro: {grupo_filtro}")
@@ -171,14 +181,20 @@ def geral_frequencias():
         print(f"Aplicando filtro de grupo: {grupo_filtro}")
         query = query.filter(Grupos.nome_grupo == grupo_filtro)
 
-    # Filtro por data
-    if data_filtro:
+    # Filtro por intervalo de datas
+    if data_inicial:
         try:
-            data_formatada = datetime.strptime(data_filtro, '%Y-%m-%d').date()
-            query = query.filter(
-                InforFrequencias.data_chamada == data_formatada)
+            data_inicio_formatada = datetime.strptime(data_inicial, '%Y-%m-%d').date()
+            query = query.filter(InforFrequencias.data_chamada >= data_inicio_formatada)
         except ValueError:
-            flash("Formato de data inválido!", "danger")
+            flash("Data inicial inválida!", "danger")
+
+    if data_final:
+        try:
+            data_fim_formatada = datetime.strptime(data_final, '%Y-%m-%d').date()
+            query = query.filter(InforFrequencias.data_chamada <= data_fim_formatada)
+        except ValueError:
+            flash("Data final inválida!", "danger")
 
     # Filtro por título
     if titulo_filtro:
@@ -199,7 +215,8 @@ def geral_frequencias():
                            registros=registros,
                            grupos_disponiveis=grupos_disponiveis,
                            grupo_filtro=grupo_filtro,
-                           data_filtro=data_filtro,
+                           data_inicial=data_inicial,
+                           data_final=data_final,                           
                            titulo_filtro=titulo_filtro)
 
 
