@@ -33,7 +33,7 @@
             </div>
 
             <div class="card-body px-4 py-4">
-                <form class="row g-4" id="formAtualizacao" action="{{ url_for('grupo_bp.grupos_crisma') }}" method="POST">
+                <form class="row g-4" id="formAtualizacao" action="{{ url_for('grupo_bp.atualizar_info_grupo') }}" method="POST">
                     <input type="hidden" name="grupo_id" value="{{ grupo_requisitado.id_grupo }}">
 
                     <div class="col-md-6">

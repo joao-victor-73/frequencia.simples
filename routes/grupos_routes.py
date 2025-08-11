@@ -127,8 +127,8 @@ def atualizar_info_grupo():
         print("Erro ao salvar no banco de dados: ", str(e))
         db.session.rollback()
 
-    flash("Informações do grupo atualizadas com sucesso!", "success")
-    return redirect(url_for("grupo_bp.editar_grupo", grupo_id=grupo_id))
+    flash("Informações da turma atualizadas com sucesso!", "success")
+    return redirect(url_for("grupo_bp.grupos_crisma", grupo_id=grupo_id))
 
 
 @grupos_bp.route("/atualizar_catequistas_grupo", methods=['POST'])
