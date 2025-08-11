@@ -96,9 +96,9 @@
                 <tbody>
                     {% for crismando, grupo, total_presencas, total_faltas, total_justificadas in lista_crismandos %}
                         {% set linha_classe = '' %}
-                        {% if total_faltas and total_faltas >= 7 %}
+                        {% if total_faltas and total_faltas >= 10 %}
                             {% set linha_classe = 'table-danger' %}
-                        {% elif total_faltas and total_faltas >= 5 %}
+                        {% elif total_faltas and total_faltas >= 8 %}
                             {% set linha_classe = 'table-warning' %}
                         {% endif %}
 

@@ -32,9 +32,9 @@ def lista_de_crismandos():
     subquery_frequencias = (
         db.session.query(
             Frequencias.fk_id_crismando,
-            sa.func.count(sa.case((Frequencias.status_frequencia == 'presente', 1))).label('total_presencas'),
-            sa.func.count(sa.case((Frequencias.status_frequencia == 'falta', 1))).label('total_faltas'),
-            sa.func.count(sa.case((Frequencias.status_frequencia == 'justificada', 1))).label('total_justificadas')
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'presente', 1), else_=0)).label('total_presencas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'falta', 1), else_=0)).label('total_faltas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'justificada', 1), else_=0)).label('total_justificadas'),
         )
         .join(InforFrequencias, Frequencias.fk_id_infor_freq == InforFrequencias.id_infor_freq)
         .filter(
@@ -44,6 +44,7 @@ def lista_de_crismandos():
         .group_by(Frequencias.fk_id_crismando)
         .subquery()
     )
+
 
 
     # Join com Catequistas e Frequências
@@ -185,15 +186,22 @@ def geral_crismandos():
     filtrar_eucaristia = request.args.get('eucaristia')
 
     # Subquery para contar presenças, faltas e justificadas
-    subquery_frequencias = db.session.query(
-        Frequencias.fk_id_crismando,
-        sa.func.count(sa.case((Frequencias.status_frequencia == 'presente', 1))).label(
-            'total_presencas'),
-        sa.func.count(sa.case((Frequencias.status_frequencia == 'falta', 1))).label(
-            'total_faltas'),
-        sa.func.count(sa.case((Frequencias.status_frequencia == 'justificada', 1))).label(
-            'total_justificadas')
-    ).group_by(Frequencias.fk_id_crismando).subquery()
+    subquery_frequencias = (
+        db.session.query(
+            Frequencias.fk_id_crismando,
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'presente', 1), else_=0)).label('total_presencas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'falta', 1), else_=0)).label('total_faltas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia == 'justificada', 1), else_=0)).label('total_justificadas'),
+        )
+        .join(InforFrequencias, Frequencias.fk_id_infor_freq == InforFrequencias.id_infor_freq)
+        .filter(
+            Frequencias.status_freq_inf == 1,
+            InforFrequencias.status_frequencia_inf == 1
+        )
+        .group_by(Frequencias.fk_id_crismando)
+        .subquery()
+    )
+
 
     # Join com Catequistas e Frequências
     query = db.session.query(
