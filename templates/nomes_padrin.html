@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">👥 Padrinhos / Madrinhas</h2>
+        <button id="btnEditar" class="btn btn-outline-primary">✏️ Editar</button>
+    </div>
+
+    <form id="formPadrinhos" action="{{ url_for('crismando_bp.atualizar_padrinhos') }}" method="POST">
+        <table class="table table-bordered table-hover align-middle text-center rounded-3 overflow-hidden">
+            <thead class="table-light">
+                <tr>
+                    <th>N°</th>
+                    <th>Nome</th>
+                    <th>Data de Nascimento</th>
+                    <th>Turma</th>
+                    <th>Nome Pd / Md</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crismando, grupo in lista_crismandos %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ crismando.nome }}</td>
+                    <td>{{ crismando.data_nascimento.strftime('%d/%m/%Y') if crismando.data_nascimento else 'N/A' }}</td>
+                    <td>{{ grupo.nome_grupo }}</td>
+                    <td>
+                        <input type="text" name="padrinho_{{ crismando.id }}" 
+                               value="{{ crismando.nome_padrim or '' }}" 
+                               class="form-control" disabled>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="text-center mt-3">
+            <button id="btnSalvar" type="submit" class="btn btn-success" style="display:none;">💾 Salvar Padrinhos</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const btnEditar = document.getElementById('btnEditar');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const inputs = document.querySelectorAll('#formPadrinhos input[type="text"]');
+    const form = document.getElementById('formPadrinhos');
+
+    btnEditar.addEventListener('click', () => {
+        inputs.forEach(input => input.disabled = false);
+        btnSalvar.style.display = 'inline-block';
+        btnEditar.disabled = true;
+    });
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        Swal.fire({
+            title: "Tem certeza?",
+            text: "Deseja salvar as alterações nos padrinhos?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim, salvar!",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+</script>
+{% endblock %}

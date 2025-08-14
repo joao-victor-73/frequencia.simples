@@ -56,6 +56,7 @@ class Crismandos(db.Model):
     tel2 = db.Column(db.String(20))
     batismo = db.Column(db.Enum('Sim', 'Nao', 'Nao Sei'), default='Nao')
     eucaristia = db.Column(db.Enum('Sim', 'Nao', 'Nao Sei'), default='Nao')
+    tamanho_camisa = db.Column(db.String(2))
     status_crismando = db.Column(
         db.Enum('ativo', 'desistente'), default='ativo')
     fk_id_grupo = db.Column(db.Integer, db.ForeignKey(

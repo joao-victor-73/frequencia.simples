@@ -32,8 +32,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Itens do menu (alinhados à esquerda) -->
                 <ul class="navbar-nav me-auto"> 
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('crismando_bp.lista_de_crismandos') }}">Sua turma</a>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link active dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
+                            Sua turma
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+                            <li> <a class="dropdown-item" href="{{ url_for('crismando_bp.lista_de_crismandos') }}"> Lista de Crismandos </a> </li>
+                            <li> <a class="dropdown-item" href="{{ url_for('crismando_bp.padrinhos') }}"> Nome dos Padrinhos </a> </li>
+                            <li> <a class="dropdown-item" href="{{ url_for('crismando_bp.tamanho_camisas') }}"> Tamanho das Camisas </a> </li>
+                        </ul>
                     </li>
 
                     <!-- Verificando se o usuário não é o usuário que faz a frequencia das formações de catequistas  -->
@@ -49,11 +57,14 @@
     
                     {% else %}
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('frequencia_bp.listar_frequencias') }}">Frequências</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('frequencia_bp.fazer_frequencia') }}">Registrar Frequência</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
+                                Frequências
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+                                <li> <a class="dropdown-item" href="{{ url_for('frequencia_bp.listar_frequencias') }}"> Listar frequências </a> </li>
+                                <li> <a class="dropdown-item" href="{{ url_for('frequencia_bp.fazer_frequencia') }}"> Registrar frequência </a> </li>
+                            </ul>
                         </li>
 
                     {% endif %}
@@ -143,7 +154,6 @@
     
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
     {% block scripts %}{% endblock %}
 </body>
