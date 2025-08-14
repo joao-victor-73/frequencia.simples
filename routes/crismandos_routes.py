@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models.models import Usuarios, Catequistas, Crismandos, Grupos, Frequencias, InforFrequencias
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from models.models import Catequistas, Crismandos, Grupos, Frequencias, InforFrequencias
 from flask_login import login_required, current_user
 from utils.decorators import coordenador_required
 from models import db
@@ -32,9 +32,12 @@ def lista_de_crismandos():
     subquery_frequencias = (
         db.session.query(
             Frequencias.fk_id_crismando,
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'presente', 1), else_=0)).label('total_presencas'),
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'falta', 1), else_=0)).label('total_faltas'),
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'justificada', 1), else_=0)).label('total_justificadas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'presente', 1), else_=0)).label('total_presencas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'falta', 1), else_=0)).label('total_faltas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'justificada', 1), else_=0)).label('total_justificadas'),
         )
         .join(InforFrequencias, Frequencias.fk_id_infor_freq == InforFrequencias.id_infor_freq)
         .filter(
@@ -45,8 +48,6 @@ def lista_de_crismandos():
         .subquery()
     )
 
-
-
     # Join com Catequistas e Frequências
     query = db.session.query(
         Crismandos,
@@ -55,8 +56,7 @@ def lista_de_crismandos():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
-
+           ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando)
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -106,14 +106,14 @@ def editar_infor(id_crismando):
     # Obtendo os dados associados ao id do crismando
     crismando = db.session.query(Crismandos).filter_by(id=id_crismando).first()
 
-
     # lista_catequistas = db.session.query(Catequistas).options(joinedload(Catequistas.grupo)).all()
     # lista_catequistas = db.session.query(Catequistas)
 
     # lista_catequistas = db.session.query(Catequistas).filter_by(fk_id_grupo=crismando.fk_id_grupo).all()
 
     # Pega os catequistas do grupo do crismando
-    catequistas_do_grupo = db.session.query(Catequistas).filter_by(fk_id_grupo=crismando.fk_id_grupo).all()
+    catequistas_do_grupo = db.session.query(Catequistas).filter_by(
+        fk_id_grupo=crismando.fk_id_grupo).all()
 
     # Se for coordenador, envia a lista de todos os grupos também
     lista_grupos = []
@@ -136,7 +136,8 @@ def editar_infor(id_crismando):
 def atualizar_infor():
 
     # Pega o id do crismando. (esse id vem de um input hidden la no template 'infor_crismandos')
-    atualiza_crismando = Crismandos.query.filter_by(id=request.form['id_crismando']).first()
+    atualiza_crismando = Crismandos.query.filter_by(
+        id=request.form['id_crismando']).first()
 
     atualiza_crismando.nome = request.form['nome_crismando']
     atualiza_crismando.data_nascimento = request.form['data_nascimento']
@@ -173,10 +174,12 @@ def atualizar_infor():
 @coordenador_required
 def geral_crismandos():
     # Obter os valores de busca da URL que vem da pagina index.html
-    origem_url_voltar = request.args.get('origem') or request.referrer or url_for('crismando.index')  # Padrão: index
-    
+    origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
+        'crismando.index')  # Padrão: index
+
     search_term = request.args.get('busca', '').strip()
-    status_filter = request.args.get('buscar_status_crismando', '').strip()  # obtém o status selecionado
+    status_filter = request.args.get(
+        'buscar_status_crismando', '').strip()  # obtém o status selecionado
     grupo_filtro = request.args.get('buscar_grupo')
 
     # Pega o valor se o checkbox foi marcado
@@ -189,9 +192,12 @@ def geral_crismandos():
     subquery_frequencias = (
         db.session.query(
             Frequencias.fk_id_crismando,
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'presente', 1), else_=0)).label('total_presencas'),
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'falta', 1), else_=0)).label('total_faltas'),
-            sa.func.sum(sa.case((Frequencias.status_frequencia == 'justificada', 1), else_=0)).label('total_justificadas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'presente', 1), else_=0)).label('total_presencas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'falta', 1), else_=0)).label('total_faltas'),
+            sa.func.sum(sa.case((Frequencias.status_frequencia ==
+                        'justificada', 1), else_=0)).label('total_justificadas'),
         )
         .join(InforFrequencias, Frequencias.fk_id_infor_freq == InforFrequencias.id_infor_freq)
         .filter(
@@ -202,7 +208,6 @@ def geral_crismandos():
         .subquery()
     )
 
-
     # Join com Catequistas e Frequências
     query = db.session.query(
         Crismandos,
@@ -211,9 +216,8 @@ def geral_crismandos():
         subquery_frequencias.c.total_faltas,
         subquery_frequencias.c.total_justificadas
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-        ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando
-                    ).filter( Crismandos.status_informacoes == 1)
-
+           ).outerjoin(subquery_frequencias, Crismandos.id == subquery_frequencias.c.fk_id_crismando
+                       ).filter(Crismandos.status_informacoes == 1)
 
     # Join entre as tabelas Crismandos e Catequistas
     # query = db.session.query(Crismandos, Catequistas).join(Catequistas)
@@ -273,7 +277,6 @@ def registrar_crismando():
                            catequistas_disponiveis=catequistas_disponiveis)
 
 
-
 @crismando_bp.route('/salvar_crismando', methods=['POST', 'GET'])
 @login_required
 def salvar_crismando():
@@ -302,7 +305,7 @@ def salvar_crismando():
         if Crismandos.query.filter_by(nome=nome).first():
             flash(f"O Crismando '{nome}' já está cadastrado!", "warning")
             return redirect(url_for("crismando_bp.lista_de_crismandos"))
-        
+
         else:
             novo_crismando = Crismandos(
                 nome=nome,
@@ -327,7 +330,7 @@ def salvar_crismando():
                 print(novo_crismando)
                 print(f"Novo crismando: {nome}, foi registrado com sucesso.")
                 flash("Cadastro realizado com sucesso", "success")
-            
+
             except Exception as e:
                 print("Erro ao salvar no banco de dados: ", str(e))
                 db.session.rollback()
@@ -346,3 +349,84 @@ def deletar_crismando(id):
 
     flash("Informações do crismando deletada com sucesso!", 'success')
     return redirect(url_for('crismando_bp.lista_de_crismandos'))
+
+
+# Add pagina tamanho_camisas (13/08)
+
+
+# Página para listar e editar tamanhos de camisa
+@crismando_bp.route('/tamanho_camisas', methods=['POST', 'GET'])
+@login_required
+def tamanho_camisas():
+
+    # Pega o ID do grupo do catequista logado
+    grupo_id_catequista = current_user.catequista.fk_id_grupo
+
+    # Query: pega apenas os crismandos do grupo do catequista
+    lista_crismandos = (
+        db.session.query(Crismandos, Grupos)
+        .join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo)
+        .filter(
+            Crismandos.status_informacoes == 1,
+            Crismandos.fk_id_grupo == grupo_id_catequista
+        )
+        .order_by(Crismandos.nome)
+        .all()
+    )
+
+    return render_template('tamanho_camisas.html', lista_crismandos=lista_crismandos)
+
+
+# Rota para atualizar o tamanho via AJAX
+@crismando_bp.route('/atualizar_tamanho', methods=['POST'])
+def atualizar_tamanho():
+    crismando_id = request.form.get('id')
+    tamanho = request.form.get('tamanho')
+
+    crismando = Crismandos.query.get(crismando_id)
+    if crismando:
+        crismando.tamanho_camisa = tamanho
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Tamanho atualizado com sucesso'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Crismando não encontrado'})
+
+
+# Add pagina nomes_padrin (13/08)
+
+# Página de visualização e edição dos padrinhos
+@crismando_bp.route('/padrinhos', methods=['GET'])
+@login_required
+def padrinhos():
+    # Pega apenas os crismandos do grupo do catequista logado
+    lista_crismandos = db.session.query(
+        Crismandos,
+        Grupos
+    ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
+    ).filter(
+        Crismandos.status_informacoes == 1,
+        Grupos.id_grupo == current_user.catequista.fk_id_grupo
+    ).order_by(Crismandos.nome).all()
+
+    return render_template('nomes_padrin.html', lista_crismandos=lista_crismandos)
+
+
+# Rota para atualizar os padrinhos
+@crismando_bp.route('/atualizar_padrinhos', methods=['POST'])
+@login_required
+def atualizar_padrinhos():
+    for crismando_id in request.form:
+        if crismando_id.startswith('padrinho_'):
+            id_int = int(crismando_id.split('_')[1])
+            crismando = Crismandos.query.get(id_int)
+            if crismando:
+                crismando.nome_padrim = request.form[crismando_id]
+                db.session.add(crismando)
+    try:
+        db.session.commit()
+        flash("Padrinhos atualizados com sucesso!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Erro ao atualizar padrinhos.", "danger")
+        print(e)
+    return redirect(url_for('crismando_bp.padrinhos'))
