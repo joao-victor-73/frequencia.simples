@@ -3,6 +3,8 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models.models import Usuarios, Catequistas, Grupos
 from utils.decorators import coordenador_required
 from models import db
+import time
+from sqlalchemy.exc import OperationalError
 
 
 # Criação do Blueprint
@@ -15,7 +17,23 @@ def login():
         email = request.form['email']
         senha = request.form['senha']
 
-        usuario = Usuarios.query.filter_by(email=email).first()
+        usuario = None
+        tentativas = 3
+
+        for i in range(tentativas):
+            try:
+                usuario = Usuarios.query.filter_by(email=email).first()
+                break  # conseguiu conectar, sai do loop
+            
+            except OperationalError as e:
+                print(f"Tentativa {i+1} falhou: {e}")
+                if i < tentativas - 1:
+                    time.sleep(5)  # espera 5s e tenta de novo
+                else:
+                    flash("⚠️ Servidor iniciando, tente novamente em alguns segundos.", "warning")
+                    return render_template('login.html')
+
+
         if usuario and usuario.check_password(senha):
             login_user(usuario)
 
