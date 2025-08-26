@@ -166,6 +166,7 @@ cython_debug/
 
 # Pasta de backups da base de dados
 backups_bd
+backups
 
 
 arquivos_diversificados
