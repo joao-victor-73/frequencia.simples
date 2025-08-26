@@ -21,13 +21,17 @@ DB_PORT = os.environ['MYSQL_PORT']
 # 🔹 Configurações do e-mail
 EMAIL_ORIGEM = os.environ['MAIL_USERNAME']
 EMAIL_SENHA = os.environ['MAIL_PASSWORD']  # usar senha de app do Gmail
-EMAIL_DESTINO = os.environ['MAIL_RECIPIENT']  # Email para quem vai ser enviado
+# EMAIL_DESTINO = os.environ['MAIL_RECIPIENTS']  # Email para quem vai ser enviado
 
 
 def gerar_backup():
     """Gera backup do banco MySQL"""
+
+    # Criar a pasta se não existir
+    os.makedirs("backups", exist_ok=True)
+
     data = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-    nome_arquivo = f"backup_{data}.sql"
+    nome_arquivo = os.path.join("backups", f"backup_{data}.sql")
 
     comando = [
         r"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe",
@@ -51,9 +55,8 @@ def gerar_backup():
 def enviar_email(arquivo_backup):
     """Envia o backup por e-mail"""
 
-    destinatarios = ['jvt869@gmail.com', 
-                     'moisescavalcantii@gmail.com',
-                     'joaoacademico02@gmail.com']
+
+    destinatarios = os.environ["MAIL_RECIPIENTS"].split(",")
 
     msg = MIMEMultipart()
     msg["From"] = EMAIL_ORIGEM
