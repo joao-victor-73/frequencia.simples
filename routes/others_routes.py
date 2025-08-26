@@ -18,7 +18,7 @@ others_bp = Blueprint('other', __name__)  # nome do blueprint
 def perfil():
     # id_catequista = request.args.get('id_catequista')
     # catequista = db.session.query(Catequistas).filter_by(id_catequista=id_catequista).first()
-    
+
     return render_template('perfil.html')
 
 
@@ -31,6 +31,12 @@ def atualizar_perfil():
     data_nascimento = request.form.get('data_nascimento')
     endereco = request.form.get('endereco')
     avatar_perfil = request.form.get('avatar_perfil')
+
+    # Verificar se já existe um catequista com o mesmo nome
+    # Se sim, fazer um aviso para não permitir
+    if Catequistas.query.filter_by(nome=nome).first():
+        flash(f"O nome que você quer inserir já está registrado!", "warning")
+        return redirect(url_for("other.perfil"))
 
     # Atualiza dados pessoais
     current_user.email = email

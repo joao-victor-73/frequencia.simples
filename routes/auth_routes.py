@@ -1,6 +1,8 @@
 from flask_login import login_user, login_required, logout_user
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models.models import Usuarios, Catequistas, Grupos
+import datetime
+from utils.backup import gerar_backup, enviar_email  # SCRIPT de backup
 from utils.decorators import coordenador_required
 from models import db
 import time
@@ -9,6 +11,9 @@ from sqlalchemy.exc import OperationalError
 
 # Criação do Blueprint
 auth_bp = Blueprint('auth', __name__)  # nome do blueprint
+
+# Caminho para registrar a última execução
+ULTIMO_BACKUP_FILE = "ultimo_backup.txt"
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -24,20 +29,45 @@ def login():
             try:
                 usuario = Usuarios.query.filter_by(email=email).first()
                 break  # conseguiu conectar, sai do loop
-            
+
             except OperationalError as e:
                 print(f"Tentativa {i+1} falhou: {e}")
                 if i < tentativas - 1:
                     time.sleep(5)  # espera 5s e tenta de novo
                 else:
-                    flash("⚠️ Servidor iniciando, tente novamente em alguns segundos.", "warning")
+                    flash(
+                        "⚠️ Servidor iniciando, tente novamente em alguns segundos.", "warning")
                     return render_template('login.html')
-
 
         if usuario and usuario.check_password(senha):
             login_user(usuario)
 
             flash("Login realizado com sucesso", "success")
+
+            # 🔹 Backup automático aos sábados
+            hoje = datetime.date.today()
+            if hoje.weekday() == 5:  # 0=segunda ... 5=sábado
+                ultimo_backup = None
+                if os.path.exists(ULTIMO_BACKUP_FILE):
+                    with open(ULTIMO_BACKUP_FILE, "r") as f:
+                        data = f.read().strip()
+                        if data:
+                            ultimo_backup = datetime.date.fromisoformat(data)
+
+                if ultimo_backup != hoje:
+                    try:
+                        arquivo_backup = gerar_backup()
+                        enviar_email(arquivo_backup)
+
+                        # Atualiza o arquivo com a data do último backup
+                        with open(ULTIMO_BACKUP_FILE, "w") as f:
+                            f.write(str(hoje))
+
+                        flash("✅ Backup automático realizado com sucesso!", "info")
+
+                    except Exception as e:
+                        print("Erro ao gerar/enviar backup:", e)
+                        flash("⚠️ Ocorreu um erro ao gerar o backup automático.", "warning")
 
             return redirect(url_for('crismando_bp.lista_de_crismandos'))
         else:
