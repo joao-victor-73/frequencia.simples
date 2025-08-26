@@ -2,6 +2,7 @@ from flask_login import login_user, login_required, logout_user
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from models.models import Usuarios, Catequistas, Grupos
 import datetime
+import os
 from utils.backup import gerar_backup, enviar_email  # SCRIPT de backup
 from utils.decorators import coordenador_required
 from models import db
