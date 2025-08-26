@@ -28,8 +28,6 @@ class Catequistas(db.Model):
     status_informacoes = db.Column(db.Integer, default=1)
 
     # Relacionamentos
-    crismandos = db.relationship(
-        'Crismandos', backref='catequista', lazy=True, cascade="all, delete-orphan")
     usuario = db.relationship(
         'Usuarios', uselist=False, backref='catequista', cascade="all, delete-orphan")
 
@@ -62,10 +60,6 @@ class Crismandos(db.Model):
     fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
         'grupos.id_grupo'), nullable=True)
     status_informacoes = db.Column(db.Integer, default=1)
-
-    # Foreign Key
-    fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
-        'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'))
 
     # Relacionamento com Frequencias
     frequencias = db.relationship(

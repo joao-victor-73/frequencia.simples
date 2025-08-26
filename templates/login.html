@@ -35,7 +35,8 @@
             <p class="text-muted">Acesse sua conta para continuar</p>
         </div>
         <div class="card-body">
-            <form method="POST">
+
+            <form method="POST" id="loginForm">
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
                     <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
@@ -44,10 +45,31 @@
                     <label for="senha" class="form-label">Senha</label>
                     <input type="password" name="senha" class="form-control" placeholder="********" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Entrar</button>
+                
+                <button type="submit" class="btn btn-primary mt-3 d-flex align-items-center justify-content-center" id="btnLogin">
+                    <span id="btnText">Entrar</span>
+                    <div class="spinner-border spinner-border-sm ms-2" role="status" id="btnSpinner" style="display: none;">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </button>
+                            
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function() {
+            // Desabilita o botão
+            document.getElementById("btnLogin").disabled = true;
+
+            // Mostra o spinner
+            document.getElementById("btnSpinner").style.display = "inline-block";
+
+            // Troca o texto (opcional: pode deixar junto)
+            document.getElementById("btnText").innerText = "Conectando...";
+        });
+    </script>
+
 
 </body>
 </html>
