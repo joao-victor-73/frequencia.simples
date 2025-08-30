@@ -100,12 +100,11 @@
                             <li><a class="dropdown-item" href="{{ url_for('crismando_bp.geral_crismandos') }}">Lista Geral de Crismandos</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('frequencia_bp.geral_frequencias') }}">Lista Geral de Frequências</a></li>                                
                         </ul>
-                    </li>
-
-                    {% else %}
-                        <li class="nav-item">
+                                                <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('crismando_bp.registrar_crismando') }}"> Registrar crismando </a>
-                        </li>
+                    </li>
+                    
+                    {% else %}
 
                     {% endif %}
                 </ul>

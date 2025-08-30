@@ -34,7 +34,7 @@ def gerar_backup():
     nome_arquivo = os.path.join("backups", f"backup_{data}.sql")
 
     comando = [
-        r"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe",
+        "mysqldump.exe",
         f"-h{DB_HOST}",
         f"-P{DB_PORT}",
         f"-u{DB_USER}",
