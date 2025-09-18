@@ -8,6 +8,18 @@ from utils.decorators import coordenador_required
 from models import db
 import time
 from sqlalchemy.exc import OperationalError
+import threading
+
+
+def backup_async():
+    try:
+        arquivo_backup = gerar_backup()
+        enviar_email(arquivo_backup)
+        with open(ULTIMO_BACKUP_FILE, "w") as f:
+            f.write(str(datetime.date.today()))
+        print("✅ Backup automático realizado com sucesso!")
+    except Exception as e:
+        print("⚠️ Erro ao gerar/enviar backup:", e)
 
 
 # Criação do Blueprint
@@ -47,7 +59,7 @@ def login():
 
             # 🔹 Backup automático aos sábados
             hoje = datetime.date.today()
-            if hoje.weekday() == 5:  # 0=segunda ... 5=sábado
+            if hoje.weekday() == 5:  # sábado
                 ultimo_backup = None
                 if os.path.exists(ULTIMO_BACKUP_FILE):
                     with open(ULTIMO_BACKUP_FILE, "r") as f:
@@ -56,19 +68,8 @@ def login():
                             ultimo_backup = datetime.date.fromisoformat(data)
 
                 if ultimo_backup != hoje:
-                    try:
-                        arquivo_backup = gerar_backup()
-                        enviar_email(arquivo_backup)
+                    threading.Thread(target=backup_async, daemon=True).start()
 
-                        # Atualiza o arquivo com a data do último backup
-                        with open(ULTIMO_BACKUP_FILE, "w") as f:
-                            f.write(str(hoje))
-
-                        flash("✅ Backup automático realizado com sucesso!", "info")
-
-                    except Exception as e:
-                        print("Erro ao gerar/enviar backup:", e)
-                        flash("⚠️ Ocorreu um erro ao gerar o backup automático.", "warning")
 
             return redirect(url_for('crismando_bp.lista_de_crismandos'))
         else:
