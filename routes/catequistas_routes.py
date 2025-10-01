@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from models.models import Usuarios, Catequistas, Grupos
+from models.models import Catequistas, Grupos
 from flask_login import login_required
 from utils.decorators import coordenador_required
 from models import db

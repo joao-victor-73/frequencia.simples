@@ -177,6 +177,9 @@ def geral_crismandos():
     origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
         'crismando.index')  # Padrão: index
 
+    page = request.args.get("page", 1, type=int)   # número da página (default = 1)
+    per_page = 25  # quantos registros por página
+
     search_term = request.args.get('busca', '').strip()
     status_filter = request.args.get(
         'buscar_status_crismando', '').strip()  # obtém o status selecionado
@@ -254,6 +257,9 @@ def geral_crismandos():
     # Executamos a consulta e pegamos os resultados
     lista_crismandos = query.all()
 
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    lista_crismandos = pagination.items
+
     return render_template('geral_crismandos.html',
                            lista_crismandos=lista_crismandos,
                            search_term=search_term,
@@ -263,7 +269,8 @@ def geral_crismandos():
                            filtrar_batizado=filtrar_batizado,
                            filtrar_eucaristia=filtrar_eucaristia,
                            grupos_disponiveis=grupos_disponiveis,
-                           origem_url_voltar=origem_url_voltar)
+                           origem_url_voltar=origem_url_voltar,
+                           pagination=pagination)
 
 
 @crismando_bp.route('/registrar_crismando', methods=['POST', 'GET'])

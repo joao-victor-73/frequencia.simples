@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from sqlalchemy.orm import joinedload
-from models.models import Catequistas, Grupos, Crismandos
+from models.models import Catequistas, Grupos
 from flask_login import login_required
 from utils.decorators import coordenador_required
 from models import db
