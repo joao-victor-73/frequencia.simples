@@ -177,7 +177,8 @@ def geral_crismandos():
     origem_url_voltar = request.args.get('origem') or request.referrer or url_for(
         'crismando.index')  # Padrão: index
 
-    page = request.args.get("page", 1, type=int)   # número da página (default = 1)
+    # número da página (default = 1)
+    page = request.args.get("page", 1, type=int)
     per_page = 25  # quantos registros por página
 
     search_term = request.args.get('busca', '').strip()
@@ -190,6 +191,9 @@ def geral_crismandos():
 
     # Pega o valor se o checkbox foi marcado
     filtrar_eucaristia = request.args.get('eucaristia')
+
+    # Ordenação por PRESENÇA / FALTA / JUSTIFICATIVAS
+    ordenar_por = request.args.get("ordenar_por", "nome")  # padrão: nome
 
     # Subquery para contar presenças, faltas e justificadas
     subquery_frequencias = (
@@ -245,9 +249,22 @@ def geral_crismandos():
 
     if grupo_filtro:
         query = query.filter(Grupos.id_grupo == grupo_filtro)
+    
 
-    # Ordenação alfabética dos resultados
-    query = query.order_by(Crismandos.nome)
+    # Ordenação por PRESENÇA / FALTA / JUSTIFICATIVAS
+    if ordenar_por == "presencas":
+        query = query.order_by(subquery_frequencias.c.total_presencas.desc())
+
+    elif ordenar_por == "faltas":
+        query = query.order_by(subquery_frequencias.c.total_faltas.desc())
+    
+    elif ordenar_por == "justificadas":
+        query = query.order_by(subquery_frequencias.c.total_justificadas.desc())
+        
+    else: # Padrão
+        # Ordenação alfabética dos resultados
+        query = query.order_by(Crismandos.nome)
+
 
     # Obtendo todos os grupos disponíveis
     # grupos_disponiveis = db.session.query(Grupos.nome_grupo).distinct().all()
@@ -410,7 +427,7 @@ def padrinhos():
         Crismandos,
         Grupos
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
-    ).filter(
+           ).filter(
         Crismandos.status_informacoes == 1,
         Grupos.id_grupo == current_user.catequista.fk_id_grupo
     ).order_by(Crismandos.nome).all()

@@ -5,77 +5,83 @@
     <div class="container mt-5">
         <h2 class="text-center text-primary mb-4">Lista Geral de Todos os Crismandos</h2>
 
-        <div class="card p-4 shadow rounded-4">
-            <form method="GET" action="{{ url_for('crismando_bp.geral_crismandos') }}">
-                <div class="row g-3 mb-3">
-
-                    <!-- FILTRO DE BUSCA PELO NOME -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Nome</label>
-                        <input type="text" name="busca" class="form-control rounded-3" placeholder="Buscar pelo nome..." value="{{ request.args.get('busca', '') }}">
-                    </div>
-                    
-                    <!-- FILTRO DE BUSCA PELO GRUPO -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Turma</label>
-                        <select name="buscar_grupo" class="form-select rounded-3">
-                            <option value="" {% if request.args.get('buscar_grupo', '') == '' %} selected {% endif %}>Todos</option>
-                            {% for grupo in grupos_disponiveis %}
-                            <option value="{{ grupo.id_grupo }}" {% if request.args.get('buscar_grupo') == grupo.id_grupo|string %} selected {% endif %}>
-                                {{ grupo.nome_grupo }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <!-- FILTRO DE BUSCA PELO STATUS(ativo/desistente) -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Status</label>
-                        <select name="buscar_status_crismando" class="form-select rounded-3">
-                            <option value="" {% if request.args.get('buscar_status_crismando', '') == '' %} selected {% endif %}>Nenhum</option>
-                            <option value="ativo" {% if request.args.get('buscar_status_crismando') == 'ativo' %} selected {% endif %}>Ativo</option>
-                            <option value="desistente" {% if request.args.get('buscar_status_crismando') == 'desistente' %} selected {% endif %}>Desistente</option>
-                        </select>
-                    </div>
+    <div class="card p-4 shadow rounded-4 mb-4">
+        <form method="GET" action="{{ url_for('crismando_bp.geral_crismandos') }}">
+            
+            <!-- LINHA 1 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Nome</label>
+                    <input type="text" name="busca" class="form-control rounded-3" 
+                        placeholder="Buscar pelo nome..." value="{{ request.args.get('busca', '') }}">
                 </div>
                 
-                <!-- FILTRO DE BUSCA PELOS SACRAMENTOS -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Batizado?</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="batismo" value="1" {% if request.args.get('batismo') == '1' %} checked {% endif %}>
-                                <label class="form-check-label">Sim</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="batismo" value="0" {% if request.args.get('batismo') == '0' %} checked {% endif %}>
-                                <label class="form-check-label">Não</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Eucaristia?</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="eucaristia" value="1" {% if request.args.get('eucaristia') == '1' %} checked {% endif %}>
-                                <label class="form-check-label">Sim</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="eucaristia" value="0" {% if request.args.get('eucaristia') == '0' %} checked {% endif %}>
-                                <label class="form-check-label">Não</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Turma</label>
+                    <select name="buscar_grupo" class="form-select rounded-3">
+                        <option value="" {% if request.args.get('buscar_grupo', '') == '' %} selected {% endif %}>Todos</option>
+                        {% for grupo in grupos_disponiveis %}
+                        <option value="{{ grupo.id_grupo }}" {% if request.args.get('buscar_grupo') == grupo.id_grupo|string %} selected {% endif %}>
+                            {{ grupo.nome_grupo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Status</label>
+                    <select name="buscar_status_crismando" class="form-select rounded-3">
+                        <option value="" {% if request.args.get('buscar_status_crismando', '') == '' %} selected {% endif %}>Todos</option>
+                        <option value="ativo" {% if request.args.get('buscar_status_crismando') == 'ativo' %} selected {% endif %}>Ativo</option>
+                        <option value="desistente" {% if request.args.get('buscar_status_crismando') == 'desistente' %} selected {% endif %}>Desistente</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- LINHA 2 -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Batizado?</label>
+                    <select name="batismo" class="form-select rounded-3">
+                        <option value="" {% if request.args.get('batismo') == '' %} selected {% endif %}>Todos</option>
+                        <option value="1" {% if request.args.get('batismo') == '1' %} selected {% endif %}>Sim</option>
+                        <option value="0" {% if request.args.get('batismo') == '0' %} selected {% endif %}>Não</option>
+                    </select>
                 </div>
 
-                <div class="d-flex justify-content-center mt-3 gap-3">
-                    <button type="submit" class="btn btn-primary px-4 rounded-3">Buscar</button>
-                    <a href="{{ url_for('crismando_bp.geral_crismandos') }}" class="btn btn-outline-secondary px-4 rounded-3">Limpar Filtros</a>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Eucaristia?</label>
+                    <select name="eucaristia" class="form-select rounded-3">
+                        <option value="" {% if request.args.get('eucaristia') == '' %} selected {% endif %}>Todos</option>
+                        <option value="1" {% if request.args.get('eucaristia') == '1' %} selected {% endif %}>Sim</option>
+                        <option value="0" {% if request.args.get('eucaristia') == '0' %} selected {% endif %}>Não</option>
+                    </select>
                 </div>
-            </form>
-        </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Ordenar por</label>
+                    <select name="ordenar_por" id="ordenar_por" class="form-select rounded-3">
+                        <option value="nome" {% if request.args.get('ordenar_por') == 'nome' %}selected{% endif %}>Nome</option>
+                        <option value="presencas" {% if request.args.get('ordenar_por') == 'presencas' %}selected{% endif %}>Presenças</option>
+                        <option value="faltas" {% if request.args.get('ordenar_por') == 'faltas' %}selected{% endif %}>Faltas</option>
+                        <option value="justificadas" {% if request.args.get('ordenar_por') == 'justificadas' %}selected{% endif %}>Justificadas</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- BOTÕES -->
+            <div class="d-flex justify-content-center mt-3 gap-3">
+                <button type="submit" class="btn btn-primary px-4 rounded-3">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+                <a href="{{ url_for('crismando_bp.geral_crismandos') }}" 
+                class="btn btn-outline-secondary px-4 rounded-3">
+                <i class="bi bi-x-circle"></i> Limpar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+
 
         <div class="table-responsive mt-4">
             <table class="table table-bordered table-hover align-middle text-center rounded-3 overflow-hidden">
@@ -109,7 +115,7 @@
                             <td>{{ total_presencas or 0 }}</td>
                             <td>{{ total_faltas or 0 }}</td>
                             <td>{{ total_justificadas or 0 }}</td>
-                            <td>{{ crismando.batismo|title }}</td>
+                            <td>{{ crismando.batismo|title }} </td>
                             <td>{{ crismando.eucaristia|title }}</td>
                             <td>{{ grupo.nome_grupo }}</td>
                             <td>
