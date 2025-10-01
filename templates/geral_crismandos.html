@@ -12,10 +12,10 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Nome</label>
-                    <input type="text" name="busca" class="form-control rounded-3" 
-                        placeholder="Buscar pelo nome..." value="{{ request.args.get('busca', '') }}">
+                    <input type="text" name="busca" class="form-control rounded-3" placeholder="Buscar pelo nome..." value="{{ request.args.get('busca', '') }}">
                 </div>
                 
+                <!-- FILTRO DE BUSCA PELO GRUPO -->
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Turma</label>
                     <select name="buscar_grupo" class="form-select rounded-3">
@@ -27,7 +27,8 @@
                         {% endfor %}
                     </select>
                 </div>
-                
+
+                <!-- FILTRO DE BUSCA PELO STATUS(ativo/desistente) -->
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Status</label>
                     <select name="buscar_status_crismando" class="form-select rounded-3">
@@ -40,21 +41,23 @@
             
             <!-- LINHA 2 -->
             <div class="row g-3 mb-3">
+
+                <!-- FILTRO DE BUSCA PELOS SACRAMENTOS -->
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Batizado?</label>
                     <select name="batismo" class="form-select rounded-3">
-                        <option value="" {% if request.args.get('batismo') == '' %} selected {% endif %}>Todos</option>
-                        <option value="1" {% if request.args.get('batismo') == '1' %} selected {% endif %}>Sim</option>
-                        <option value="0" {% if request.args.get('batismo') == '0' %} selected {% endif %}>Não</option>
+                        <option value="">Todos</option>
+                        <option value="Sim" {% if request.args.get('batismo') == 'Sim' %} selected {% endif %}>Sim</option>
+                        <option value="Nao" {% if request.args.get('batismo') == 'Nao' %} selected {% endif %}>Não</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Eucaristia?</label>
                     <select name="eucaristia" class="form-select rounded-3">
-                        <option value="" {% if request.args.get('eucaristia') == '' %} selected {% endif %}>Todos</option>
-                        <option value="1" {% if request.args.get('eucaristia') == '1' %} selected {% endif %}>Sim</option>
-                        <option value="0" {% if request.args.get('eucaristia') == '0' %} selected {% endif %}>Não</option>
+                        <option value="">Todos</option>
+                        <option value="Sim" {% if request.args.get('eucaristia') == 'Sim' %} selected {% endif %}>Sim</option>
+                        <option value="Nao" {% if request.args.get('eucaristia') == 'Nao' %} selected {% endif %}>Não</option>
                     </select>
                 </div>
                 

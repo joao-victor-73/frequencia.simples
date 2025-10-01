@@ -237,15 +237,12 @@ def geral_crismandos():
     if status_filter:
         query = query.filter(Crismandos.status_crismando == status_filter)
 
-    # Filtro por batismo (1 = Sim | 0 - Não)
-    if filtrar_batizado is not None:
-        query = query.filter(Crismandos.batismo == (
-            'sim' if filtrar_batizado == '1' else 'nao'))
+    # Filtro por batismo
+    if filtrar_batizado:
+        query = query.filter(Crismandos.batismo == filtrar_batizado)
 
-    # Filtro por eucaristia (1 = Sim | 0 - Não)
-    if filtrar_eucaristia is not None:
-        query = query.filter(Crismandos.eucaristia == (
-            'sim' if filtrar_eucaristia == '1' else 'nao'))
+    if filtrar_eucaristia:
+        query = query.filter(Crismandos.eucaristia == filtrar_eucaristia)
 
     if grupo_filtro:
         query = query.filter(Grupos.id_grupo == grupo_filtro)
