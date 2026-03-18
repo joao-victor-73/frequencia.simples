@@ -39,7 +39,8 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Número para contato 2</label>
-                    <input type="text" id="telefone2" name="telefone2" maxlegth="15" class="form-control rounded-3" {% if crismando.tel2 == '' or crismando.tel2 == 'None' %} value='Sem Contato' {% endif %}  value="{{crismando.tel2}}"  >
+                    <input type="text" id="telefone2" name="telefone2" class="form-control rounded-3" 
+                        value="{{ 'Sem Contato' if not crismando.tel2 or crismando.tel2 == 'None' else crismando.tel2 }}">
                 </div>
 
                 <div class="col-12">
@@ -78,16 +79,16 @@
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Recebeu o Batismo?</label>
                     <select name="batismo" class="form-select rounded-3">
-                        <option value="sim" {% if crismando.batismo == 'sim' %} selected {% endif %}>Sim</option>
-                        <option value="nao" {% if crismando.batismo == 'nao' %} selected {% endif %}>Não</option>
+                        <option value="Sim" {% if crismando.batismo == 'Sim' %} selected {% endif %}>Sim</option>
+                        <option value="Nao" {% if crismando.batismo == 'Nao' %} selected {% endif %}>Não</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Recebeu a 1ª Eucaristia?</label>
                     <select name="eucaristia" class="form-select rounded-3">
-                        <option value="sim" {% if crismando.eucaristia == 'sim' %} selected {% endif %}>Sim</option>
-                        <option value="nao" {% if crismando.eucaristia == 'nao' %} selected {% endif %}>Não</option>
+                        <option value="Sim" {% if crismando.eucaristia == 'Sim' %} selected {% endif %}>Sim</option>
+                        <option value="Nao" {% if crismando.eucaristia == 'Nao' %} selected {% endif %}>Não</option>
                     </select>
                 </div>
 
