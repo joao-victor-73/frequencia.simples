@@ -389,6 +389,7 @@ def tamanho_camisas():
         .join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo)
         .filter(
             Crismandos.status_informacoes == 1,
+            Crismandos.status_crismando == 'ativo',
             Crismandos.fk_id_grupo == grupo_id_catequista
         )
         .order_by(Crismandos.nome)
@@ -426,6 +427,7 @@ def padrinhos():
     ).join(Grupos, Crismandos.fk_id_grupo == Grupos.id_grupo
            ).filter(
         Crismandos.status_informacoes == 1,
+        Crismandos.status_crismando == 'ativo',
         Grupos.id_grupo == current_user.catequista.fk_id_grupo
     ).order_by(Crismandos.nome).all()
 
