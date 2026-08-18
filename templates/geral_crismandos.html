@@ -70,6 +70,23 @@
                         <option value="justificadas" {% if request.args.get('ordenar_por') == 'justificadas' %}selected{% endif %}>Justificadas</option>
                     </select>
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Dados?</label>
+                    <select name="dados_verificados" class="form-select rounded-3">
+                        <option value="" {% if request.args.get('dados_verificados', '') == '' %} selected {% endif %}>
+                            Todos
+                        </option>
+
+                        <option value="0" {% if request.args.get('dados_verificados') == '0' %} selected {% endif %}>
+                            Faltam verificar
+                        </option>
+
+                        <option value="1" {% if request.args.get('dados_verificados') == '1' %} selected {% endif %}>
+                            Verificados
+                        </option>
+                    </select>
+                </div>
             </div>
             
             <!-- BOTÕES -->
@@ -98,6 +115,7 @@
                         <th>Faltas Justificadas</th>
                         <th>Batismo</th>
                         <th>Eucaristia</th>
+                        <th>Dados?</th>
                         <th>Turma</th>
                         <th>Ações</th>
                     </tr>
@@ -120,10 +138,19 @@
                             <td>{{ total_justificadas or 0 }}</td>
                             <td>{{ crismando.batismo|title }} </td>
                             <td>{{ crismando.eucaristia|title }}</td>
+                            
+                            <td>
+                                {% if crismando.dados %}
+                                    <span class="text-success fw-bold fs-5"> ✓ </span>
+                                {% else %}
+                                    <span class="text-muted"> — </span>
+                                {% endif %}
+                            </td>
+
                             <td>{{ grupo.nome_grupo }}</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal_{{ crismando.id }}">
-                                    Ver
+                                    Ver +
                                 </button>
                             </td>
                         </tr>
@@ -223,6 +250,15 @@
                             <p><strong>Turma:</strong> {{ grupo.nome_grupo }}</p>
                         </div>
                         <div class="modal-footer">
+                            <form method="POST"
+                                action="{{ url_for('crismando_bp.dados_verificados', id_crismando=crismando.id) }}"
+                                class="d-inline">
+
+                                <button type="submit" class="btn btn-outline-success">
+                                    ✓ Dados Verificados
+                                </button>
+
+                            </form>
                             <a href="{{ url_for('crismando_bp.editar_infor', id_crismando=crismando.id) }}" class="btn btn-outline-primary">Editar</a>
                             <a href="{{ url_for('crismando_bp.deletar_crismando', id=crismando.id) }}"
                                 class="btn btn-outline-danger"

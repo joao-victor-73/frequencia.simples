@@ -195,6 +195,9 @@ def geral_crismandos():
     # Ordenação por PRESENÇA / FALTA / JUSTIFICATIVAS
     ordenar_por = request.args.get("ordenar_por", "nome")  # padrão: nome
 
+    # Buscar se os dados estão verificados ou não
+    dados_verificados = request.args.get('dados')
+
     # Subquery para contar presenças, faltas e justificadas
     subquery_frequencias = (
         db.session.query(
@@ -262,6 +265,10 @@ def geral_crismandos():
         # Ordenação alfabética dos resultados
         query = query.order_by(Crismandos.nome)
 
+    if dados_verificados in ['0', '1']:
+        query = query.filter(
+            Crismandos.dados_verificados == int(dados_verificados)
+        )
 
     # Obtendo todos os grupos disponíveis
     # grupos_disponiveis = db.session.query(Grupos.nome_grupo).distinct().all()
@@ -284,6 +291,7 @@ def geral_crismandos():
                            filtrar_eucaristia=filtrar_eucaristia,
                            grupos_disponiveis=grupos_disponiveis,
                            origem_url_voltar=origem_url_voltar,
+                           dados_verificados=dados_verificados,
                            pagination=pagination)
 
 
@@ -451,3 +459,14 @@ def atualizar_padrinhos():
         flash("Erro ao atualizar padrinhos.", "danger")
         print(e)
     return redirect(url_for('crismando_bp.padrinhos'))
+
+
+
+@crismando_bp.route('/dados-verificados/<int:id_crismando>', methods=['POST'])
+def dados_verificados(id_crismando):
+    crismando = Crismandos.query.get_or_404(id_crismando)
+
+    crismando.dados = 1
+    db.session.commit()
+
+    return redirect(url_for('crismando_bp.geral_crismandos'))
