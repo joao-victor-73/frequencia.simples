@@ -21,6 +21,8 @@
             <form class="row g-4" id="formAtualizacao" action="{{ url_for('crismando_bp.atualizar_infor') }}" method="POST">
                 <input type="hidden" name="id_crismando" value="{{ crismando.id }}">
                 <input type="hidden" name="id_catequista" value="{{ crismando.fk_id_catequista }}">
+                <input type="hidden" name="origem" value="{{ origem_url_voltar }}">
+                
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nome</label>
@@ -166,7 +168,12 @@
                     
                 <div class="col-12 text-center mt-3">
                     <button type="submit" class="btn btn-outline-primary px-4 rounded-pill me-2">Salvar</button>
-                    <a href="{{ origem_url_voltar }}" class="btn btn-outline-secondary px-4 rounded-pill">Voltar</a>
+                    
+                    <a href="{{ origem_url_voltar }}" 
+                        class="btn btn-outline-secondary px-4 rounded-pill">
+                        Voltar
+                    </a>
+
                 </div>
 
             </form>
