@@ -60,6 +60,7 @@ class Crismandos(db.Model):
     fk_id_grupo = db.Column(db.Integer, db.ForeignKey(
         'grupos.id_grupo'), nullable=True)
     status_informacoes = db.Column(db.Integer, default=1)
+    dados = db.Column(db.Integer, default=1)
 
     # Relacionamento com Frequencias
     frequencias = db.relationship(
@@ -92,12 +93,13 @@ class InforFrequencias(db.Model):
     id_infor_freq = db.Column(db.Integer, primary_key=True, autoincrement=True)
     titulo_encontro = db.Column(db.String(250), nullable=False)
     data_chamada = db.Column(db.Date, nullable=False)
-    data_registro = db.Column(db.DateTime(timezone=True), default=horario_brasil) #  Armazena a data/hora que foi salvo a frequência
+    # Armazena a data/hora que foi salvo a frequência
+    data_registro = db.Column(db.DateTime(
+        timezone=True), default=horario_brasil)
     status_frequencia_inf = db.Column(db.Integer, default=1)
 
     fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
         'catequistas.id_catequista', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    
 
     catequista = db.relationship(
         'Catequistas', backref='infor_frequencias', foreign_keys=[fk_id_catequista])
@@ -147,7 +149,6 @@ class Usuarios(db.Model, UserMixin):
         return str(self.id_usuario)
 
 
-
 # FREQUENCIAS CATEQUISTAS
 class FrequenciaCatequistas(db.Model):
     __tablename__ = 'frequencias_catequistas'
@@ -157,20 +158,23 @@ class FrequenciaCatequistas(db.Model):
     data_encontro = db.Column(db.Date, nullable=False)
     status_inf_fre_catequista = db.Column(db.Integer, default=1)
 
-    presencas = db.relationship('PresencaCatequista', backref='frequencia', cascade="all, delete", lazy=True)
+    presencas = db.relationship(
+        'PresencaCatequista', backref='frequencia', cascade="all, delete", lazy=True)
 
 
 class PresencaCatequista(db.Model):
     __tablename__ = 'presenca_catequistas'
 
     id = db.Column(db.Integer, primary_key=True)
-    status_frequencia = db.Column(db.Enum('presente', 'falta', 'justificada'), default='presente')
+    status_frequencia = db.Column(
+        db.Enum('presente', 'falta', 'justificada'), default='presente')
     observacao = db.Column(db.String(255))
     status_inf_presenca_cat = db.Column(db.Integer, default=1)
 
-    fk_id_catequista = db.Column(db.Integer, db.ForeignKey('catequistas.id_catequista'), nullable=False)
-    fk_id_freq_catequista = db.Column(db.Integer, db.ForeignKey('frequencias_catequistas.id_freq_catequista'), nullable=False)
+    fk_id_catequista = db.Column(db.Integer, db.ForeignKey(
+        'catequistas.id_catequista'), nullable=False)
+    fk_id_freq_catequista = db.Column(db.Integer, db.ForeignKey(
+        'frequencias_catequistas.id_freq_catequista'), nullable=False)
 
     # Isso aqui é para garantir que existe uma relação no modelo PresencaCatequista com o modelo Catequista.
     catequista = db.relationship('Catequistas', backref='presencas')
-
